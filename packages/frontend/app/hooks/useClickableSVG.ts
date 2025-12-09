@@ -5,7 +5,6 @@ import { useEffect, useRef, type RefObject } from 'react';
  * Not generic, written for specific temporary use case.
  *
  * @param idInDOM - DOM ID of the clickable element inside the SVG document
- * @param refObj - React ref pointing to the <object> rendering the parent SVG
  * @param action - callback fn to execute when the clickable is triggered
  */
 export function useBannerSVG(
@@ -14,8 +13,10 @@ export function useBannerSVG(
 ): {
     ref: RefObject<HTMLObjectElement | null>;
 } {
+    // ref pointing to the `<object>` used to render the SVG
     const bannerRef = useRef<HTMLObjectElement>(null);
 
+    // logic to attach a click handler to the SVG once rendered
     useEffect(() => {
         // variable to hold current value of ref object
         const objectEl = bannerRef.current;
@@ -24,15 +25,30 @@ export function useBannerSVG(
 
         // fn to execute when the SVG completes loading
         const handleLoad = (): void => {
-            const svgDoc = objectEl.contentDocument;
-            const rect = svgDoc?.getElementById(idInDOM);
-            if (rect) {
-                const handleClick: () => void = action;
-                rect.addEventListener('click', handleClick);
-                rect.style.cursor = 'pointer';
+            try {
+                const svgDoc = objectEl.contentDocument;
+                const rect = svgDoc?.getElementById(idInDOM);
+                if (rect) {
+                    const handleClick: () => void = action;
+                    rect.addEventListener('click', handleClick);
+                    rect.style.cursor = 'pointer';
+                } else {
+                    throw new Error(
+                        'failed to attach click handler to SVG element',
+                    );
+                }
+            } catch (error) {
+                console.warn(
+                    'Failed to attach click handler to SVG element',
+                    'DOM ID: ' + idInDOM,
+                    error,
+                );
             }
         };
 
+        // adding an event listener happens in two nested stages
+        // first stage attaches listener to the object element (parent SVG)
+        // that listener then attaches the click `action` to the identified sub-element
         const EVENT_TRIGGER = 'load';
 
         // when obj (SVG) finsihes loading, run fn to attach click event to sub-elem
@@ -47,5 +63,6 @@ export function useBannerSVG(
         return () => objectEl.removeEventListener(EVENT_TRIGGER, handleLoad);
     }, []);
 
+    // returns the ref pointing to the `<object>` to make connection in DOM
     return { ref: bannerRef };
 }
