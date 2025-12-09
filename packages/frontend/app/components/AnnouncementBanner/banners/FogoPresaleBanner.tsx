@@ -4,8 +4,8 @@ import {
     PresaleBannerNarrow,
     PresaleBannerWide,
 } from '~/assets';
+import { useBannerSVG } from '~/hooks/useClickableSVG';
 import useMediaQuery from '~/hooks/useMediaQuery';
-import { useBannerSVG } from '~/routes/testpage/testpage';
 
 export default function FogoPresaleBanner() {
     // hooks to attach click handlers to SVGs
