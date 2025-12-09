@@ -40,6 +40,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     const upperSymbol = symbol?.toUpperCase() ?? 'BTC';
 
     const activeOrder = useOrderPlacementStore((state) => state.activeOrder);
+    const quickMode = useOrderPlacementStore((state) => state.quickMode);
 
     const [size, setSize] = useState<string>('');
     const [tradeType, setTradeType] = useState<TradeType>('Limit');
@@ -257,15 +258,17 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                 Save
                             </button>
 
-                            <button
-                                className={styles.confirmButton}
-                                disabled={isDisabled}
-                                onClick={() => {
-                                    if (!isDisabled) handleSaveAndEnable();
-                                }}
-                            >
-                                Save & Enable
-                            </button>
+                            {!quickMode && (
+                                <button
+                                    className={styles.confirmButton}
+                                    disabled={isDisabled}
+                                    onClick={() => {
+                                        if (!isDisabled) handleSaveAndEnable();
+                                    }}
+                                >
+                                    Save & Enable
+                                </button>
+                            )}
                         </>
                     )}
                 </div>
