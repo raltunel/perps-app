@@ -315,6 +315,10 @@ export const TradingViewProvider: React.FC<{
                 setLiquidationsActive(isToggled);
                 updateButtonStyle();
             };
+
+            const onRightClick = () => {
+                alert('right click');
+            };
             const onMouseEnter = () => {
                 const wrapper = liquidationsButton.querySelector(
                     '.liquidations-wrapper',
@@ -331,6 +335,7 @@ export const TradingViewProvider: React.FC<{
             };
 
             liquidationsButton.addEventListener('click', onClick);
+            liquidationsButton.addEventListener('contextmenu', onRightClick);
             liquidationsButton.addEventListener('mouseenter', onMouseEnter);
             liquidationsButton.addEventListener('mouseleave', onMouseLeave);
 
