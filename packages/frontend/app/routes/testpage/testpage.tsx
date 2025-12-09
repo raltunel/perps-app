@@ -24,7 +24,7 @@ function useBannerSVG(
 
     useEffect(() => {
         // variable to hold current value of ref object
-        const objectEl = refObj.current;
+        const objectEl = bannerRef.current;
         // exit fn if there is no element (value is `null` until rendered)
         if (!objectEl) return;
 
