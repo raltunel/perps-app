@@ -14,7 +14,7 @@ import { useRef, useEffect, type RefObject } from 'react';
  * @param refObj - React ref pointing to the <object> rendering the parent SVG
  * @param action - callback fn to execute when the clickable is triggered
  */
-function useBannerSVG(
+export function useBannerSVG(
     idInDOM: string,
     action: () => void,
 ): {

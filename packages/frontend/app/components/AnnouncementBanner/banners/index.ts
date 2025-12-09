@@ -2,6 +2,7 @@ import React from 'react';
 
 // Import all custom banner components here
 import ExampleBanner from './ExampleBanner';
+import FogoPresaleBanner from './FogoPresaleBanner';
 
 /**
  * Registry of all available announcement banner components.
@@ -13,8 +14,9 @@ import ExampleBanner from './ExampleBanner';
  * 4. Set VITE_ACTIVE_ANNOUNCEMENT_BANNER=<key> in your .env to activate it
  */
 export const bannerRegistry: Record<string, React.ComponentType> = {
-    example: ExampleBanner,
+    // example: ExampleBanner,
     // Add more banners here:
+    fogoPresale: FogoPresaleBanner,
     // maintenance: MaintenanceBanner,
     // newFeature: NewFeatureBanner,
 };
