@@ -24,6 +24,7 @@ export const usePreviewOrderLines = (): {
 
     useEffect(() => {
         if (!orderInputPriceValue.value) {
+            setObPreviewLine(null);
             return;
         } else {
             setObPreviewLine({

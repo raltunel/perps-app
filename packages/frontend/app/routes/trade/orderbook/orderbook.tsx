@@ -327,6 +327,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
         if (orderInputPriceValue.value) {
             focusedPriceRef.current = orderInputPriceValue.value;
             shouldFindProperResolutionRef.current = true;
+        } else {
+            focusedPriceRef.current = null;
+            setFocusedSlotOutOfBounds(null);
         }
     }, [orderInputPriceValue.value]);
 
