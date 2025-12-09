@@ -16,9 +16,12 @@ import { useRef, useEffect, type RefObject } from 'react';
  */
 function useBannerSVG(
     idInDOM: string,
-    refObj: RefObject<HTMLObjectElement | null>,
     action: () => void,
-): void {
+): {
+    ref: RefObject<HTMLObjectElement | null>;
+} {
+    const bannerRef = useRef<HTMLObjectElement>(null);
+
     useEffect(() => {
         // variable to hold current value of ref object
         const objectEl = refObj.current;
@@ -49,49 +52,60 @@ function useBannerSVG(
         // remove the event listener when the component unmounts
         return () => objectEl.removeEventListener(EVENT_TRIGGER, handleLoad);
     }, []);
+
+    return { ref: bannerRef };
 }
 
 export default function testpage() {
-    // need one ref for each SVG banner
-    const bannerRefWide = useRef<HTMLObjectElement>(null);
-    const bannerRefMedium = useRef<HTMLObjectElement>(null);
-    const bannerRefNarrow = useRef<HTMLObjectElement>(null);
-
-    // DOM ids for the three banners on this page
-    const BANNER_DOM_IDS = {
-        wide: 'fogo-presale-banner-wide-clickable',
-        medium: 'fogo-presale-banner-medium-clickable',
-        narrow: 'fogo-presale-banner-narrow-clickable',
-    };
-
     // fn shell to run when user triggers a banner clickable
-    function logClick(size: string): void {
+    function handleClick(size: string): void {
         console.log(`clicked ${size} banner`);
     }
 
+    // DOM ids for the three banners on this page
+    const BANNER_METADATA = {
+        wide: {
+            idForDOM: 'fogo-presale-banner-wide-clickable',
+            action: () => handleClick('wide'),
+        },
+        medium: {
+            idForDOM: 'fogo-presale-banner-medium-clickable',
+            action: () => handleClick('medium'),
+        },
+        narrow: {
+            idForDOM: 'fogo-presale-banner-narrow-clickable',
+            action: () => handleClick('narrow'),
+        },
+    };
+
     // hook instantiations to manage click handlers in DOM
-    useBannerSVG(BANNER_DOM_IDS.wide, bannerRefWide, () => logClick('wide'));
-    useBannerSVG(BANNER_DOM_IDS.medium, bannerRefMedium, () =>
-        logClick('medium'),
+    const wideBanner = useBannerSVG(
+        BANNER_METADATA.wide.idForDOM,
+        BANNER_METADATA.wide.action,
     );
-    useBannerSVG(BANNER_DOM_IDS.narrow, bannerRefNarrow, () =>
-        logClick('narrow'),
+    const mediumBanner = useBannerSVG(
+        BANNER_METADATA.medium.idForDOM,
+        BANNER_METADATA.medium.action,
+    );
+    const narrowBanner = useBannerSVG(
+        BANNER_METADATA.narrow.idForDOM,
+        BANNER_METADATA.narrow.action,
     );
 
     return (
         <div className={styles.testpage}>
             <object
-                ref={bannerRefWide}
+                ref={wideBanner.ref}
                 type='image/svg+xml'
                 data={PresaleBannerWide}
             />
             <object
-                ref={bannerRefMedium}
+                ref={mediumBanner.ref}
                 type='image/svg+xml'
                 data={PresaleBannerMedium}
             />
             <object
-                ref={bannerRefNarrow}
+                ref={narrowBanner.ref}
                 type='image/svg+xml'
                 data={PresaleBannerNarrow}
             />
