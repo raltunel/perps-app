@@ -1,6 +1,7 @@
 import { useLiqChartStore } from '~/stores/LiqChartStore';
 import styles from './LiquidationChartOptions.module.css';
 import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 interface LiquidationChartOptionsProps {}
 
@@ -11,20 +12,27 @@ const LiquidationChartOptions: React.FC<
 
     useEffect(() => {
         if (showLiqOptions) {
-            const targetElement = document.getElementById(
-                'liquidations-settings-button',
-            );
-            if (targetElement) {
-                const targetElementRect = targetElement.getBoundingClientRect();
-                const liqOptionsWrapper = document.getElementById(
-                    'liquidations-options-wrapper',
-                );
+            const tvIframe = document.querySelector(
+                '#tv_chart iframe',
+            ) as HTMLIFrameElement;
+            if (tvIframe) {
+                const tvIframeDoc = tvIframe.contentDocument;
+                if (tvIframeDoc) {
+                    const targetElement = tvIframeDoc.getElementById(
+                        'liquidations-settings-button',
+                    );
+                    if (targetElement) {
+                        const targetElementRect =
+                            targetElement.getBoundingClientRect();
+                        const liqOptionsWrapper = document.getElementById(
+                            'liquidations-options-wrapper',
+                        );
 
-                console.log('>>>>>> targetElementRect', targetElementRect);
-                console.log('>>>>>> liqOptionsWrapper', liqOptionsWrapper);
-                if (liqOptionsWrapper) {
-                    liqOptionsWrapper.style.left = `${targetElementRect.left}px`;
-                    liqOptionsWrapper.style.top = `${targetElementRect.bottom}px`;
+                        if (liqOptionsWrapper) {
+                            liqOptionsWrapper.style.left = `${targetElementRect.left + tvIframe.getBoundingClientRect().left}px`;
+                            liqOptionsWrapper.style.top = `${targetElementRect.bottom + tvIframe.getBoundingClientRect().top}px`;
+                        }
+                    }
                 }
             }
         }
@@ -33,12 +41,22 @@ const LiquidationChartOptions: React.FC<
     return (
         <>
             {showLiqOptions ? (
-                <div
+                <motion.div
                     id='liquidations-options-wrapper'
                     className={styles.liqOptionsWrapper}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
                 >
-                    asdsadasd
-                </div>
+                    <div className={styles.liqOptionsHeader}>
+                        Liquidation Options
+                    </div>
+                    <div className={styles.liqOptionsRow}>
+                        <div className={styles.liqOptionsLabel}>Levels</div>
+                        <div className={styles.liqOptionsValue}></div>
+                    </div>
+                </motion.div>
             ) : (
                 <></>
             )}

@@ -302,6 +302,7 @@ export const TradingViewProvider: React.FC<{
                 settingsButton: liquidationsSettingsButton,
             } = createCustomToolbarButton(liquidationsWrapper, {
                 text: 'Liquidations',
+                id: 'liquidations-settings-button',
                 iconHtml: CustomToolbarBtnIcons.liquidations,
                 settingsButton: true,
             });
@@ -352,8 +353,10 @@ export const TradingViewProvider: React.FC<{
                 if (wrapper) wrapper.style.backgroundColor = 'transparent';
             };
 
+            let showOpts = showLiqOptions || false;
             const onSettingsClick = () => {
-                setShowLiqOptions(!showLiqOptions);
+                showOpts = !showOpts;
+                setShowLiqOptions(showOpts);
             };
 
             liquidationsButton.addEventListener('click', onClick);
