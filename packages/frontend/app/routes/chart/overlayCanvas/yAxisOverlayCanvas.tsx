@@ -9,8 +9,8 @@ import {
 } from './overlayCanvasUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
-import { getLastCandleClosePrice } from '../data/candleDataCache';
 import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
+import { useChartStore } from '~/stores/TradingviewChartStore';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -22,6 +22,11 @@ const YAxisOverlayCanvas: React.FC = () => {
     const isNearOrderPriceRef = useRef(false);
     const isInitialSizeSetRef = useRef(false);
     const { updateYPosition } = usePreviewOrderLines();
+
+    const { symbolInfo } = useTradeDataStore();
+    const lastCandle = useChartStore((state) => state.lastCandle);
+
+    const markPx = symbolInfo?.markPx || 1;
     useEffect(() => {
         if (!chart) return;
 
@@ -237,10 +242,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         const isLogarithmic = priceScale.getMode() === 1;
         let orderPricePixel: number;
 
-        // Get last candle close price from cache
-        const resolution = chart.activeChart().resolution();
-        const lastCandleClose = getLastCandleClosePrice(symbol, resolution);
-        const closePrice = lastCandleClose || 1;
+        const closePrice = lastCandle?.close || markPx;
 
         let closePricePixel: number;
         if (isLogarithmic) {
@@ -284,7 +286,14 @@ const YAxisOverlayCanvas: React.FC = () => {
             canvas.style.cursor = 'default';
             canvas.style.pointerEvents = 'none';
         }
-    }, [mouseY, orderInputPriceValue.value, chart, isDrag, symbol]);
+    }, [
+        mouseY,
+        orderInputPriceValue.value,
+        chart,
+        isDrag,
+        symbol,
+        lastCandle?.close,
+    ]);
 
     useEffect(() => {
         if (!canvasRef.current) return;
