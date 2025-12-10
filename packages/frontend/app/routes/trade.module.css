@@ -3,6 +3,12 @@
     --scroll-icon-width-height: 12px;
     --scroll-button-width: 24px;
     --scroll-button-height: 16px;
+
+    --content-top: 150px;
+    --content-top-with-banner: 250px;
+
+    --mobile-tab-nav-top: 105px;
+    --mobile-tab-nav-top-with-banner: 205px;
 }
 
 html,
@@ -299,7 +305,6 @@ body {
     .mobileTabNav {
         display: flex;
         position: fixed;
-        top: 105px;
         left: 0;
         right: 0;
         height: 40px;
@@ -310,7 +315,12 @@ body {
         padding: 0 var(--padding-s);
         overflow: visible;
     }
-
+    .mobileTabNavMin {
+        top: var(--mobile-tab-nav-top);
+    }
+    .mobileTabNavMax {
+        top: var(--mobile-tab-nav-top-with-banner);
+    }
     .mobileTabBtns {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -408,7 +418,6 @@ body {
 
     .mobileSection {
         position: fixed;
-        top: 150px;
         left: 0;
         right: 0;
         bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
@@ -419,6 +428,12 @@ body {
         border-radius: 0;
         padding-bottom: 20px !important;
         -webkit-overflow-scrolling: touch;
+    }
+    .mobileSectionMin {
+        top: var(--content-top-with-banner);
+    }
+    .mobileSectionMax {
+        top: var(--content-top);
     }
 
     .mobileSection.active {
