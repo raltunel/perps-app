@@ -14,7 +14,7 @@ import FogoPresaleBanner from './FogoPresaleBanner';
  * 4. Set VITE_ACTIVE_ANNOUNCEMENT_BANNER=<key> in your .env to activate it
  */
 export const bannerRegistry: Record<string, React.ComponentType> = {
-    // example: ExampleBanner,
+    example: ExampleBanner,
     // Add more banners here:
     fogoPresale: FogoPresaleBanner,
     // maintenance: MaintenanceBanner,
