@@ -596,10 +596,7 @@ export default function Trade() {
 
     const MobileTabNavigation = useMemo(() => {
         return (
-            <div
-                className={`${styles.mobileTabNav} ${isFogoPresale ? styles.mobileTabNavMax : styles.mobileTabNavMin}`}
-                id='mobileTradeTabs'
-            >
+            <div className={`${styles.mobileTabNav} `} id='mobileTradeTabs'>
                 <div className={styles.mobileTabBtns}>
                     {tabList.map(({ key, label }) => {
                         if (key !== 'positions') {
@@ -788,6 +785,7 @@ export default function Trade() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.18 }}
+                className={styles.mobileOuterContainer}
             >
                 <TradeRouteHandler />
                 <WebDataConsumer />
