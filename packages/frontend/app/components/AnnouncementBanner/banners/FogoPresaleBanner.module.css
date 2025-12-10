@@ -1,0 +1,18 @@
+.fogo_header_banner_wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.fogo_header_banner_wrapper a {
+    display: inline-block;
+}
+
+.fogo_header_banner_wrapper img {
+    display: block;
+    height: 50px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
