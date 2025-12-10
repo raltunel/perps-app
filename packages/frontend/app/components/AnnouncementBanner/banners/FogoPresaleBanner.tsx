@@ -4,7 +4,7 @@ import {
     PresaleBannerNarrow,
     PresaleBannerWide,
 } from '~/assets';
-import { useBannerSVG } from '~/hooks/useClickableSVG';
+import { useClickableSVG } from '~/hooks/useClickableSVG';
 import useMediaQuery from '~/hooks/useMediaQuery';
 
 export default function FogoPresaleBanner() {
@@ -18,14 +18,15 @@ export default function FogoPresaleBanner() {
     }
 
     // hooks to attach click handlers to SVGs
-    const bannerWide = useBannerSVG('fogo-presale-banner-wide-clickable', () =>
-        goToPresale(),
+    const bannerWide = useClickableSVG(
+        'fogo-presale-banner-wide-clickable',
+        () => goToPresale(),
     );
-    const bannerMedium = useBannerSVG(
+    const bannerMedium = useClickableSVG(
         'fogo-presale-banner-medium-clickable',
         () => goToPresale(),
     );
-    const bannerNarrow = useBannerSVG(
+    const bannerNarrow = useClickableSVG(
         'fogo-presale-banner-narrow-clickable',
         () => goToPresale(),
     );

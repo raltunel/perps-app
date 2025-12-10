@@ -6,7 +6,7 @@ import { useEffect, useRef, type RefObject } from 'react';
  * @param idInDOM - DOM ID of the clickable element inside the SVG document
  * @param action - callback fn to execute when the clickable is triggered
  */
-export function useBannerSVG(
+export function useClickableSVG(
     idInDOM: string,
     action: () => void,
 ): {

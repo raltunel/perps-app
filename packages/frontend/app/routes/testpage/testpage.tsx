@@ -4,7 +4,7 @@ import {
     PresaleBannerWide,
 } from '~/assets';
 import styles from './testpage.module.css';
-import { useBannerSVG } from '~/hooks/useClickableSVG';
+import { useClickableSVG } from '~/hooks/useClickableSVG';
 
 export default function testpage() {
     // fn shell to run when user triggers a banner clickable
@@ -29,15 +29,15 @@ export default function testpage() {
     };
 
     // hook instantiations to manage click handlers in DOM
-    const wideBanner = useBannerSVG(
+    const wideBanner = useClickableSVG(
         BANNER_METADATA.wide.idForDOM,
         BANNER_METADATA.wide.action,
     );
-    const mediumBanner = useBannerSVG(
+    const mediumBanner = useClickableSVG(
         BANNER_METADATA.medium.idForDOM,
         BANNER_METADATA.medium.action,
     );
-    const narrowBanner = useBannerSVG(
+    const narrowBanner = useClickableSVG(
         BANNER_METADATA.narrow.idForDOM,
         BANNER_METADATA.narrow.action,
     );
