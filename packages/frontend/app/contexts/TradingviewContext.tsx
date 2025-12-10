@@ -566,6 +566,18 @@ export const TradingViewProvider: React.FC<{
                         quickText.textContent = 'Quick Trade Mode';
                     }
 
+                    if (state.activeOrder) {
+                        container.setAttribute(
+                            'title',
+                            `Size: ${state.activeOrder.size} ${state.activeOrder.currency}`,
+                        );
+                    } else {
+                        container.setAttribute(
+                            'title',
+                            'Click to enable quick trade mode',
+                        );
+                    }
+
                     if (state.quickMode) {
                         quickButton.style.backgroundColor =
                             'var(--accent1-dark, #5f5df0)';
