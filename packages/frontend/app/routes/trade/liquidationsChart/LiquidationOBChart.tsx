@@ -1325,7 +1325,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 hoverLineDataRef.current = [];
                 liqTooltipRef.current.style('visibility', 'hidden');
                 setActiveTooltipType(LiqChartTooltipType.Level);
-                handleTooltip(relativeMouseX, relativeMouseY);
+
+                // can be reactivated to sync both tooltips (chart and independent)
+                // handleTooltip(relativeMouseX, relativeMouseY);
                 hideTooltipRef.current = true;
                 return;
             }

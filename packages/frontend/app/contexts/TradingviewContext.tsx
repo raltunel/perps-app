@@ -37,6 +37,8 @@ import {
     getLiquidationsSvgIcon,
     priceFormatterFactory,
     type ChartLayout,
+    createCustomToolbarButton,
+    CustomToolbarBtnIcons,
 } from '~/routes/chart/data/utils/utils';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
@@ -53,6 +55,7 @@ import type {
 import { processSymbolUrlParam } from '~/utils/AppUtils';
 
 import i18n from 'i18next';
+import { useLiqChartStore } from '~/stores/LiqChartStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -93,6 +96,8 @@ export const TradingViewProvider: React.FC<{
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
     const { symbol, addToFetchedChannels } = useTradeDataStore();
+
+    const { showLiqOptions, setShowLiqOptions } = useLiqChartStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
@@ -289,23 +294,39 @@ export const TradingViewProvider: React.FC<{
 
         tvWidget.headerReady().then(() => {
             setChartLoadingStatus('ready');
-            const liquidationsButton = tvWidget.createButton();
+            const liquidationsWrapper = tvWidget.createButton({
+                align: 'left',
+            });
+            const {
+                button: liquidationsButton,
+                settingsButton: liquidationsSettingsButton,
+            } = createCustomToolbarButton(liquidationsWrapper, {
+                text: 'Liquidations',
+                iconHtml: CustomToolbarBtnIcons.liquidations,
+                settingsButton: true,
+            });
 
             let isToggled = liquidationsActive;
 
             const updateButtonStyle = () => {
-                const svg = getLiquidationsSvgIcon(
-                    isToggled ? '#7371fc' : '#cbcaca',
-                );
-                liquidationsButton.style.color = isToggled
-                    ? '#7371fc'
-                    : '#cbcaca';
-
-                liquidationsButton.innerHTML = `
-                    <span class="liquidations-wrapper" style="display: flex; align-items: center;border-radius:4px;padding:5px">
-                      ${svg}
-                     <span style="padding-left:3px"> Liquidations
-                     </span>`;
+                if (isToggled) {
+                    liquidationsButton.style.borderColor =
+                        'color-mix(in srgb, var(--accent1-dark, #5f5df0) 70%, transparent)';
+                    liquidationsButton.style.color = '#ffffff';
+                    if (liquidationsSettingsButton) {
+                        liquidationsSettingsButton.style.borderColor =
+                            'color-mix(in srgb, var(--accent1-dark, #5f5df0) 60%, transparent)';
+                        liquidationsSettingsButton.style.color = '#ffffff';
+                    }
+                } else {
+                    liquidationsButton.style.borderColor = '#2a2e39';
+                    liquidationsButton.style.color = '#cbcaca';
+                    if (liquidationsSettingsButton) {
+                        liquidationsSettingsButton.style.borderColor =
+                            'transparent';
+                        liquidationsSettingsButton.style.color = '#cbcaca';
+                    }
+                }
             };
 
             updateButtonStyle();
@@ -316,9 +337,6 @@ export const TradingViewProvider: React.FC<{
                 updateButtonStyle();
             };
 
-            const onRightClick = () => {
-                alert('right click');
-            };
             const onMouseEnter = () => {
                 const wrapper = liquidationsButton.querySelector(
                     '.liquidations-wrapper',
@@ -334,8 +352,18 @@ export const TradingViewProvider: React.FC<{
                 if (wrapper) wrapper.style.backgroundColor = 'transparent';
             };
 
+            const onSettingsClick = () => {
+                setShowLiqOptions(!showLiqOptions);
+            };
+
             liquidationsButton.addEventListener('click', onClick);
-            liquidationsButton.addEventListener('contextmenu', onRightClick);
+            // liquidationsButton.addEventListener('contextmenu', onRightClick);
+            if (liquidationsSettingsButton) {
+                liquidationsSettingsButton.addEventListener(
+                    'click',
+                    onSettingsClick,
+                );
+            }
             liquidationsButton.addEventListener('mouseenter', onMouseEnter);
             liquidationsButton.addEventListener('mouseleave', onMouseLeave);
 
@@ -349,6 +377,12 @@ export const TradingViewProvider: React.FC<{
                     'mouseleave',
                     onMouseLeave,
                 );
+                if (liquidationsSettingsButton) {
+                    liquidationsSettingsButton.removeEventListener(
+                        'click',
+                        onSettingsClick,
+                    );
+                }
             };
         });
 

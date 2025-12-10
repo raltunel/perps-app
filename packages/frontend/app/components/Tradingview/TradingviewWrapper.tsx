@@ -6,6 +6,7 @@ import LiquidationOverlayCanvas from '~/routes/chart/overlayCanvas/LiqudationOve
 import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
+import LiquidationChartOptions from '~/routes/trade/liquidationsChart/LiquidationChartOptions';
 
 const TradingViewWrapper: React.FC = () => {
     const { liquidationsActive } = useAppStateStore();
@@ -62,6 +63,7 @@ const TradingViewWrapper: React.FC = () => {
                     <TradingViewChart />
                     {liquidationsActive && <LiquidationOverlayCanvas />}
                     <OrderLinesOverlayCanvas />
+                    <LiquidationChartOptions />
                 </TradingViewProvider>
             )}
         </div>

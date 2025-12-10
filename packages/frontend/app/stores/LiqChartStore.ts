@@ -22,6 +22,8 @@ interface LiqChartStore {
     setActiveTab: (activeTab: LiqChartTabType) => void;
     showLiqOverlayAlways: boolean;
     setShowLiqOverlayAlways: (showLiqOverlayAlways: boolean) => void;
+    showLiqOptions: boolean;
+    setShowLiqOptions: (showLiqOptions: boolean) => void;
 }
 
 export const useLiqChartStore = create<LiqChartStore>()(
@@ -42,6 +44,9 @@ export const useLiqChartStore = create<LiqChartStore>()(
             showLiqOverlayAlways: false,
             setShowLiqOverlayAlways: (showLiqOverlayAlways: boolean) =>
                 set({ showLiqOverlayAlways }),
+            showLiqOptions: false,
+            setShowLiqOptions: (showLiqOptions: boolean) =>
+                set({ showLiqOptions }),
         }),
         {
             name: 'LIQCHART',

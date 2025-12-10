@@ -6,6 +6,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useEffect, useState } from 'react';
 import { LiqChartTabType, useLiqChartStore } from '~/stores/LiqChartStore';
 import { useMobile } from '~/hooks/useMediaQuery';
+import { motion } from 'framer-motion';
 
 export interface LiqProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -80,16 +81,23 @@ const LiqComponent = ({
                     {(activeTab !== LiqChartTabType.Distribution ||
                         showLiqOverlayAlways ||
                         isMobile) && (
-                        <LiquidationsChart
-                            buyData={hrBuys}
-                            sellData={hrSells}
-                            liqBuys={hrLiqBuys}
-                            liqSells={hrLiqSells}
-                            width={overlayLiqCanvasAttr.width}
-                            height={overlayLiqCanvasAttr.height}
-                            scaleData={scaleData}
-                            location={'liqMobile'}
-                        />
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2, ease: 'easeInOut' }}
+                        >
+                            <LiquidationsChart
+                                buyData={hrBuys}
+                                sellData={hrSells}
+                                liqBuys={hrLiqBuys}
+                                liqSells={hrLiqSells}
+                                width={overlayLiqCanvasAttr.width}
+                                height={overlayLiqCanvasAttr.height}
+                                scaleData={scaleData}
+                                location={'liqMobile'}
+                            />
+                        </motion.div>
                     )}
                 </div>
             )}
