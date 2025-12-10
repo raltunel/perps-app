@@ -8,17 +8,26 @@ import { useBannerSVG } from '~/hooks/useClickableSVG';
 import useMediaQuery from '~/hooks/useMediaQuery';
 
 export default function FogoPresaleBanner() {
+    // fn to open the presale link in a new tab
+    function goToPresale(): void {
+        window.open(
+            'https://presale.fogo.io/',
+            '_blank',
+            'noopener,noreferrer',
+        );
+    }
+
     // hooks to attach click handlers to SVGs
     const bannerWide = useBannerSVG('fogo-presale-banner-wide-clickable', () =>
-        console.log('clicked WIDE page header banner'),
+        goToPresale(),
     );
     const bannerMedium = useBannerSVG(
         'fogo-presale-banner-medium-clickable',
-        () => console.log('clicked MEDIUM page header banner'),
+        () => goToPresale(),
     );
     const bannerNarrow = useBannerSVG(
         'fogo-presale-banner-narrow-clickable',
-        () => console.log('clicked NARROW page header banner'),
+        () => goToPresale(),
     );
 
     // screen width breakpoints (px) to change the SVG in the active DOM
