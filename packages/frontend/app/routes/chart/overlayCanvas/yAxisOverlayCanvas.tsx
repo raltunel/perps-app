@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -11,6 +11,8 @@ import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
 import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
 import { useChartStore } from '~/stores/TradingviewChartStore';
+import { useOpenOrderLines } from '../orders/useOpenOrderLines';
+import { usePositionOrderLines } from '../orders/usePositionOrderLines';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -27,6 +29,49 @@ const YAxisOverlayCanvas: React.FC = () => {
     const lastCandle = useChartStore((state) => state.lastCandle);
 
     const markPx = symbolInfo?.markPx || 1;
+
+    const openOrderLines = useOpenOrderLines();
+    const positionOrderLines = usePositionOrderLines();
+
+    const closestLabelInfo = useMemo(() => {
+        if (!orderInputPriceValue.value) return null;
+
+        const closePrice = lastCandle?.close || markPx;
+
+        const allPrices: number[] = [
+            closePrice,
+            ...openOrderLines.map((line) => line.yPrice),
+            ...positionOrderLines.map((line) => line.yPrice),
+        ].filter((price) => price > 0);
+
+        if (allPrices.length === 0) return null;
+
+        let closestPrice = allPrices[0];
+        let minDistance = Math.abs(allPrices[0] - orderInputPriceValue.value);
+
+        for (const price of allPrices) {
+            const distance = Math.abs(price - orderInputPriceValue.value);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestPrice = price;
+            }
+        }
+
+        const isClosestPriceTheClosePrice = closestPrice === closePrice;
+
+        return {
+            closestPrice,
+            distance: minDistance,
+            isClosestPriceTheClosePrice,
+        };
+    }, [
+        orderInputPriceValue.value,
+        lastCandle?.close,
+        markPx,
+        openOrderLines,
+        positionOrderLines,
+    ]);
+
     useEffect(() => {
         if (!chart) return;
 
@@ -242,32 +287,56 @@ const YAxisOverlayCanvas: React.FC = () => {
         const isLogarithmic = priceScale.getMode() === 1;
         let orderPricePixel: number;
 
-        const closePrice = lastCandle?.close || markPx;
-
-        let closePricePixel: number;
         if (isLogarithmic) {
             orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue.value);
-            closePricePixel = scaleData.scaleSymlog(closePrice);
         } else {
             orderPricePixel = scaleData.yScale(orderInputPriceValue.value);
-            closePricePixel = scaleData.yScale(closePrice);
         }
 
         // Approximate label height in pixels
         const labelHeight = 15;
 
-        // Check if closePricePixel and orderPricePixel are too close to each other
-        const pixelDistance = Math.abs(closePricePixel - orderPricePixel);
-        const areLabelsClose = pixelDistance <= labelHeight;
-
         let adjustedOrderPricePixel = orderPricePixel;
-        if (areLabelsClose) {
-            if (orderInputPriceValue.value >= closePrice) {
-                adjustedOrderPricePixel =
-                    orderPricePixel - (labelHeight - pixelDistance);
+
+        if (closestLabelInfo) {
+            const { closestPrice, isClosestPriceTheClosePrice } =
+                closestLabelInfo;
+            const closePrice = lastCandle?.close || markPx;
+
+            let closestPricePixel: number;
+
+            if (isLogarithmic) {
+                closestPricePixel = scaleData.scaleSymlog(closestPrice);
             } else {
-                adjustedOrderPricePixel =
-                    orderPricePixel + (labelHeight - pixelDistance);
+                closestPricePixel = scaleData.yScale(closestPrice);
+            }
+
+            const pixelDistance = Math.abs(closestPricePixel - orderPricePixel);
+            const areLabelsClose = pixelDistance <= labelHeight;
+
+            if (areLabelsClose) {
+                if (isClosestPriceTheClosePrice) {
+                    if (orderInputPriceValue.value >= closestPrice) {
+                        adjustedOrderPricePixel =
+                            orderPricePixel - (labelHeight - pixelDistance);
+                    } else {
+                        adjustedOrderPricePixel =
+                            orderPricePixel + (labelHeight - pixelDistance);
+                    }
+                } else {
+                    if (closestPrice > closePrice) {
+                        if (orderInputPriceValue.value >= closestPrice) {
+                            adjustedOrderPricePixel =
+                                orderPricePixel - (labelHeight - pixelDistance);
+                        } else {
+                            adjustedOrderPricePixel =
+                                orderPricePixel + (labelHeight - pixelDistance);
+                        }
+                    } else if (orderInputPriceValue.value < closestPrice) {
+                        adjustedOrderPricePixel =
+                            orderPricePixel + (labelHeight - pixelDistance);
+                    }
+                }
             }
         }
 
@@ -292,7 +361,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         chart,
         isDrag,
         symbol,
-        lastCandle?.close,
+        closestLabelInfo,
     ]);
 
     useEffect(() => {
