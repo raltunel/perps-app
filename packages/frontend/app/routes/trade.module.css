@@ -285,7 +285,7 @@ body {
         gap: var(--gap-xs);
         height: 100%;
         width: 100%;
-        padding-bottom: calc(var(--gap-l-plus) + env(safe-area-inset-bottom));
+        padding-bottom: calc(42px + env(safe-area-inset-bottom));
         box-sizing: border-box; /* Important! */
     }
     .symbolInfoContainer {
