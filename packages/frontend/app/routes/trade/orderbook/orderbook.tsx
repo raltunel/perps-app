@@ -847,12 +847,22 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         >
                             {focusedSlotOutOfBounds && (
                                 <>
-                                    <div
-                                        className={`${styles.obGradientForFocusedSlot} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
-                                    ></div>
-                                    <div
-                                        className={`${styles.obGradientForFocusedSlot} ${styles.wider} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
-                                    ></div>
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.4 }}
+                                    >
+                                        <div
+                                            className={`${styles.obGradientForFocusedSlot} ${styles.smaller} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
+                                        ></div>
+                                        <div
+                                            className={`${styles.obGradientForFocusedSlot} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
+                                        ></div>
+                                        <div
+                                            className={`${styles.obGradientForFocusedSlot} ${styles.wider} ${focusedSlotOutOfBounds === 'buy' ? styles.buy : ''}`}
+                                        ></div>
+                                    </motion.div>
                                 </>
                             )}
 
