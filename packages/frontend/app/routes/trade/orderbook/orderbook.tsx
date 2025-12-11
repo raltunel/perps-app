@@ -325,13 +325,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
     useEffect(() => {
         if (orderInputPriceValue.value) {
             focusedPriceRef.current = orderInputPriceValue.value;
-            if (
-                orderInputPriceValue.changeType === 'dragEnd' &&
-                !foundClosestSlotForFocusedPriceRef.current
-            ) {
-                findProperResolution(focusedPriceRef.current);
-                lockOrderBook.current = true;
-            }
+
+            // COMMENTED OUT >> CODE BLOCK FOR FINDING PROPER RESOLUTION
+            // if (
+            //     orderInputPriceValue.changeType === 'dragEnd' &&
+            //     !foundClosestSlotForFocusedPriceRef.current
+            // ) {
+            //     findProperResolution(focusedPriceRef.current);
+            //     lockOrderBook.current = true;
+            // }
         } else {
             focusedPriceRef.current = null;
             setFocusedSlotOutOfBounds(null);
@@ -413,55 +415,56 @@ const OrderBook: React.FC<OrderBookProps> = ({
         orderCount,
     ]);
 
-    const findProperResolution = useCallback(
-        (focusedPrice: number) => {
-            if (!midPriceRef.current) return;
-            if (!filledResolution.current) return;
+    // COMMENTED OUT >> CODE BLOCK FOR FINDING PROPER RESOLUTION
 
-            const currentResolution = filledResolution.current;
-            const side = focusedPrice < midPriceRef.current ? 'buy' : 'sell';
+    // const findProperResolution = useCallback(
+    //     (focusedPrice: number) => {
+    //         if (!midPriceRef.current) return;
+    //         if (!filledResolution.current) return;
 
-            const thresholdRatioForPickingResolution = 1;
-            let found = false;
+    //         const currentResolution = filledResolution.current;
+    //         const side = focusedPrice < midPriceRef.current ? 'buy' : 'sell';
 
-            for (let i = 0; i < resolutions.length; i++) {
-                const res = resolutions[i];
-                if (res.val >= currentResolution.val) {
-                    const remaining = midPriceRef.current % res.val;
-                    const startPrice =
-                        midPriceRef.current -
-                        remaining +
-                        (side === 'buy' ? 0 : res.val);
-                    const endPrice =
-                        startPrice +
-                        (orderCount - 1) * res.val * (side === 'buy' ? -1 : 1);
+    //         const thresholdRatioForPickingResolution = 1;
+    //         let found = false;
 
-                    const distFocusedPrice = Math.abs(
-                        focusedPrice - startPrice,
-                    );
-                    const distRange = Math.abs(endPrice - startPrice);
+    //         for (let i = 0; i < resolutions.length; i++) {
+    //             const res = resolutions[i];
+    //             if (res.val >= currentResolution.val) {
+    //                 const remaining = midPriceRef.current % res.val;
+    //                 const startPrice =
+    //                     midPriceRef.current -
+    //                     remaining +
+    //                     (side === 'buy' ? 0 : res.val);
+    //                 const endPrice =
+    //                     startPrice +
+    //                     (orderCount - 1) * res.val * (side === 'buy' ? -1 : 1);
 
-                    if (
-                        distFocusedPrice / distRange <
-                        thresholdRatioForPickingResolution
-                    ) {
-                        setSelectedResolution(res);
-                        lockOrderBook.current = false;
-                        found = true;
-                        break;
-                    }
-                }
-            }
+    //                 const distFocusedPrice = Math.abs(
+    //                     focusedPrice - startPrice,
+    //                 );
+    //                 const distRange = Math.abs(endPrice - startPrice);
 
-            if (!found) {
-                setSelectedResolution(resolutions[resolutions.length - 1]);
-            }
-        },
-        [orderCount, resolutions],
-    );
+    //                 if (
+    //                     distFocusedPrice / distRange <
+    //                     thresholdRatioForPickingResolution
+    //                 ) {
+    //                     setSelectedResolution(res);
+    //                     lockOrderBook.current = false;
+    //                     found = true;
+    //                     break;
+    //                 }
+    //             }
+    //         }
 
-    // code blocks were being used in sdk approach
+    //         if (!found) {
+    //             setSelectedResolution(resolutions[resolutions.length - 1]);
+    //         }
+    //     },
+    //     [orderCount, resolutions],
+    // );
 
+    // COMMENTED OUT >> CODE BLOCK WAS USED IN SDK APPROACH
     // const handleOrderBookWorkerResult = useCallback(
     //     ({ data }: { data: OrderBookOutput }) => {
     //         setOrderBook(data.buys, data.sells);

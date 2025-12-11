@@ -897,7 +897,7 @@ function OrderInput({
             );
             if (
                 isMidModeActiveRef.current ||
-                orderInputPriceValue.changeType !== 'drag'
+                orderInputPriceValue.changeType !== 'dragEnd'
             )
                 return;
             const orderElem = document.getElementById(
