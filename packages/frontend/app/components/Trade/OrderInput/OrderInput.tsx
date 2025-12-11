@@ -888,13 +888,21 @@ function OrderInput({
         if (orderInputPriceValue.value > 0) {
             const resVal = usualResolution?.val || 1;
             const decimals = Math.floor(Math.log10(resVal)) * -1;
-            setPrice(
-                formatNumWithOnlyDecimals(
-                    orderInputPriceValue.value,
-                    decimals > 0 ? decimals : 0,
-                    true,
-                ),
+            const priceToSet = formatNumWithOnlyDecimals(
+                orderInputPriceValue.value,
+                decimals > 0 ? decimals : 0,
+                true,
             );
+            setPrice(priceToSet);
+
+            if (markPx) {
+                if (orderInputPriceValue.value >= markPx) {
+                    setTradeDirection('sell');
+                } else {
+                    setTradeDirection('buy');
+                }
+            }
+
             if (
                 isMidModeActiveRef.current ||
                 orderInputPriceValue.changeType !== 'dragEnd'
@@ -910,7 +918,7 @@ function OrderInput({
                 orderElem?.classList.remove('divPulseNeon');
             }, 800);
         }
-    }, [orderInputPriceValue, usualResolution]);
+    }, [orderInputPriceValue, usualResolution, markPx]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
