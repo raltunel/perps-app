@@ -160,7 +160,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const needExtraPollingRef = useRef(needExtraPolling);
     needExtraPollingRef.current = needExtraPolling;
 
-    const shouldFindProperResolutionRef = useRef(false);
     const foundClosestSlotForFocusedPriceRef = useRef(false);
 
     useEffect(() => {
@@ -320,14 +319,12 @@ const OrderBook: React.FC<OrderBookProps> = ({
     useEffect(() => {
         if (obPreviewLine?.yPrice) {
             focusedPriceRef.current = obPreviewLine.yPrice;
-            shouldFindProperResolutionRef.current = true;
         }
     }, [obPreviewLine?.yPrice]);
 
     useEffect(() => {
         if (orderInputPriceValue.value) {
             focusedPriceRef.current = orderInputPriceValue.value;
-            shouldFindProperResolutionRef.current = true;
             if (
                 orderInputPriceValue.changeType === 'dragEnd' &&
                 !foundClosestSlotForFocusedPriceRef.current
@@ -450,7 +447,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     ) {
                         setSelectedResolution(res);
                         lockOrderBook.current = false;
-                        shouldFindProperResolutionRef.current = false;
                         found = true;
                         break;
                     }
