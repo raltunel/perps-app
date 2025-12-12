@@ -81,7 +81,17 @@
 .update .closeButton {
     color: var(--white);
 }
-
+.notInPageHeader {
+    display: none;
+}
+@media (max-width: 1268px) {
+    .inPageHeader {
+        display: none;
+    }
+    .notInPageHeader {
+        display: flex;
+    }
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .announcementBanner {
