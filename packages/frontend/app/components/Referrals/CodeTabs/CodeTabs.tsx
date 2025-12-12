@@ -232,6 +232,8 @@ export default function CodeTabs(props: PropsIF) {
             setIsCachedValueValid(true);
             setEditModeReferral(false);
         }
+        // Update lastValidatedCode to prevent the useEffect from re-validating
+        setLastValidatedCode(r);
     }
 
     // pixel-width breakpoint to toggle shorter copy
