@@ -33,10 +33,24 @@ const YAxisOverlayCanvas: React.FC = () => {
     const openOrderLines = useOpenOrderLines();
     const positionOrderLines = usePositionOrderLines();
 
-    const closestLabelInfo = useMemo(() => {
-        if (!orderInputPriceValue.value) return null;
+    const labelAnalysis = useMemo(() => {
+        if (!orderInputPriceValue.value || !chart) return null;
 
         const closePrice = lastCandle?.close || markPx;
+        const scaleData = scaleDataRef.current;
+        if (!scaleData) return null;
+
+        const paneIndex = getMainSeriesPaneIndex(chart);
+        if (paneIndex === null) return null;
+
+        const priceScalePane = chart.activeChart().getPanes()[
+            paneIndex
+        ] as IPaneApi;
+        const priceScale = priceScalePane.getMainSourcePriceScale();
+        if (!priceScale) return null;
+
+        const isLogarithmic = priceScale.getMode() === 1;
+        const labelHeight = 15;
 
         const allPrices: number[] = [
             closePrice,
@@ -44,25 +58,103 @@ const YAxisOverlayCanvas: React.FC = () => {
             ...positionOrderLines.map((line) => line.yPrice),
         ].filter((price) => price > 0);
 
-        if (allPrices.length === 0) return null;
+        const orderPricePixel = isLogarithmic
+            ? scaleData.scaleSymlog(orderInputPriceValue.value)
+            : scaleData.yScale(orderInputPriceValue.value);
 
-        let closestPrice = allPrices[0];
-        let minDistance = Math.abs(allPrices[0] - orderInputPriceValue.value);
+        type LabelInfo = {
+            price: number;
+            pixel: number;
+            isOrderLabel: boolean;
+            isClosePrice: boolean;
+        };
 
-        for (const price of allPrices) {
-            const distance = Math.abs(price - orderInputPriceValue.value);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestPrice = price;
+        const labels: LabelInfo[] = [
+            ...allPrices.map((price) => ({
+                price,
+                pixel: isLogarithmic
+                    ? scaleData.scaleSymlog(price)
+                    : scaleData.yScale(price),
+                isOrderLabel: false,
+                isClosePrice: price === closePrice,
+            })),
+            {
+                price: orderInputPriceValue.value,
+                pixel: orderPricePixel,
+                isOrderLabel: true,
+                isClosePrice: false,
+            },
+        ];
+
+        const aboveClosePrice = labels.filter((l) => l.price >= closePrice);
+        const belowClosePrice = labels.filter((l) => l.price <= closePrice);
+
+        aboveClosePrice.sort((a, b) => a.price - b.price);
+        belowClosePrice.sort((a, b) => b.price - a.price);
+
+        const adjustedLabels: Array<LabelInfo & { adjustedPixel: number }> = [];
+
+        for (let i = 0; i < aboveClosePrice.length; i++) {
+            const label = aboveClosePrice[i];
+            let adjustedPixel = label.pixel;
+
+            if (i > 0) {
+                const prevLabel = adjustedLabels[adjustedLabels.length - 1];
+                const distanceOriginal = Math.abs(
+                    label.pixel - prevLabel.pixel,
+                );
+                const distanceAdjusted = Math.abs(
+                    label.pixel - prevLabel.adjustedPixel,
+                );
+
+                if (
+                    distanceOriginal < labelHeight ||
+                    distanceAdjusted < labelHeight
+                ) {
+                    adjustedPixel = prevLabel.adjustedPixel - labelHeight;
+                }
             }
+
+            adjustedLabels.push({
+                ...label,
+                adjustedPixel,
+            });
         }
 
-        const isClosestPriceTheClosePrice = closestPrice === closePrice;
+        for (let i = 0; i < belowClosePrice.length; i++) {
+            const label = belowClosePrice[i];
+            let adjustedPixel = label.pixel;
+
+            if (i > 0) {
+                const prevLabel = adjustedLabels[adjustedLabels.length - 1];
+                const distanceOriginal = Math.abs(
+                    label.pixel - prevLabel.pixel,
+                );
+                const distanceAdjusted = Math.abs(
+                    label.pixel - prevLabel.adjustedPixel,
+                );
+
+                if (
+                    distanceOriginal < labelHeight ||
+                    distanceAdjusted < labelHeight
+                ) {
+                    adjustedPixel = prevLabel.adjustedPixel + labelHeight;
+                }
+            }
+
+            adjustedLabels.push({
+                ...label,
+                adjustedPixel,
+            });
+        }
+
+        const orderLabel = adjustedLabels.find((l) => l.isOrderLabel);
+        if (!orderLabel) return null;
 
         return {
-            closestPrice,
-            distance: minDistance,
-            isClosestPriceTheClosePrice,
+            allLabels: adjustedLabels,
+            orderLabel,
+            closePrice,
         };
     }, [
         orderInputPriceValue.value,
@@ -70,6 +162,8 @@ const YAxisOverlayCanvas: React.FC = () => {
         markPx,
         openOrderLines,
         positionOrderLines,
+        chart,
+        JSON.stringify(scaleDataRef?.current?.yScale.domain()),
     ]);
 
     useEffect(() => {
@@ -259,90 +353,20 @@ const YAxisOverlayCanvas: React.FC = () => {
     }, [chart, isChartReady, isPaneChanged]);
 
     useEffect(() => {
-        const dpr = window.devicePixelRatio || 1;
-
         if (
             !canvasRef.current ||
             !chart ||
             isDrag ||
-            !orderInputPriceValue.value
+            !orderInputPriceValue.value ||
+            !labelAnalysis
         )
             return;
 
         const canvas = canvasRef.current;
-
-        const scaleData = scaleDataRef.current;
-        if (!scaleData) return;
-
-        const paneIndex = getMainSeriesPaneIndex(chart);
-        if (paneIndex === null) return;
-
-        const priceScalePane = chart.activeChart().getPanes()[
-            paneIndex
-        ] as IPaneApi;
-        const priceScale = priceScalePane.getMainSourcePriceScale();
-
-        if (!priceScale) return;
-
-        const isLogarithmic = priceScale.getMode() === 1;
-        let orderPricePixel: number;
-
-        if (isLogarithmic) {
-            orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue.value);
-        } else {
-            orderPricePixel = scaleData.yScale(orderInputPriceValue.value);
-        }
-
-        // Approximate label height in pixels
-        const labelHeight = 15;
-
-        let adjustedOrderPricePixel = orderPricePixel;
-
-        if (closestLabelInfo) {
-            const { closestPrice, isClosestPriceTheClosePrice } =
-                closestLabelInfo;
-            const closePrice = lastCandle?.close || markPx;
-
-            let closestPricePixel: number;
-
-            if (isLogarithmic) {
-                closestPricePixel = scaleData.scaleSymlog(closestPrice);
-            } else {
-                closestPricePixel = scaleData.yScale(closestPrice);
-            }
-
-            const pixelDistance = Math.abs(closestPricePixel - orderPricePixel);
-            const areLabelsClose = pixelDistance <= labelHeight;
-
-            if (areLabelsClose) {
-                if (isClosestPriceTheClosePrice) {
-                    if (orderInputPriceValue.value >= closestPrice) {
-                        adjustedOrderPricePixel =
-                            orderPricePixel - (labelHeight - pixelDistance);
-                    } else {
-                        adjustedOrderPricePixel =
-                            orderPricePixel + (labelHeight - pixelDistance);
-                    }
-                } else {
-                    if (closestPrice > closePrice) {
-                        if (orderInputPriceValue.value >= closestPrice) {
-                            adjustedOrderPricePixel =
-                                orderPricePixel - (labelHeight - pixelDistance);
-                        } else {
-                            adjustedOrderPricePixel =
-                                orderPricePixel + (labelHeight - pixelDistance);
-                        }
-                    } else if (orderInputPriceValue.value < closestPrice) {
-                        adjustedOrderPricePixel =
-                            orderPricePixel + (labelHeight - pixelDistance);
-                    }
-                }
-            }
-        }
-
+        const { orderLabel } = labelAnalysis;
+        const adjustedPixel = orderLabel.adjustedPixel;
         const tolerance = 10;
-        const isNearOrderPrice =
-            Math.abs(mouseY - adjustedOrderPricePixel) <= tolerance;
+        const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
 
         isNearOrderPriceRef.current = isNearOrderPrice;
 
@@ -361,7 +385,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         chart,
         isDrag,
         symbol,
-        closestLabelInfo,
+        labelAnalysis,
     ]);
 
     useEffect(() => {
