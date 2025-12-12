@@ -43,6 +43,8 @@ import {
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
+import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost';
+import { ACTIVE_ANNOUNCEMENT_BANNER } from '~/utils/Constants';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -393,7 +395,13 @@ export default function PageHeader() {
                             Spot
                         </a>
                     </Tooltip>
+                    <AnnouncementBannerHost
+                        type={ACTIVE_ANNOUNCEMENT_BANNER}
+                        dismissible={false}
+                        inPageHeader
+                    />
                 </nav>
+
                 <div className={styles.rightSide}>
                     {showDepositSlot && (
                         <span className={styles.depositSlot}>
@@ -433,7 +441,7 @@ export default function PageHeader() {
                             ) : (
                                 // desktop/tablet placeholder only (prevents layout shift on connect)
                                 <div
-                                    className={styles.depositButtonPlaceholder}
+                                    // className={styles.depositButtonPlaceholder}
                                     aria-hidden
                                 />
                             )}

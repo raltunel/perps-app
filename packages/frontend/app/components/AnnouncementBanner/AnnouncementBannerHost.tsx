@@ -11,12 +11,14 @@ export type AnnouncementBannerType =
     | 'success'
     | 'warning'
     | 'error'
-    | 'update';
+    | 'update'
+    | 'fogoPresale';
 
 interface AnnouncementBannerHostProps {
     type?: AnnouncementBannerType;
     dismissible?: boolean;
     className?: string;
+    inPageHeader?: boolean;
 }
 
 /**
@@ -26,9 +28,10 @@ interface AnnouncementBannerHostProps {
  * The banner key maps to components registered in ./banners/index.ts
  */
 const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
-    type = 'info',
-    dismissible = true,
+    type = 'fogoPresale',
+    dismissible = false,
     className = '',
+    inPageHeader = false,
 }) => {
     const bannerKey = ACTIVE_ANNOUNCEMENT_BANNER;
     const alreadyViewed = useViewed();
@@ -67,6 +70,8 @@ const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
                 return styles.error;
             case 'update':
                 return styles.update;
+            case 'fogoPresale':
+                return styles.fogo_presale;
             default:
                 return styles.info;
         }
@@ -81,7 +86,9 @@ const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
         .join(' ');
 
     return (
-        <div className={combinedClassName}>
+        <div
+            className={`${combinedClassName} ${inPageHeader ? styles.inPageHeader : styles.notInPageHeader}`}
+        >
             <div className={styles.content}>
                 <BannerComponent />
             </div>

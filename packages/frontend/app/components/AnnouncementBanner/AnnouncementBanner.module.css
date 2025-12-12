@@ -1,7 +1,7 @@
 .announcementBanner {
     width: 100%;
-    padding: var(--padding-m) var(--padding-l);
-    border-bottom: 1px solid;
+    /* padding: var(--padding-m) var(--padding-l); */
+    /* border-bottom: 1px solid; */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -69,6 +69,10 @@
     border-color: var(--accent1);
 }
 
+.fogo_presale {
+    background: var(--bg-dark1);
+}
+
 /* Close button color adjustments for different types */
 .info .closeButton,
 .success .closeButton,
@@ -77,11 +81,21 @@
 .update .closeButton {
     color: var(--white);
 }
-
+.notInPageHeader {
+    display: none;
+}
+@media (max-width: 1268px) {
+    .inPageHeader {
+        display: none;
+    }
+    .notInPageHeader {
+        display: flex;
+    }
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .announcementBanner {
-        padding: var(--padding-s) var(--padding-m);
+        /* padding: var(--padding-s) var(--padding-m); */
     }
 
     .content {
@@ -97,11 +111,11 @@
 
 @media (max-width: 480px) {
     .announcementBanner {
-        padding: var(--padding-xs) var(--padding-s);
+        /* padding: var(--padding-xs) var(--padding-s); */
     }
 
     .content {
         font-size: var(--font-size-xs);
-        padding-right: var(--padding-m);
+        /* padding-right: var(--padding-m); */
     }
 }

@@ -235,11 +235,3 @@
         grid-template-columns: 1fr;
     }
 }
-
-.modal_inside {
-    width: 600px;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    background-color: green;
-}

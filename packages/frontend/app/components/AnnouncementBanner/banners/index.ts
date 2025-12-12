@@ -2,6 +2,7 @@ import React from 'react';
 
 // Import all custom banner components here
 import ExampleBanner from './ExampleBanner';
+import FogoPresaleBanner from './FogoPresaleBanner';
 
 /**
  * Registry of all available announcement banner components.
@@ -15,6 +16,7 @@ import ExampleBanner from './ExampleBanner';
 export const bannerRegistry: Record<string, React.ComponentType> = {
     example: ExampleBanner,
     // Add more banners here:
+    fogoPresale: FogoPresaleBanner,
     // maintenance: MaintenanceBanner,
     // newFeature: NewFeatureBanner,
 };
