@@ -50,4 +50,5 @@ export type OrderInputChangeType =
     | 'dragging'
     | 'dragEnd'
     | 'obClick'
-    | 'inputChange';
+    | 'inputChange'
+    | 'midPriceChange';

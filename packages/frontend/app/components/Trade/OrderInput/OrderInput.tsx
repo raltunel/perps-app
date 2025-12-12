@@ -69,11 +69,13 @@ import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
 import type {
     modalContentT,
+    OrderInputChangeType,
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
 import { useTranslation } from 'react-i18next';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 const useOnlyMarket = false;
 
@@ -223,6 +225,8 @@ function OrderInput({
         );
     }, [price, marketOrderType]);
 
+    const isMobile = useMobile();
+
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -276,6 +280,8 @@ function OrderInput({
     // Get Pyth price for the current symbol
     const pythPriceData = usePythPrice(symbol);
     const markPx = symbolInfo?.markPx || pythPriceData?.price;
+    const markPxRef = useRef(markPx);
+    markPxRef.current = markPx;
 
     const {
         parseFormattedNum,
@@ -315,7 +321,8 @@ function OrderInput({
                 true,
             );
 
-            setPrice(formattedMidPrice);
+            // setPrice(formattedMidPrice);
+            assignPrice(formattedMidPrice, 'setPriceDispatch');
         }
     };
 
@@ -679,7 +686,8 @@ function OrderInput({
     useEffect(() => {
         if (obChosenPrice > 0) {
             setIsMidModeActive(false);
-            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+            // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+            assignPrice(formatNumWithOnlyDecimals(obChosenPrice), 'obClick');
             handleTypeChange();
         }
     }, [obChosenPrice]);
@@ -863,26 +871,47 @@ function OrderInput({
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
         if (typeof event === 'string') {
-            setPrice(event);
+            // setPrice(event);
+            assignPrice(event, 'inputChange');
         } else {
-            setPrice(event.target.value);
+            // setPrice(event.target.value);
+            assignPrice(event.target.value, 'inputChange');
             setIsMidModeActive(false);
         }
     };
 
     useEffect(() => {
         if (marketOrderType === 'market') {
-            setOrderInputPriceValue({ value: 0, changeType: 'inputChange' });
+            if (!isMobile) {
+                setOrderInputPriceValue({
+                    value: 0,
+                    changeType: 'inputChange',
+                });
+            }
         } else {
             const parsed = parseFormattedNum(price);
             if (!isNaN(parsed)) {
                 setOrderInputPriceValue({
                     value: parsed,
-                    changeType: 'inputChange',
+                    changeType: 'setPriceDispatch',
                 });
             }
         }
     }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
+
+    const assignPrice = useCallback(
+        (price: string, changeType: OrderInputChangeType) => {
+            const parsed = parseFormattedNum(price);
+
+            if (isNaN(parsed)) return;
+
+            setOrderInputPriceValue({
+                value: parsed,
+                changeType: changeType,
+            });
+        },
+        [setOrderInputPriceValue],
+    );
 
     useEffect(() => {
         if (orderInputPriceValue.value > 0) {
@@ -895,11 +924,17 @@ function OrderInput({
             );
             setPrice(priceToSet);
 
-            if (markPx) {
-                if (orderInputPriceValue.value >= markPx) {
-                    setTradeDirection('sell');
-                } else {
-                    setTradeDirection('buy');
+            if (markPxRef.current) {
+                if (
+                    orderInputPriceValue.changeType === 'dragEnd' ||
+                    orderInputPriceValue.changeType === 'inputChange' ||
+                    orderInputPriceValue.changeType === 'obClick'
+                ) {
+                    if (orderInputPriceValue.value >= markPxRef.current) {
+                        setTradeDirection('sell');
+                    } else {
+                        setTradeDirection('buy');
+                    }
                 }
             }
 
@@ -918,7 +953,7 @@ function OrderInput({
                 orderElem?.classList.remove('divPulseNeon');
             }, 800);
         }
-    }, [orderInputPriceValue, usualResolution, markPx]);
+    }, [orderInputPriceValue, usualResolution]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
