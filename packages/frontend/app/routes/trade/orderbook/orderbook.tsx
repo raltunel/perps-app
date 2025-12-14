@@ -197,7 +197,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [needExtraPolling]);
 
     useEffect(() => {
-        if (needExtraPollingRef.current && symbolInfo?.markPx) {
+        if (
+            needExtraPollingRef.current &&
+            symbolInfo?.markPx &&
+            !midPriceRef.current
+        ) {
             setMidPrice(symbolInfo.markPx);
         }
     }, [symbolInfo?.markPx]);
