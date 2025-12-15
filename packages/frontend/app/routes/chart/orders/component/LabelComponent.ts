@@ -844,6 +844,7 @@ const LabelComponent = ({
 
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
                 }
             }
         };
