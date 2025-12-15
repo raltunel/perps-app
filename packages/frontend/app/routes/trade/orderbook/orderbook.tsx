@@ -37,6 +37,7 @@ import { t } from 'i18next';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
 import { useWs, type WsSubscriptionConfig } from '~/contexts/WsContext';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 interface OrderBookProps {
     orderCount: number;
@@ -73,6 +74,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
     const { subscribe, unsubscribe, forceReconnect } = useWs();
+
+    const isMobile = useMobile();
 
     const orderClickDisabled = false;
     const forceReconnectInterval = useRef<ReturnType<
@@ -351,7 +354,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
             !focusedPriceRef.current ||
             !buys.length ||
             !sells.length ||
-            !midPriceRef.current
+            !midPriceRef.current ||
+            isMobile
         ) {
             setFocusedSlot(null);
             return;
@@ -417,6 +421,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         obPreviewLine?.yPrice,
         isMidModeActive,
         orderCount,
+        isMobile,
     ]);
 
     // COMMENTED OUT >> CODE BLOCK FOR FINDING PROPER RESOLUTION
