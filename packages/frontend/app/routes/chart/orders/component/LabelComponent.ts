@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
@@ -67,6 +67,15 @@ const LabelComponent = ({
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
+    const dragStateRef = useRef<{
+        tempSelectedLine: LabelLocationData | undefined;
+        originalPrice: number | undefined;
+        isDragging: boolean;
+    }>({
+        tempSelectedLine: undefined,
+        originalPrice: undefined,
+        isDragging: false,
+    });
 
     const isLiqPriceLineDraggable = false;
 
@@ -530,9 +539,7 @@ const LabelComponent = ({
 
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
-        let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
-        let originalPrice: number | undefined = undefined;
         const dpr = window.devicePixelRatio || 1;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -556,8 +563,9 @@ const LabelComponent = ({
                         isLiqPriceLineDraggable))
             ) {
                 canvas.style.cursor = 'grabbing';
-                tempSelectedLine = isLabel;
-                originalPrice = isLabel.parentLine.yPrice;
+                dragStateRef.current.tempSelectedLine = isLabel;
+                dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
+                dragStateRef.current.isDragging = true;
                 setSelectedLine(isLabel);
                 setIsDrag(true);
             }
@@ -587,17 +595,18 @@ const LabelComponent = ({
                 }
             }
 
-            tempSelectedLine = tempSelectedLine
+            dragStateRef.current.tempSelectedLine = dragStateRef.current
+                .tempSelectedLine
                 ? {
-                      ...tempSelectedLine,
+                      ...dragStateRef.current.tempSelectedLine,
                       parentLine: {
-                          ...tempSelectedLine.parentLine,
+                          ...dragStateRef.current.tempSelectedLine.parentLine,
                           yPrice: advancedValue,
                       },
                   }
                 : undefined;
 
-            setSelectedLine(tempSelectedLine);
+            setSelectedLine(dragStateRef.current.tempSelectedLine);
         };
 
         async function limitOrderDragEnd(tempSelectedLine: LabelLocationData) {
@@ -766,6 +775,8 @@ const LabelComponent = ({
         }
 
         const handleDragEnd = async () => {
+            const { tempSelectedLine, originalPrice } = dragStateRef.current;
+
             if (!tempSelectedLine || originalPrice === undefined) {
                 return;
             }
@@ -777,7 +788,10 @@ const LabelComponent = ({
             if (tempSelectedLine.parentLine.type === 'LIQ') {
                 liqPriceDragEnd(tempSelectedLine);
             }
-            tempSelectedLine = undefined;
+
+            dragStateRef.current.tempSelectedLine = undefined;
+            dragStateRef.current.originalPrice = undefined;
+            dragStateRef.current.isDragging = false;
             setIsDrag(false);
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
@@ -801,6 +815,50 @@ const LabelComponent = ({
             d3.select(canvas).on('.drag', null);
         };
     }, [overlayCanvasRef.current, chart, selectedLine, drawnLabelsRef.current]);
+
+    // Handle mouse leaving chart during drag
+    useEffect(() => {
+        if (!chart) return;
+
+        const handleMouseLeave = () => {
+            const { isDragging, tempSelectedLine, originalPrice } =
+                dragStateRef.current;
+
+            if (isDragging && tempSelectedLine && originalPrice !== undefined) {
+                // Restore original price
+                const restoredLine = {
+                    ...tempSelectedLine,
+                    parentLine: {
+                        ...tempSelectedLine.parentLine,
+                        yPrice: originalPrice,
+                    },
+                };
+                setSelectedLine(restoredLine);
+
+                // Reset drag state
+                dragStateRef.current.tempSelectedLine = undefined;
+                dragStateRef.current.originalPrice = undefined;
+                dragStateRef.current.isDragging = false;
+                setIsDrag(false);
+                setSelectedLine(undefined);
+
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+                }
+            }
+        };
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        const iframeBody = iframeDoc?.body;
+
+        if (iframeBody) {
+            iframeBody.addEventListener('mouseleave', handleMouseLeave);
+
+            return () => {
+                iframeBody.removeEventListener('mouseleave', handleMouseLeave);
+            };
+        }
+    }, [chart]);
 
     return null;
 };
