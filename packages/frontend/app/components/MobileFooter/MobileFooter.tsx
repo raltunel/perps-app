@@ -46,6 +46,7 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     const [activePanel, setActivePanel] = useState<
         'none' | 'menu' | 'settings'
     >('none');
+
     const [dragY, setDragY] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const dragStartY = useRef(0);
@@ -61,8 +62,8 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
 
     const closePanel = useCallback(() => {
         setActivePanel('none');
-        setIsDragging(false);
-    }, []);
+        resetDragState();
+    }, [resetDragState]);
 
     const handleDragStart = useCallback((e: React.PointerEvent) => {
         setIsDragging(true);
@@ -86,12 +87,12 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
             (e.target as HTMLElement).releasePointerCapture(e.pointerId);
 
             if (dragY > 50) {
-                setActivePanel('none');
+                closePanel();
             } else {
                 setDragY(0);
             }
         },
-        [isDragging, dragY],
+        [isDragging, dragY, closePanel],
     );
 
     const menuToggleRef = useRef<HTMLButtonElement>(null);
@@ -158,15 +159,6 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     const handleMenuItemClick = (item: FooterMenuItem) => {
         if (item.type === 'external' && item.url) {
             window.open(item.url, '_blank');
-            if (typeof plausible === 'function') {
-                plausible('External Link Clicked', {
-                    props: {
-                        location: 'mobile-footer',
-                        linkType: item.label,
-                        url: item.url,
-                    },
-                });
-            }
         } else if (item.type === 'internal' && item.path) {
             navigate(item.path);
         } else if (item.type === 'action' && item.onClick) {
@@ -186,9 +178,12 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     };
 
     return (
-        <nav className={styles.footer}>
-            {/* EXPANDING PANEL */}
-            <AnimatePresence initial={false} onExitComplete={resetDragState}>
+        <motion.nav
+            className={styles.footer}
+            animate={{ y: isAnyPanelOpen ? dragY : 0 }}
+            transition={{ y: { duration: isDragging ? 0 : 0.2 } }}
+        >
+            <AnimatePresence initial={false}>
                 {isAnyPanelOpen && (
                     <motion.div
                         ref={panelRef}
@@ -197,21 +192,17 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
                         animate={{
                             height: 'auto',
                             opacity: 1,
-                            y: dragY,
                             transition: {
                                 height: { duration: 0.2 },
                                 opacity: { duration: 0.15 },
-                                y: { duration: isDragging ? 0 : 0.2 },
                             },
                         }}
                         exit={{
                             height: 0,
                             opacity: 0,
-                            y: dragY > 50 ? dragY : 0,
                             transition: { duration: 0.15 },
                         }}
                     >
-                        {/* DRAG HANDLE */}
                         <div
                             className={styles.dragHandle}
                             onPointerDown={handleDragStart}
@@ -258,58 +249,51 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
                 )}
             </AnimatePresence>
 
-            {/* BOTTOM ROW - NO ANIMATION */}
             <div className={styles.footerMainRow}>
                 <div className={styles.navItemsRow}>
                     {navItems.map((item) => (
                         <NavItem key={item.name} item={item} />
                     ))}
                 </div>
+
                 <button
                     ref={settingsToggleRef}
-                    type='button'
                     className={`${styles.menuToggle} ${
                         isSettingsOpen ? styles.menuToggleActive : ''
                     }`}
                     onClick={toggleSettingsPanel}
-                    aria-label={t('aria.openSettings')}
                 >
                     <LuSettings size={20} />
                 </button>
+                {/* 
                 <button
                     ref={menuToggleRef}
-                    type='button'
                     className={`${styles.menuToggle} ${
                         isMenuOpen ? styles.menuToggleActive : ''
                     }`}
                     onClick={toggleMenuPanel}
-                    aria-label={t('aria.openMenu')}
                 >
                     <CgMoreO size={22} />
-                </button>
+                </button> */}
             </div>
-        </nav>
+        </motion.nav>
     );
 };
 
-const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
-    const { name, path, icon, end } = item;
-
-    return (
-        <NavLink
-            to={path}
-            end={end}
-            className={({ isActive }) =>
-                `${styles.navItem} ${isActive ? styles.active : ''}`
-            }
-        >
-            <div className={styles.iconWrapper}>
-                <div className={styles.icon}>{icon}</div>
-                <span className={styles.label}>{name}</span>
-            </div>
-        </NavLink>
-    );
-});
+const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => (
+    <NavLink
+        to={item.path}
+        end={item.end}
+        className={({ isActive }) =>
+            `${styles.navItem} ${isActive ? styles.active : ''}`
+        }
+    >
+        <div className={styles.iconWrapper}>
+            <div className={styles.icon}>{item.icon}</div>
+            <span className={styles.label}>{item.name}</span>
+        </div>
+    </NavLink>
+));
 
 const homeSvg = <RiHome2Line size={23} />;
 
@@ -321,13 +305,14 @@ const tradeSvg = (
         viewBox='0 0 25 25'
         fill='none'
     >
+        {' '}
         <path
             d='M18.84 10.87C19.7853 11.2224 20.6265 11.8075 21.2858 12.5712C21.945 13.3349 22.4011 14.2524 22.6117 15.2391C22.8224 16.2257 22.7809 17.2495 22.491 18.2158C22.2012 19.1822 21.6723 20.0598 20.9534 20.7676C20.2345 21.4754 19.3487 21.9905 18.378 22.2652C17.4072 22.54 16.3829 22.5655 15.3997 22.3395C14.4165 22.1134 13.5061 21.6431 12.7528 20.972C11.9995 20.3009 11.4276 19.4507 11.09 18.5M7.75 6.5H8.75V10.5M17.46 14.38L18.16 15.09L15.34 17.91M14.75 8.5C14.75 11.8137 12.0637 14.5 8.75 14.5C5.43629 14.5 2.75 11.8137 2.75 8.5C2.75 5.18629 5.43629 2.5 8.75 2.5C12.0637 2.5 14.75 5.18629 14.75 8.5Z'
             stroke='currentColor'
             strokeWidth='2.2'
             strokeLinecap='round'
             strokeLinejoin='round'
-        />
+        />{' '}
     </svg>
 );
 
