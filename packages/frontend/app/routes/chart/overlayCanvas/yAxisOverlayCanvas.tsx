@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -11,6 +11,8 @@ import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
 import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
 import { useChartStore } from '~/stores/TradingviewChartStore';
+import { useOpenOrderLines } from '../orders/useOpenOrderLines';
+import { usePositionOrderLines } from '../orders/usePositionOrderLines';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -27,6 +29,143 @@ const YAxisOverlayCanvas: React.FC = () => {
     const lastCandle = useChartStore((state) => state.lastCandle);
 
     const markPx = symbolInfo?.markPx || 1;
+
+    const openOrderLines = useOpenOrderLines();
+    const positionOrderLines = usePositionOrderLines();
+
+    const labelAnalysis = useMemo(() => {
+        if (!orderInputPriceValue.value || !chart) return null;
+
+        const closePrice = lastCandle?.close || markPx;
+        const scaleData = scaleDataRef.current;
+        if (!scaleData) return null;
+
+        const paneIndex = getMainSeriesPaneIndex(chart);
+        if (paneIndex === null) return null;
+
+        const priceScalePane = chart.activeChart().getPanes()[
+            paneIndex
+        ] as IPaneApi;
+        const priceScale = priceScalePane.getMainSourcePriceScale();
+        if (!priceScale) return null;
+
+        const isLogarithmic = priceScale.getMode() === 1;
+        const labelHeight = 15;
+
+        const allPrices: number[] = [
+            closePrice,
+            ...openOrderLines.map((line) => line.yPrice),
+            ...positionOrderLines.map((line) => line.yPrice),
+        ].filter((price) => price > 0);
+
+        const orderPricePixel = isLogarithmic
+            ? scaleData.scaleSymlog(orderInputPriceValue.value)
+            : scaleData.yScale(orderInputPriceValue.value);
+
+        type LabelInfo = {
+            price: number;
+            pixel: number;
+            isOrderLabel: boolean;
+            isClosePrice: boolean;
+        };
+
+        const labels: LabelInfo[] = [
+            ...allPrices.map((price) => ({
+                price,
+                pixel: isLogarithmic
+                    ? scaleData.scaleSymlog(price)
+                    : scaleData.yScale(price),
+                isOrderLabel: false,
+                isClosePrice: price === closePrice,
+            })),
+            {
+                price: orderInputPriceValue.value,
+                pixel: orderPricePixel,
+                isOrderLabel: true,
+                isClosePrice: false,
+            },
+        ];
+
+        const aboveClosePrice = labels.filter((l) => l.price >= closePrice);
+        const belowClosePrice = labels.filter((l) => l.price <= closePrice);
+
+        aboveClosePrice.sort((a, b) => a.price - b.price);
+        belowClosePrice.sort((a, b) => b.price - a.price);
+
+        const adjustedLabels: Array<LabelInfo & { adjustedPixel: number }> = [];
+
+        for (let i = 0; i < aboveClosePrice.length; i++) {
+            const label = aboveClosePrice[i];
+            let adjustedPixel = label.pixel;
+
+            if (i > 0) {
+                const prevLabel = adjustedLabels[adjustedLabels.length - 1];
+                const distanceOriginal = Math.abs(
+                    label.pixel - prevLabel.pixel,
+                );
+                const distanceAdjusted = Math.abs(
+                    label.pixel - prevLabel.adjustedPixel,
+                );
+
+                if (
+                    distanceOriginal < labelHeight ||
+                    distanceAdjusted < labelHeight
+                ) {
+                    adjustedPixel = prevLabel.adjustedPixel - labelHeight;
+                }
+            }
+
+            adjustedLabels.push({
+                ...label,
+                adjustedPixel,
+            });
+        }
+
+        for (let i = 0; i < belowClosePrice.length; i++) {
+            const label = belowClosePrice[i];
+            let adjustedPixel = label.pixel;
+
+            if (i > 0) {
+                const prevLabel = adjustedLabels[adjustedLabels.length - 1];
+                const distanceOriginal = Math.abs(
+                    label.pixel - prevLabel.pixel,
+                );
+                const distanceAdjusted = Math.abs(
+                    label.pixel - prevLabel.adjustedPixel,
+                );
+
+                if (
+                    distanceOriginal < labelHeight ||
+                    distanceAdjusted < labelHeight
+                ) {
+                    adjustedPixel = prevLabel.adjustedPixel + labelHeight;
+                }
+            }
+
+            adjustedLabels.push({
+                ...label,
+                adjustedPixel,
+            });
+        }
+
+        const orderLabel = adjustedLabels.find((l) => l.isOrderLabel);
+        if (!orderLabel) return null;
+
+        return {
+            allLabels: adjustedLabels,
+            orderLabel,
+            closePrice,
+        };
+    }, [
+        orderInputPriceValue.value,
+        lastCandle?.close,
+        markPx,
+        openOrderLines,
+        positionOrderLines,
+        chart,
+        JSON.stringify(scaleDataRef?.current?.yScale.domain()),
+    ]);
+
     useEffect(() => {
         if (!chart) return;
 
@@ -214,66 +353,20 @@ const YAxisOverlayCanvas: React.FC = () => {
     }, [chart, isChartReady, isPaneChanged]);
 
     useEffect(() => {
-        const dpr = window.devicePixelRatio || 1;
-
         if (
             !canvasRef.current ||
             !chart ||
             isDrag ||
-            !orderInputPriceValue.value
+            !orderInputPriceValue.value ||
+            !labelAnalysis
         )
             return;
 
         const canvas = canvasRef.current;
-
-        const scaleData = scaleDataRef.current;
-        if (!scaleData) return;
-
-        const paneIndex = getMainSeriesPaneIndex(chart);
-        if (paneIndex === null) return;
-
-        const priceScalePane = chart.activeChart().getPanes()[
-            paneIndex
-        ] as IPaneApi;
-        const priceScale = priceScalePane.getMainSourcePriceScale();
-
-        if (!priceScale) return;
-
-        const isLogarithmic = priceScale.getMode() === 1;
-        let orderPricePixel: number;
-
-        const closePrice = lastCandle?.close || markPx;
-
-        let closePricePixel: number;
-        if (isLogarithmic) {
-            orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue.value);
-            closePricePixel = scaleData.scaleSymlog(closePrice);
-        } else {
-            orderPricePixel = scaleData.yScale(orderInputPriceValue.value);
-            closePricePixel = scaleData.yScale(closePrice);
-        }
-
-        // Approximate label height in pixels
-        const labelHeight = 15;
-
-        // Check if closePricePixel and orderPricePixel are too close to each other
-        const pixelDistance = Math.abs(closePricePixel - orderPricePixel);
-        const areLabelsClose = pixelDistance <= labelHeight;
-
-        let adjustedOrderPricePixel = orderPricePixel;
-        if (areLabelsClose) {
-            if (orderInputPriceValue.value >= closePrice) {
-                adjustedOrderPricePixel =
-                    orderPricePixel - (labelHeight - pixelDistance);
-            } else {
-                adjustedOrderPricePixel =
-                    orderPricePixel + (labelHeight - pixelDistance);
-            }
-        }
-
+        const { orderLabel } = labelAnalysis;
+        const adjustedPixel = orderLabel.adjustedPixel;
         const tolerance = 10;
-        const isNearOrderPrice =
-            Math.abs(mouseY - adjustedOrderPricePixel) <= tolerance;
+        const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
 
         isNearOrderPriceRef.current = isNearOrderPrice;
 
@@ -292,7 +385,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         chart,
         isDrag,
         symbol,
-        lastCandle?.close,
+        labelAnalysis,
     ]);
 
     useEffect(() => {
