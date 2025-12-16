@@ -13,15 +13,22 @@ import {
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useLiqChartStore } from '~/stores/LiqChartStore';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 interface OBLiqFetcherProps {}
 
 const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
+    const { maxLiqValue, minLiqValue, setMaxLiqValue, setMinLiqValue } =
+        useLiqChartStore();
+
     const { symbol, symbolInfo } = useTradeDataStore();
     const symbolRef = useRef<string>('');
     symbolRef.current = symbol;
+    const symbolInfoRef = useRef<SymbolInfoIF | null>(null);
+    symbolInfoRef.current = symbolInfo;
 
     const { setHrBuys, setHrSells, setHrLiqBuys, setHrLiqSells } =
         useOrderBookStore();
@@ -94,7 +101,34 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
         );
         setHrLiqBuys(liqBuys);
         setHrLiqSells(liqSells.reverse());
-    }, [setHrBuys, setHrSells, setHrLiqBuys, setHrLiqSells]);
+
+        if (maxLiqValue === null) {
+            let maxLiq = 0;
+            [...liqBuys, ...liqSells].forEach((liq) => {
+                if (liq.sz > maxLiq) {
+                    maxLiq = liq.sz;
+                }
+            });
+            setMaxLiqValue(maxLiq * (symbolInfoRef.current?.markPx ?? 0));
+        }
+
+        if (minLiqValue === null) {
+            let minLiq = Infinity;
+            [...liqBuys, ...liqSells].forEach((liq) => {
+                if (liq.sz < minLiq) {
+                    minLiq = liq.sz;
+                }
+            });
+            setMinLiqValue(minLiq * (symbolInfoRef.current?.markPx ?? 0));
+        }
+    }, [
+        setHrBuys,
+        setHrSells,
+        setHrLiqBuys,
+        setHrLiqSells,
+        maxLiqValue,
+        minLiqValue,
+    ]);
 
     useEffect(() => {
         genRandomData();

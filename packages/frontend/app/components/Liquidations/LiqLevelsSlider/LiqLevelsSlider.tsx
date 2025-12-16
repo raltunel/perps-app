@@ -1,11 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './LiqLevelsSlider.module.css';
-
-interface LiqLevel {
-    id: number;
-    label: string;
-    color: string;
-}
+import { useLiqChartStore, type LiqLevel } from '~/stores/LiqChartStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface LiqThreshold {
     id: number;
@@ -19,13 +15,8 @@ interface LiqLevelsSliderProps {
 export const LiqLevelsSlider = ({
     onThresholdsChange,
 }: LiqLevelsSliderProps) => {
-    // 4 levels defined by their colors
-    const levels: LiqLevel[] = [
-        { id: 1, label: 'Level 4', color: '#FDE725' }, // Yellow - highest
-        { id: 2, label: 'Level 3', color: '#2BAE7D' }, // Green
-        { id: 3, label: 'Level 2', color: '#287D8D' }, // Blue
-        { id: 4, label: 'Level 1', color: '#461668' }, // Purple - lowest
-    ];
+    const { liqLevels, setLiqLevels, maxLiqValue, minLiqValue } =
+        useLiqChartStore();
 
     // Default threshold values
     const defaultThresholds: LiqThreshold[] = [
@@ -34,9 +25,26 @@ export const LiqLevelsSlider = ({
         { id: 3, value: 80 },
     ];
 
+    const { formatNum } = useNumFormatter();
+
     // 3 thresholds to create 4 sections
     const [thresholds, setThresholds] =
         useState<LiqThreshold[]>(defaultThresholds);
+
+    useEffect(() => {
+        const newLiqLevels = [...liqLevels];
+
+        thresholds.forEach((threshold) => {
+            const level = newLiqLevels.find(
+                (level) => level.id === threshold.id,
+            );
+            if (level) {
+                level.minRatio = threshold.value;
+            }
+        });
+
+        setLiqLevels(newLiqLevels);
+    }, [thresholds]);
 
     const [draggingId, setDraggingId] = useState<number | null>(null);
     const trackRef = useRef<HTMLDivElement>(null);
@@ -121,32 +129,53 @@ export const LiqLevelsSlider = ({
         const segments: string[] = [];
 
         // Level 1 (Purple) from 0% to first threshold
-        segments.push(`${levels[3].color} 0%`);
-        segments.push(`${levels[3].color} ${sortedThresholds[0].value}%`);
+        segments.push(`${liqLevels[3].color} 0%`);
+        segments.push(`${liqLevels[3].color} ${sortedThresholds[0].value}%`);
 
         // Level 2 (Blue) from first to second threshold
-        segments.push(`${levels[2].color} ${sortedThresholds[0].value}%`);
-        segments.push(`${levels[2].color} ${sortedThresholds[1].value}%`);
+        segments.push(`${liqLevels[2].color} ${sortedThresholds[0].value}%`);
+        segments.push(`${liqLevels[2].color} ${sortedThresholds[1].value}%`);
 
         // Level 3 (Green) from second to third threshold
-        segments.push(`${levels[1].color} ${sortedThresholds[1].value}%`);
-        segments.push(`${levels[1].color} ${sortedThresholds[2].value}%`);
+        segments.push(`${liqLevels[1].color} ${sortedThresholds[1].value}%`);
+        segments.push(`${liqLevels[1].color} ${sortedThresholds[2].value}%`);
 
         // Level 4 (Yellow) from third threshold to 100%
-        segments.push(`${levels[0].color} ${sortedThresholds[2].value}%`);
-        segments.push(`${levels[0].color} 100%`);
+        segments.push(`${liqLevels[0].color} ${sortedThresholds[2].value}%`);
+        segments.push(`${liqLevels[0].color} 100%`);
 
         return segments.join(', ');
+    };
+
+    const getValueForRatio = (ratio: number) => {
+        if (minLiqValue === null || maxLiqValue === null) return 0;
+        return formatNum(
+            (minLiqValue + ((maxLiqValue - minLiqValue) * ratio) / 100).toFixed(
+                2,
+            ),
+        );
     };
 
     // Get level ranges for display
     const getLevelRanges = () => {
         const sorted = sortedThresholds.map((t) => t.value);
         return [
-            { level: levels[3], range: `0-${sorted[0]}` },
-            { level: levels[2], range: `${sorted[0]}-${sorted[1]}` },
-            { level: levels[1], range: `${sorted[1]}-${sorted[2]}` },
-            { level: levels[0], range: `${sorted[2]}-100` },
+            {
+                level: liqLevels[3],
+                range: `Min-${getValueForRatio(sorted[0])}`,
+            },
+            {
+                level: liqLevels[2],
+                range: `${getValueForRatio(sorted[0])}-${getValueForRatio(sorted[1])}`,
+            },
+            {
+                level: liqLevels[1],
+                range: `${getValueForRatio(sorted[1])}-${getValueForRatio(sorted[2])}`,
+            },
+            {
+                level: liqLevels[0],
+                range: `${getValueForRatio(sorted[2])}-Max`,
+            },
         ];
     };
 
@@ -187,16 +216,16 @@ export const LiqLevelsSlider = ({
                     {sortedThresholds.map((threshold, index) => {
                         const leftColor =
                             index === 0
-                                ? levels[3].color
+                                ? liqLevels[3].color
                                 : index === 1
-                                  ? levels[2].color
-                                  : levels[1].color;
+                                  ? liqLevels[2].color
+                                  : liqLevels[1].color;
                         const rightColor =
                             index === 0
-                                ? levels[2].color
+                                ? liqLevels[2].color
                                 : index === 1
-                                  ? levels[1].color
-                                  : levels[0].color;
+                                  ? liqLevels[1].color
+                                  : liqLevels[0].color;
 
                         return (
                             <div

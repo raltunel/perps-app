@@ -11,12 +11,19 @@ export enum LiqChartTabType {
     Feed = 'Feed',
 }
 
-export const defaultLiqLevels = [
-    { id: 1, value: 50 },
-    { id: 2, value: 70 },
-    { id: 3, value: 80 },
-];
+export type LiqLevel = {
+    id: number;
+    label: string;
+    color: string;
+    minRatio?: number;
+};
 
+const defaultLiqLevels = [
+    { id: 3, label: 'Level 4', color: '#FDE725', minRatio: 80 }, // Yellow - highest
+    { id: 2, label: 'Level 3', color: '#2BAE7D', minRatio: 70 }, // Green
+    { id: 1, label: 'Level 2', color: '#287D8D', minRatio: 50 }, // Blue
+    { id: 0, label: 'Level 1', color: '#461668' },
+];
 interface LiqChartStore {
     activeTooltipType: LiqChartTooltipType;
     setActiveTooltipType: (tooltipType: LiqChartTooltipType) => void;
@@ -30,6 +37,12 @@ interface LiqChartStore {
     setShowLiqOverlayAlways: (showLiqOverlayAlways: boolean) => void;
     showLiqOptions: boolean;
     setShowLiqOptions: (showLiqOptions: boolean) => void;
+    minLiqValue: number | null;
+    setMinLiqValue: (minLiqValue: number) => void;
+    maxLiqValue: number | null;
+    setMaxLiqValue: (maxLiqValue: number) => void;
+    liqLevels: LiqLevel[];
+    setLiqLevels: (liqLevels: LiqLevel[]) => void;
 }
 
 export const useLiqChartStore = create<LiqChartStore>()(
@@ -53,6 +66,12 @@ export const useLiqChartStore = create<LiqChartStore>()(
             showLiqOptions: false,
             setShowLiqOptions: (showLiqOptions: boolean) =>
                 set({ showLiqOptions }),
+            minLiqValue: null,
+            setMinLiqValue: (minLiqValue: number) => set({ minLiqValue }),
+            maxLiqValue: null,
+            setMaxLiqValue: (maxLiqValue: number) => set({ maxLiqValue }),
+            liqLevels: defaultLiqLevels,
+            setLiqLevels: (liqLevels: LiqLevel[]) => set({ liqLevels }),
         }),
         {
             name: 'LIQCHART',
