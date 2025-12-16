@@ -11,6 +11,12 @@ export enum LiqChartTabType {
     Feed = 'Feed',
 }
 
+export const defaultLiqLevels = [
+    { id: 1, value: 50 },
+    { id: 2, value: 70 },
+    { id: 3, value: 80 },
+];
+
 interface LiqChartStore {
     activeTooltipType: LiqChartTooltipType;
     setActiveTooltipType: (tooltipType: LiqChartTooltipType) => void;

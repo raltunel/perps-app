@@ -2,6 +2,7 @@ import { useLiqChartStore } from '~/stores/LiqChartStore';
 import styles from './LiquidationChartOptions.module.css';
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { LiqLevelsSlider } from '~/components/Liquidations/LiqLevelsSlider/LiqLevelsSlider';
 
 interface LiquidationChartOptionsProps {}
 
@@ -53,8 +54,10 @@ const LiquidationChartOptions: React.FC<
                         Liquidation Options
                     </div>
                     <div className={styles.liqOptionsRow}>
-                        <div className={styles.liqOptionsLabel}>Levels</div>
-                        <div className={styles.liqOptionsValue}></div>
+                        {/* <div className={styles.liqOptionsLabel}>Levels</div> */}
+                        <div className={styles.liqOptionsValue}>
+                            <LiqLevelsSlider onLevelsChange={() => {}} />
+                        </div>
                     </div>
                 </motion.div>
             ) : (
