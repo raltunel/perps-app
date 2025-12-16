@@ -184,9 +184,24 @@ function OrderInput({
     const sessionState = useSession();
     const activeOptions: useAppOptionsIF = useAppOptions();
 
+    const {
+        obChosenPrice,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+        setOrderInputPriceValue,
+        orderInputPriceValue,
+        tradeDirection,
+        setTradeDirection,
+        setIsMidModeActive,
+        isMidModeActive,
+        marketOrderType,
+        setMarketOrderType,
+    } = useTradeDataStore();
+
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
-    const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const marketOrderTypeRef = useRef(marketOrderType);
     marketOrderTypeRef.current = marketOrderType;
 
@@ -242,20 +257,6 @@ function OrderInput({
     const OI_BUFFER = 0.9995;
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
-
-    const {
-        obChosenPrice,
-        symbol,
-        symbolInfo,
-        marginMode,
-        setMarginMode,
-        setOrderInputPriceValue,
-        orderInputPriceValue,
-        tradeDirection,
-        setTradeDirection,
-        setIsMidModeActive,
-        isMidModeActive,
-    } = useTradeDataStore();
 
     const isMidModeActiveRef = useRef(isMidModeActive);
     isMidModeActiveRef.current = isMidModeActive;
@@ -693,10 +694,15 @@ function OrderInput({
 
     useEffect(() => {
         if (obChosenPrice > 0) {
-            setIsMidModeActive(false);
-            // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
-            assignPrice(formatNumWithOnlyDecimals(obChosenPrice), 'obClick');
-            handleTypeChange();
+            setTimeout(() => {
+                setIsMidModeActive(false);
+                // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+                assignPrice(
+                    formatNumWithOnlyDecimals(obChosenPrice),
+                    'obClick',
+                );
+                handleTypeChange();
+            }, 10);
         }
     }, [obChosenPrice]);
 

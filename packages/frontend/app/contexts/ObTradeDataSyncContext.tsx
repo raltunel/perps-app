@@ -27,8 +27,16 @@ export interface ObTradeDataSyncProviderProps {
 export const ObTradeDataSyncProvider: React.FC<
     ObTradeDataSyncProviderProps
 > = ({ children }) => {
-    const { symbol, symbolInfo, isMidModeActive, setOrderInputPriceValue } =
-        useTradeDataStore();
+    const {
+        symbol,
+        symbolInfo,
+        isMidModeActive,
+        setOrderInputPriceValue,
+        marketOrderType,
+    } = useTradeDataStore();
+
+    const marketOrderTypeRef = useRef(marketOrderType);
+    marketOrderTypeRef.current = marketOrderType;
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
     const { setMidPrice, midPrice } = useOrderBookStore();
     const midPriceRef = useRef(midPrice);
@@ -68,6 +76,7 @@ export const ObTradeDataSyncProvider: React.FC<
     useEffect(() => {
         if (!isMidModeActive) return;
         if (!midPrice) return;
+        if (marketOrderTypeRef.current === 'market') return;
         setOrderInputPriceValue({
             value: midPrice,
             changeType: 'midPriceChange',
