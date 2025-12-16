@@ -22,6 +22,7 @@ import { LuCopy } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useFuul } from '~/contexts/FuulContext';
+import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 
 interface PropsIF {
     initialTab?: string;
@@ -384,13 +385,22 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
 
+    // 1
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 {referralStore.cached ? (
                     <>
-                        <h6>{t('referrals.usingAffiliateCode')}</h6>
-                        {isCachedValueValid && <p>{refCodeToConsume}</p>}
+                        <div className={styles.current_ref_code}>
+                            <h6>{t('referrals.usingAffiliateCode')}</h6>
+                            {isCachedValueValid && <p>{refCodeToConsume}</p>}
+                        </div>
+                        <p className={styles.ref_code_blurb}>
+                            Associating a code with your wallet address will
+                            register you to earn rewards on your transactions.
+                            Rewards will also be paid to the affiliate who
+                            created the code.
+                        </p>
                         {isCachedValueValid === false && (
                             <p>
                                 This code does not appear to be registered in
@@ -421,6 +431,7 @@ export default function CodeTabs(props: PropsIF) {
         return checkForPermittedCharacters(temporaryAffiliateCode);
     }, [temporaryAffiliateCode]);
 
+    // 1
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -1087,61 +1098,27 @@ export default function CodeTabs(props: PropsIF) {
             // handlers for entering a referral code
             case 'referrals.enterCode':
             case 'common.enter':
-                if (!isSessionEstablished) {
-                    return (
-                        <section className={styles.sectionWithButton}>
-                            <div className={styles.enterCodeContent}>
-                                <h6>
-                                    {t('referrals.connectYourWallet.enterCode')}
-                                </h6>
-                            </div>
-                            <div
-                                className={styles.sessionButtonWrapper}
-                                style={{ height: '100%' }}
-                            >
-                                <SessionButton />
-                            </div>
-                        </section>
-                    );
-                }
-                // Show spinner while fetching (only if volume isn't already loaded)
-                if (
-                    isFetchingVolume !== false &&
-                    referralStore.totVolume === undefined
-                ) {
-                    return spinner;
-                }
-                // Only show content/error when volume is available
-                if (
-                    referralStore.totVolume &&
-                    referralStore.totVolume > 10000
-                ) {
-                    return (
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                height: '100%',
-                                color: 'var(--text2)',
-                                padding: 'var(--padding-m, 16px)',
-                                textAlign: 'center',
-                                lineHeight: '1.5',
-                            }}
-                        >
-                            This wallet has logged {totVolumeFormatted} in
-                            trading volume. Only users with less than $10,000 in
-                            trading volume can enter a referral code.
-                        </div>
-                    );
-                }
-                const shouldShowInput =
-                    (editModeReferral ||
-                        !referralStore.cached ||
-                        isCachedValueValid === false) &&
-                    referralStore.totVolume !== undefined &&
-                    referralStore.totVolume < 10000;
-                return shouldShowInput ? enterNewCodeElem : currentCodeElem;
+                return (
+                    <EnterCode
+                        isSessionEstablished={isSessionEstablished}
+                        isFetchingVolume={isFetchingVolume}
+                        totVolume={referralStore.totVolume}
+                        totVolumeFormatted={totVolumeFormatted}
+                        cached={referralStore.cached}
+                        isCachedValueValid={isCachedValueValid}
+                        refCodeToConsume={refCodeToConsume}
+                        editModeReferral={editModeReferral}
+                        setEditModeReferral={setEditModeReferral}
+                        userInputRefCode={userInputRefCode}
+                        setUserInputRefCode={setUserInputRefCode}
+                        isUserRefCodeClaimed={isUserRefCodeClaimed}
+                        isUserInputRefCodeSelfOwned={
+                            isUserInputRefCodeSelfOwned
+                        }
+                        handleUpdateReferralCode={handleUpdateReferralCode}
+                        setInvalidCode={setInvalidCode}
+                    />
+                );
             // handlers for creating an affiliate code
             case 'referrals.createCode':
             case 'common.create':
