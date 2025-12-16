@@ -67,7 +67,7 @@ export const ObTradeDataSyncProvider: React.FC<
     }, [symbol]);
 
     useEffect(() => {
-        if (!midPriceRef.current) return;
+        if (midPriceRef.current) return;
         if (symbolInfo?.markPx) {
             setMidPrice(symbolInfo.markPx);
         }
