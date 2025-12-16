@@ -676,11 +676,16 @@ function OrderInput({
 
     useEffect(() => {
         if (obChosenPrice > 0) {
-            setIsMidModeActive(false);
-            // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
-            assignPrice(formatNumWithOnlyDecimals(obChosenPrice), 'obClick');
-            handleTypeChange();
-            setObChosenPrice(0);
+            setTimeout(() => {
+                setIsMidModeActive(false);
+                // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+                assignPrice(
+                    formatNumWithOnlyDecimals(obChosenPrice),
+                    'obClick',
+                );
+                handleTypeChange();
+                setObChosenPrice(0);
+            }, 20);
         }
     }, [obChosenPrice]);
 
