@@ -71,10 +71,14 @@ const LabelComponent = ({
         tempSelectedLine: LabelLocationData | undefined;
         originalPrice: number | undefined;
         isDragging: boolean;
+        isOutsideArea: boolean;
+        frozenPrice: number | undefined;
     }>({
         tempSelectedLine: undefined,
         originalPrice: undefined,
         isDragging: false,
+        isOutsideArea: false,
+        frozenPrice: undefined,
     });
 
     const isLiqPriceLineDraggable = false;
@@ -572,6 +576,25 @@ const LabelComponent = ({
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
+            const { isOutsideArea, frozenPrice } = dragStateRef.current;
+
+            if (isOutsideArea && frozenPrice !== undefined) {
+                dragStateRef.current.tempSelectedLine = dragStateRef.current
+                    .tempSelectedLine
+                    ? {
+                          ...dragStateRef.current.tempSelectedLine,
+                          parentLine: {
+                              ...dragStateRef.current.tempSelectedLine
+                                  .parentLine,
+                              yPrice: frozenPrice,
+                          },
+                      }
+                    : undefined;
+
+                setSelectedLine(dragStateRef.current.tempSelectedLine);
+                return;
+            }
+
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
                 canvas.getBoundingClientRect(),
@@ -775,9 +798,47 @@ const LabelComponent = ({
         }
 
         const handleDragEnd = async () => {
-            const { tempSelectedLine, originalPrice } = dragStateRef.current;
+            const { tempSelectedLine, originalPrice, isOutsideArea } =
+                dragStateRef.current;
 
             if (!tempSelectedLine || originalPrice === undefined) {
+                return;
+            }
+
+            if (isOutsideArea) {
+                const restoredLine = {
+                    ...tempSelectedLine,
+                    parentLine: {
+                        ...tempSelectedLine.parentLine,
+                        yPrice: originalPrice,
+                    },
+                };
+                setSelectedLine(restoredLine);
+
+                dragStateRef.current.tempSelectedLine = undefined;
+                dragStateRef.current.originalPrice = undefined;
+                dragStateRef.current.isDragging = false;
+                dragStateRef.current.isOutsideArea = false;
+                dragStateRef.current.frozenPrice = undefined;
+                setIsDrag(false);
+                setSelectedLine(undefined);
+
+                if (chart) {
+                    const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                    if (iframeDoc?.body) {
+                        iframeDoc.body.style.removeProperty('cursor');
+                    }
+                    if (iframeDoc?.documentElement) {
+                        iframeDoc.documentElement.style.removeProperty(
+                            'cursor',
+                        );
+                    }
+                }
+
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
                 return;
             }
 
@@ -792,7 +853,20 @@ const LabelComponent = ({
             dragStateRef.current.tempSelectedLine = undefined;
             dragStateRef.current.originalPrice = undefined;
             dragStateRef.current.isDragging = false;
+            dragStateRef.current.isOutsideArea = false;
+            dragStateRef.current.frozenPrice = undefined;
             setIsDrag(false);
+
+            if (chart) {
+                const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                if (iframeDoc?.body) {
+                    iframeDoc.body.style.removeProperty('cursor');
+                }
+                if (iframeDoc?.documentElement) {
+                    iframeDoc.documentElement.style.removeProperty('cursor');
+                }
+            }
+
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
@@ -816,35 +890,53 @@ const LabelComponent = ({
         };
     }, [overlayCanvasRef.current, chart, selectedLine, drawnLabelsRef.current]);
 
-    // Handle mouse leaving chart during drag
+    // Handle mouse leaving and entering chart during drag
     useEffect(() => {
         if (!chart) return;
 
         const handleMouseLeave = () => {
-            const { isDragging, tempSelectedLine, originalPrice } =
-                dragStateRef.current;
+            const { isDragging, tempSelectedLine } = dragStateRef.current;
 
-            if (isDragging && tempSelectedLine && originalPrice !== undefined) {
-                // Restore original price
-                const restoredLine = {
-                    ...tempSelectedLine,
-                    parentLine: {
-                        ...tempSelectedLine.parentLine,
-                        yPrice: originalPrice,
-                    },
-                };
-                setSelectedLine(restoredLine);
+            if (isDragging && tempSelectedLine) {
+                dragStateRef.current.frozenPrice =
+                    tempSelectedLine.parentLine.yPrice;
+                dragStateRef.current.isOutsideArea = true;
 
-                // Reset drag state
-                dragStateRef.current.tempSelectedLine = undefined;
-                dragStateRef.current.originalPrice = undefined;
-                dragStateRef.current.isDragging = false;
-                setIsDrag(false);
-                setSelectedLine(undefined);
+                const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                if (iframeDoc?.body) {
+                    iframeDoc.body.style.setProperty(
+                        'cursor',
+                        'not-allowed',
+                        'important',
+                    );
+                }
+                if (iframeDoc?.documentElement) {
+                    iframeDoc.documentElement.style.setProperty(
+                        'cursor',
+                        'not-allowed',
+                        'important',
+                    );
+                }
+            }
+        };
+
+        const handleMouseEnter = () => {
+            const { isDragging } = dragStateRef.current;
+
+            if (isDragging) {
+                dragStateRef.current.isOutsideArea = false;
+                dragStateRef.current.frozenPrice = undefined;
+
+                const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                if (iframeDoc?.body) {
+                    iframeDoc.body.style.removeProperty('cursor');
+                }
+                if (iframeDoc?.documentElement) {
+                    iframeDoc.documentElement.style.removeProperty('cursor');
+                }
 
                 if (overlayCanvasRef.current) {
-                    overlayCanvasRef.current.style.cursor = 'pointer';
-                    overlayCanvasRef.current.style.pointerEvents = 'none';
+                    overlayCanvasRef.current.style.cursor = 'grabbing';
                 }
             }
         };
@@ -854,9 +946,11 @@ const LabelComponent = ({
 
         if (iframeBody) {
             iframeBody.addEventListener('mouseleave', handleMouseLeave);
+            iframeBody.addEventListener('mouseenter', handleMouseEnter);
 
             return () => {
                 iframeBody.removeEventListener('mouseleave', handleMouseLeave);
+                iframeBody.removeEventListener('mouseenter', handleMouseEnter);
             };
         }
     }, [chart]);
