@@ -75,6 +75,7 @@ import type {
 } from '~/utils/CommonIFs';
 import { useTranslation } from 'react-i18next';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 const useOnlyMarket = false;
 
@@ -201,6 +202,13 @@ function OrderInput({
         setMarketOrderType,
     } = useTradeDataStore();
 
+    const orderInputPriceValueRef = useRef(orderInputPriceValue);
+    orderInputPriceValueRef.current = orderInputPriceValue.value;
+
+    const isMobileRef = useRef(false);
+    const isMobile = useMobile();
+    isMobileRef.current = isMobile;
+
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
     const marketOrderTypeRef = useRef(marketOrderType);
@@ -298,18 +306,17 @@ function OrderInput({
     };
 
     const assignPrice = (price: string, changeType: OrderInputChangeType) => {
-        console.log('>>>> assignPrice', price, changeType);
         if (price === '') {
             setOrderInputPriceValue({ value: 0, changeType });
+        } else {
+            const parsed = parseFormattedNum(price);
+            setOrderInputPriceValue({ value: parsed, changeType });
         }
-        const parsed = parseFormattedNum(price);
-        setOrderInputPriceValue({ value: parsed, changeType });
     };
 
     const setMidPriceAsPriceInput = () => {
         if (!midPriceRef.current) return;
         if (marketOrderType === 'limit') {
-            console.log('>>>> setMidPriceAsPriceInput');
             const formattedMidPrice = formatNumWithOnlyDecimals(
                 midPriceRef.current,
                 6,
@@ -330,7 +337,6 @@ function OrderInput({
 
     useEffect(() => {
         // Don't update price if confirm modal is open
-        console.log('>>>> isMidModeActive', isMidModeActive);
         if (isMidModeActive && !confirmOrderModal.isOpen) {
             setMidPriceAsPriceInput();
         }
@@ -621,10 +627,11 @@ function OrderInput({
     );
 
     useEffect(() => {
-        // setNotionalQtyNum(0);
-        // assignPrice('', 'reset');
-
-        // setPrice('');
+        if (!isMobileRef.current) {
+            setNotionalQtyNum(0);
+            // setPrice('');
+            assignPrice('', 'reset');
+        }
 
         // Apply leverage validation when symbol changes
         // BUT only if we have the correct symbolInfo for the current symbol
@@ -669,16 +676,11 @@ function OrderInput({
 
     useEffect(() => {
         if (obChosenPrice > 0) {
-            setTimeout(() => {
-                setIsMidModeActive(false);
-                // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
-                assignPrice(
-                    formatNumWithOnlyDecimals(obChosenPrice),
-                    'obClick',
-                );
-                handleTypeChange();
-                setObChosenPrice(0);
-            }, 10);
+            setIsMidModeActive(false);
+            // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+            assignPrice(formatNumWithOnlyDecimals(obChosenPrice), 'obClick');
+            handleTypeChange();
+            setObChosenPrice(0);
         }
     }, [obChosenPrice]);
 
@@ -873,10 +875,13 @@ function OrderInput({
     useEffect(() => {
         if (marketOrderType === 'market') {
             setOrderInputPriceValue({ value: 0, changeType: 'inputChange' });
-        } else if (marketOrderType === 'limit' && !orderInputPriceValue.value) {
+        } else if (
+            marketOrderType === 'limit' &&
+            !orderInputPriceValueRef.current
+        ) {
             setIsMidModeActive(true);
         }
-    }, [marketOrderType, obChosenPrice]);
+    }, [marketOrderType]);
 
     useEffect(() => {
         if (orderInputPriceValue.value > 0) {
