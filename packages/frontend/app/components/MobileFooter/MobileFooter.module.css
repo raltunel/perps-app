@@ -125,6 +125,9 @@
     background: transparent;
     border: none;
     color: var(--text1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .menuToggleActive {

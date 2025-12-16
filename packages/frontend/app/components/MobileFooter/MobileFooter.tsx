@@ -18,6 +18,7 @@ import { externalURLs } from '~/utils/Constants';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { LuSettings } from 'react-icons/lu';
 import AppOptions from '../AppOptions/AppOptions';
+import PreventPullToRefresh from '~/hooks/PreventPullToRefresh';
 
 interface NavItem {
     name: string;
@@ -178,105 +179,114 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     };
 
     return (
-        <motion.nav
-            className={styles.footer}
-            animate={{ y: isAnyPanelOpen ? dragY : 0 }}
-            transition={{ y: { duration: isDragging ? 0 : 0.2 } }}
-        >
-            <AnimatePresence initial={false}>
-                {isAnyPanelOpen && (
-                    <motion.div
-                        ref={panelRef}
-                        className={styles.footerPanel}
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{
-                            height: 'auto',
-                            opacity: 1,
-                            transition: {
-                                height: { duration: 0.2 },
-                                opacity: { duration: 0.15 },
-                            },
-                        }}
-                        exit={{
-                            height: 0,
-                            opacity: 0,
-                            transition: { duration: 0.15 },
-                        }}
-                    >
-                        <div
-                            className={styles.dragHandle}
+        <PreventPullToRefresh>
+            <motion.nav
+                className={styles.footer}
+                animate={{ y: isAnyPanelOpen ? dragY : 0 }}
+                transition={{ y: { duration: isDragging ? 0 : 0.2 } }}
+            >
+                <AnimatePresence initial={false}>
+                    {isAnyPanelOpen && (
+                        <motion.div
+                            ref={panelRef}
+                            className={styles.footerPanel}
                             onPointerDown={handleDragStart}
                             onPointerMove={handleDragMove}
                             onPointerUp={handleDragEnd}
                             onPointerCancel={handleDragEnd}
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{
+                                height: 'auto',
+                                opacity: 1,
+                                transition: {
+                                    height: { duration: 0.2 },
+                                    opacity: { duration: 0.15 },
+                                },
+                            }}
+                            exit={{
+                                height: 0,
+                                opacity: 0,
+                                transition: { duration: 0.15 },
+                            }}
                         >
-                            <div className={styles.dragBar} />
-                        </div>
+                            <div className={styles.dragHandle}>
+                                <div className={styles.dragBar} />
+                            </div>
 
-                        {isMenuOpen && (
-                            <div className={styles.footerMenu}>
-                                {menuDisplay.map((item) => (
-                                    <button
-                                        key={item.label}
-                                        className={styles.footerMenuItem}
-                                        onClick={() =>
-                                            handleMenuItemClick(item)
-                                        }
-                                    >
-                                        <span
-                                            className={styles.footerMenuLabel}
+                            {isMenuOpen && (
+                                <div className={styles.footerMenu}>
+                                    {menuDisplay.map((item) => (
+                                        <button
+                                            key={item.label}
+                                            className={styles.footerMenuItem}
+                                            onClick={() =>
+                                                handleMenuItemClick(item)
+                                            }
                                         >
-                                            {item.label}
-                                        </span>
-                                        <span className={styles.footerMenuIcon}>
-                                            {item.icon}
-                                        </span>
-                                    </button>
-                                ))}
-                                <div className={styles.version}>
-                                    {t('newVersion.version')}:{' '}
-                                    {packageJson.version.split('-')[0]}
+                                            <span
+                                                className={
+                                                    styles.footerMenuLabel
+                                                }
+                                            >
+                                                {item.label}
+                                            </span>
+                                            <span
+                                                className={
+                                                    styles.footerMenuIcon
+                                                }
+                                            >
+                                                {item.icon}
+                                            </span>
+                                        </button>
+                                    ))}
+                                    <div className={styles.version}>
+                                        {t('newVersion.version')}:{' '}
+                                        {packageJson.version.split('-')[0]}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {isSettingsOpen && (
-                            <div className={styles.footerSettings}>
-                                <AppOptions footer closePanel={closePanel} />
-                            </div>
-                        )}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            {isSettingsOpen && (
+                                <div className={styles.footerSettings}>
+                                    <AppOptions
+                                        footer
+                                        closePanel={closePanel}
+                                    />
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-            <div className={styles.footerMainRow}>
-                <div className={styles.navItemsRow}>
-                    {navItems.map((item) => (
-                        <NavItem key={item.name} item={item} />
-                    ))}
-                </div>
+                <div className={styles.footerMainRow}>
+                    <div className={styles.navItemsRow}>
+                        {navItems.map((item) => (
+                            <NavItem key={item.name} item={item} />
+                        ))}
+                    </div>
 
+                    <button
+                        ref={settingsToggleRef}
+                        className={`${styles.menuToggle} ${
+                            isSettingsOpen ? styles.menuToggleActive : ''
+                        }`}
+                        onClick={toggleSettingsPanel}
+                    >
+                        <LuSettings size={20} />
+                    </button>
+                    {/* 
                 <button
-                    ref={settingsToggleRef}
-                    className={`${styles.menuToggle} ${
-                        isSettingsOpen ? styles.menuToggleActive : ''
-                    }`}
-                    onClick={toggleSettingsPanel}
-                >
-                    <LuSettings size={20} />
-                </button>
-                {/* 
-                <button
-                    ref={menuToggleRef}
-                    className={`${styles.menuToggle} ${
-                        isMenuOpen ? styles.menuToggleActive : ''
+                ref={menuToggleRef}
+                className={`${styles.menuToggle} ${
+                    isMenuOpen ? styles.menuToggleActive : ''
                     }`}
                     onClick={toggleMenuPanel}
-                >
+                    >
                     <CgMoreO size={22} />
-                </button> */}
-            </div>
-        </motion.nav>
+                    </button> */}
+                </div>
+            </motion.nav>
+        </PreventPullToRefresh>
     );
 };
 
