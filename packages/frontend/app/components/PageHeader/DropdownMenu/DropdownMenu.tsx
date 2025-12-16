@@ -10,7 +10,7 @@ import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 import { externalURLs } from '~/utils/Constants';
 import { t } from 'i18next';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { animate, motion, useMotionValue, type PanInfo } from 'framer-motion';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { useEffect } from 'react';
@@ -34,7 +34,21 @@ const DropdownMenu = ({
 }: DropdownMenuProps) => {
     const sessionState = useSession();
     const navigate = useNavigate();
+    const location = useLocation();
+
     const isMobile = useMediaQuery('(max-width: 768px)');
+    useEffect(() => {
+        // Close immediately on route change
+        if (!isMobile) {
+            setIsDropdownMenuOpen(false);
+            return;
+        }
+
+        animate(x, SIDEBAR_WIDTH, {
+            ...SNAP,
+            onComplete: () => setIsDropdownMenuOpen(false),
+        });
+    }, [location.pathname]);
 
     /**
      * Drawer position
