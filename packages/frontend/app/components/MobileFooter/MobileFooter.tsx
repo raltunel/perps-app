@@ -266,7 +266,11 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
                 <div ref={footerMainRef} className={styles.footerMainRow}>
                     <div className={styles.navItemsRow}>
                         {navItems.map((item) => (
-                            <NavItem key={item.name} item={item} />
+                            <NavItem
+                                key={item.name}
+                                item={item}
+                                onClick={closePanel}
+                            />
                         ))}
 
                         <button
@@ -290,20 +294,23 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     );
 };
 
-const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => (
-    <NavLink
-        to={item.path}
-        end={item.end}
-        className={({ isActive }) =>
-            `${styles.navItem} ${isActive ? styles.active : ''}`
-        }
-    >
-        <div className={styles.iconWrapper}>
-            <div className={styles.icon}>{item.icon}</div>
-            <span className={styles.label}>{item.name}</span>
-        </div>
-    </NavLink>
-));
+const NavItem: React.FC<{ item: NavItem; onClick?: () => void }> = React.memo(
+    ({ item, onClick }) => (
+        <NavLink
+            to={item.path}
+            end={item.end}
+            onClick={onClick}
+            className={({ isActive }) =>
+                `${styles.navItem} ${isActive ? styles.active : ''}`
+            }
+        >
+            <div className={styles.iconWrapper}>
+                <div className={styles.icon}>{item.icon}</div>
+                <span className={styles.label}>{item.name}</span>
+            </div>
+        </NavLink>
+    ),
+);
 
 const homeSvg = <RiHome2Line size={23} />;
 
