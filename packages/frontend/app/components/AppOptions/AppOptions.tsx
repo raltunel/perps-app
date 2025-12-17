@@ -167,6 +167,7 @@ export default function AppOptions(props: AppOptionsProps) {
                 />
                 <OptionLineSelect
                     text={t('appSettings.color')}
+                    dropDirection={isMobileVersion ? 'up' : 'down'}
                     active={
                         <div style={{ gap: '10px' }}>
                             <div>{t(bsColor.toString())}</div>
