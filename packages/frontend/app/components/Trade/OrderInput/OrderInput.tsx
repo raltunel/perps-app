@@ -676,6 +676,7 @@ function OrderInput({
 
     useEffect(() => {
         if (obChosenPrice > 0) {
+            // timeout has been added to handle race condition useEffect [marketOrderType] on mobile
             setTimeout(() => {
                 setIsMidModeActive(false);
                 // setPrice(formatNumWithOnlyDecimals(obChosenPrice));
