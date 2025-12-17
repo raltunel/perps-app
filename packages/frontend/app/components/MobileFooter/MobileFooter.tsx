@@ -268,27 +268,22 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
                         {navItems.map((item) => (
                             <NavItem key={item.name} item={item} />
                         ))}
-                    </div>
 
-                    <button
-                        ref={settingsToggleRef}
-                        className={`${styles.menuToggle} ${
-                            isSettingsOpen ? styles.menuToggleActive : ''
-                        }`}
-                        onClick={toggleSettingsPanel}
-                    >
-                        <LuSettings size={20} />
-                    </button>
-                    {/* 
-                <button
-                ref={menuToggleRef}
-                className={`${styles.menuToggle} ${
-                    isMenuOpen ? styles.menuToggleActive : ''
-                    }`}
-                    onClick={toggleMenuPanel}
-                    >
-                    <CgMoreO size={22} />
-                    </button> */}
+                        <button
+                            ref={settingsToggleRef}
+                            className={`${styles.navItem} ${isSettingsOpen ? styles.active : ''}`}
+                            onClick={toggleSettingsPanel}
+                        >
+                            <div className={styles.iconWrapper}>
+                                <div className={styles.icon}>
+                                    <LuSettings size={23} />
+                                </div>
+                                <span className={styles.label}>
+                                    {t('navigation.settings')}
+                                </span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </motion.nav>
         </PreventPullToRefresh>

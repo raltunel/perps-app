@@ -240,49 +240,50 @@ export default function AppOptions(props: AppOptionsProps) {
                 />
             </ul>
             <div className={styles.actions_container}>
-                {!isDefaults && (
-                    <div
-                        className={styles.apply_defaults}
-                        style={{
-                            background: 'var(--accent1)',
-                            padding: 'var(--padding-xs',
-                            borderRadius: '0.375rem',
-                        }}
-                        onClick={() => {
-                            activeOptions.applyDefaults();
-                            setNumFormat(NumFormatTypes[0]);
-                            setBsColor('colors.default');
-                            useAppSettings.getState().resetLayoutHeights();
-
-                            // reset language to browser default or English if unsupported
-                            const defaultLanguage = getDefaultLanguage();
-                            i18n.changeLanguage(defaultLanguage);
-
-                            showChangeAppliedMessage();
-                            if (typeof plausible === 'function') {
-                                plausible('Settings Change', {
-                                    props: {
-                                        setting: 'applyDefaults',
-                                        value: 'default',
-                                    },
-                                });
-                            }
-                        }}
-                    >
-                        {t('common.applyDefaults')}
-                    </div>
-                )}
-
-                {showChangeApplied && (
+                {showChangeApplied ? (
                     <div
                         className={styles.change_applied}
                         style={{
                             color: '#22c55e',
-                            marginLeft: 'auto',
+                            textAlign: 'center',
+                            width: '100%',
                         }}
                     >
                         Change applied
                     </div>
+                ) : (
+                    !isDefaults && (
+                        <div
+                            className={styles.apply_defaults}
+                            style={{
+                                background: 'var(--accent1)',
+                                padding: 'var(--padding-xs)',
+                                borderRadius: '0.375rem',
+                                margin: '0 auto',
+                            }}
+                            onClick={() => {
+                                activeOptions.applyDefaults();
+                                setNumFormat(NumFormatTypes[0]);
+                                setBsColor('colors.default');
+                                useAppSettings.getState().resetLayoutHeights();
+
+                                const defaultLanguage = getDefaultLanguage();
+                                i18n.changeLanguage(defaultLanguage);
+
+                                showChangeAppliedMessage();
+                                if (typeof plausible === 'function') {
+                                    plausible('Settings Change', {
+                                        props: {
+                                            setting: 'applyDefaults',
+                                            value: 'default',
+                                        },
+                                    });
+                                }
+                            }}
+                        >
+                            {t('common.applyDefaults')}
+                        </div>
+                    )
                 )}
             </div>
         </section>
