@@ -23,6 +23,7 @@ import useClipboard from '~/hooks/useClipboard';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useFuul } from '~/contexts/FuulContext';
 import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
+import VolumeProgressBar from '../VolumeProgressBar/VolumeProgressBar';
 
 interface PropsIF {
     initialTab?: string;
@@ -472,17 +473,17 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [sessionState]);
 
-    useEffect(() => {
-        if (!canEditAffiliateCode) {
-            setTemporaryAffiliateCode(defaultAffiliateCode);
-        }
-    }, [canEditAffiliateCode, defaultAffiliateCode]);
+    // useEffect(() => {
+    //     if (!canEditAffiliateCode) {
+    //         setTemporaryAffiliateCode(defaultAffiliateCode);
+    //     }
+    // }, [canEditAffiliateCode, defaultAffiliateCode]);
 
-    useEffect(() => {
-        if (!canEditAffiliateCode && editModeAffiliate) {
-            setEditModeAffiliate(false);
-        }
-    }, [canEditAffiliateCode, editModeAffiliate]);
+    // useEffect(() => {
+    //     if (!canEditAffiliateCode && editModeAffiliate) {
+    //         setEditModeAffiliate(false);
+    //     }
+    // }, [canEditAffiliateCode, editModeAffiliate]);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
@@ -755,40 +756,21 @@ export default function CodeTabs(props: PropsIF) {
                     <p className={styles.trackingLinkExplanation}>
                         {t('referrals.toCustomizeAffiliateCode')}
                     </p>
-                    <div className={styles.volume_progress_bar}>
-                        <div className={styles.volume_progress_bar_labels}>
-                            <p>Your volume:</p>
-                            <p>
-                                {formatNum(
-                                    referralStore.totVolume ?? 0,
-                                    2,
-                                    true,
-                                    true,
-                                )}
-                            </p>
-                        </div>
-                        {!referralStore.totVolume && (
-                            <div className={styles.volume_progress_bar_body}>
-                                {!!referralStore.totVolume && (
-                                    <div
-                                        style={{
-                                            width: `${Math.min(
-                                                100,
-                                                (referralStore.totVolume /
-                                                    AFFILIATE_EDIT_VOLUME_THRESHOLD) *
-                                                    100,
-                                            )}%`,
-                                        }}
-                                    />
-                                )}
-                            </div>
+                    <VolumeProgressBar
+                        volume={referralStore.totVolume ?? 0}
+                        volumeFormatted={formatNum(
+                            referralStore.totVolume ?? 0,
+                            2,
+                            true,
+                            true,
                         )}
-                    </div>
+                        barWidth={AFFILIATE_EDIT_VOLUME_THRESHOLD}
+                    />
                     <p className={styles.trackingLinkExplanation}>
                         {t('common.seeDocsForMore')}
                     </p>
                 </div>
-                {canEditAffiliateCode && (
+                {
                     <SimpleButton
                         bg='accent1'
                         onClick={() => {
@@ -798,7 +780,7 @@ export default function CodeTabs(props: PropsIF) {
                     >
                         {t('common.edit')}
                     </SimpleButton>
-                )}
+                }
             </section>
         ) : (
             <section className={styles.sectionWithButton}>
@@ -897,35 +879,16 @@ export default function CodeTabs(props: PropsIF) {
                             <p>{t('referrals.toCustomizeAffiliateCode')}</p>
                         </>
                     )}
-                    <div className={styles.volume_progress_bar}>
-                        <div className={styles.volume_progress_bar_labels}>
-                            <p>Your volume:</p>
-                            <p>
-                                {formatNum(
-                                    referralStore.totVolume ?? 0,
-                                    2,
-                                    true,
-                                    true,
-                                )}
-                            </p>
-                        </div>
-                        {!referralStore.totVolume && (
-                            <div className={styles.volume_progress_bar_body}>
-                                {!!referralStore.totVolume && (
-                                    <div
-                                        style={{
-                                            width: `${Math.min(
-                                                100,
-                                                (referralStore.totVolume /
-                                                    AFFILIATE_EDIT_VOLUME_THRESHOLD) *
-                                                    100,
-                                            )}%`,
-                                        }}
-                                    />
-                                )}
-                            </div>
+                    <VolumeProgressBar
+                        volume={referralStore.totVolume ?? 0}
+                        volumeFormatted={formatNum(
+                            referralStore.totVolume ?? 0,
+                            2,
+                            true,
+                            true,
                         )}
-                    </div>
+                        barWidth={AFFILIATE_EDIT_VOLUME_THRESHOLD}
+                    />
                 </div>
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
