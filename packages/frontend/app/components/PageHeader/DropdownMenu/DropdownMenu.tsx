@@ -13,7 +13,7 @@ import { t } from 'i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { animate, motion, useMotionValue, type PanInfo } from 'framer-motion';
 import useMediaQuery from '~/hooks/useMediaQuery';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface DropdownMenuProps {
     setIsDropdownMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,7 +37,12 @@ const DropdownMenu = ({
     const location = useLocation();
 
     const isMobile = useMediaQuery('(max-width: 768px)');
+    const initialPathRef = useRef(location.pathname);
     useEffect(() => {
+        // Skip the initial mount - only close on actual route changes
+        if (location.pathname === initialPathRef.current) {
+            return;
+        }
         // Close immediately on route change
         if (!isMobile) {
             setIsDropdownMenuOpen(false);
