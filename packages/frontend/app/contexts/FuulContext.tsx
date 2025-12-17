@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
 
@@ -10,7 +10,7 @@ interface FuulContextType {
     getAffiliateCode: (
         userIdentifier: string,
         identifierType: UserIdentifierType,
-    ) => Promise<string | null>;
+    ) => Promise<Affiliate | null>;
 }
 
 const FuulContext = createContext<FuulContextType>({
