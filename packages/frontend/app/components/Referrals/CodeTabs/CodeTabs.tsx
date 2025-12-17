@@ -389,48 +389,6 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
 
-    // 1
-    const currentCodeElem = (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                {referralStore.cached ? (
-                    <>
-                        <div className={styles.current_ref_code}>
-                            <h6>{t('referrals.usingAffiliateCode')}</h6>
-                            {isCachedValueValid && <p>{refCodeToConsume}</p>}
-                        </div>
-                        <p className={styles.ref_code_blurb}>
-                            Associating a code with your wallet address will
-                            register you to earn rewards on your transactions.
-                            Rewards will also be paid to the affiliate who
-                            created the code.
-                        </p>
-                        {isCachedValueValid === false && (
-                            <p>
-                                This code does not appear to be registered in
-                                the referral system.
-                            </p>
-                        )}
-                    </>
-                ) : (
-                    <h6>{t('referrals.enterCode')}</h6>
-                )}
-            </div>
-            {referralStore.cached &&
-                referralStore.totVolume !== undefined &&
-                referralStore.totVolume < 10000 && (
-                    <div className={styles.refferal_code_buttons}>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => setEditModeReferral(true)}
-                        >
-                            {t('common.edit')}
-                        </SimpleButton>
-                    </div>
-                )}
-        </section>
-    );
-
     const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
         return checkForPermittedCharacters(temporaryAffiliateCode);
     }, [temporaryAffiliateCode]);
@@ -473,17 +431,17 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [sessionState]);
 
-    // useEffect(() => {
-    //     if (!canEditAffiliateCode) {
-    //         setTemporaryAffiliateCode(defaultAffiliateCode);
-    //     }
-    // }, [canEditAffiliateCode, defaultAffiliateCode]);
+    useEffect(() => {
+        if (!canEditAffiliateCode) {
+            setTemporaryAffiliateCode(defaultAffiliateCode);
+        }
+    }, [canEditAffiliateCode, defaultAffiliateCode]);
 
-    // useEffect(() => {
-    //     if (!canEditAffiliateCode && editModeAffiliate) {
-    //         setEditModeAffiliate(false);
-    //     }
-    // }, [canEditAffiliateCode, editModeAffiliate]);
+    useEffect(() => {
+        if (!canEditAffiliateCode && editModeAffiliate) {
+            setEditModeAffiliate(false);
+        }
+    }, [canEditAffiliateCode, editModeAffiliate]);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
