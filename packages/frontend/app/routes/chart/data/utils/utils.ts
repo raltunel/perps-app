@@ -420,6 +420,7 @@ export type CustomToolbarButtonSettings = {
     id?: string;
     iconHtml?: string;
     settingsButton?: boolean;
+    settingsButtonId?: string;
 };
 
 export function createCustomToolbarButton(
@@ -484,6 +485,10 @@ export function createCustomToolbarButton(
         settingsButton.style.border = '1px solid transparent';
         settingsButton.style.borderLeft = 'none';
         settingsButton.innerHTML = CustomToolbarBtnIcons.settings;
+
+        if (settings.settingsButtonId) {
+            settingsButton.id = settings.settingsButtonId;
+        }
 
         settingsButton.addEventListener('mouseenter', () => {
             if (settingsButton)

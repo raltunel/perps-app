@@ -15,14 +15,15 @@ export type LiqLevel = {
     id: number;
     label: string;
     color: string;
-    minRatio?: number;
+    minRatio: number;
+    maxRatio?: number;
 };
 
 const defaultLiqLevels = [
-    { id: 3, label: 'Level 4', color: '#FDE725', minRatio: 80 }, // Yellow - highest
-    { id: 2, label: 'Level 3', color: '#2BAE7D', minRatio: 70 }, // Green
-    { id: 1, label: 'Level 2', color: '#287D8D', minRatio: 50 }, // Blue
-    { id: 0, label: 'Level 1', color: '#461668' },
+    { id: 3, label: 'Level 4', color: '#FDE725', minRatio: 80, maxRatio: 100 }, // Yellow - highest
+    { id: 2, label: 'Level 3', color: '#2BAE7D', minRatio: 70, maxRatio: 80 }, // Green
+    { id: 1, label: 'Level 2', color: '#287D8D', minRatio: 50, maxRatio: 70 }, // Blue
+    { id: 0, label: 'Level 1', color: '#461668', minRatio: 0, maxRatio: 50 },
 ];
 interface LiqChartStore {
     activeTooltipType: LiqChartTooltipType;

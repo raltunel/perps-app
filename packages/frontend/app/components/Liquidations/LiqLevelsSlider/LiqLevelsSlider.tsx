@@ -38,8 +38,14 @@ export const LiqLevelsSlider = ({
             const level = newLiqLevels.find(
                 (level) => level.id === threshold.id,
             );
+            const prevLevel = newLiqLevels.find(
+                (level) => level.id === threshold.id - 1,
+            );
             if (level) {
                 level.minRatio = threshold.value;
+            }
+            if (prevLevel) {
+                prevLevel.maxRatio = threshold.value;
             }
         });
 
@@ -162,19 +168,19 @@ export const LiqLevelsSlider = ({
         return [
             {
                 level: liqLevels[3],
-                range: `Min-${getValueForRatio(sorted[0])}`,
+                range: `Min - ${getValueForRatio(sorted[0])}`,
             },
             {
                 level: liqLevels[2],
-                range: `${getValueForRatio(sorted[0])}-${getValueForRatio(sorted[1])}`,
+                range: `${getValueForRatio(sorted[0])} - ${getValueForRatio(sorted[1])}`,
             },
             {
                 level: liqLevels[1],
-                range: `${getValueForRatio(sorted[1])}-${getValueForRatio(sorted[2])}`,
+                range: `${getValueForRatio(sorted[1])} - ${getValueForRatio(sorted[2])}`,
             },
             {
                 level: liqLevels[0],
-                range: `${getValueForRatio(sorted[2])}-Max`,
+                range: `${getValueForRatio(sorted[2])} - Max`,
             },
         ];
     };

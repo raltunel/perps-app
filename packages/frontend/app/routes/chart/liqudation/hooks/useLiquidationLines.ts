@@ -3,24 +3,41 @@ import type { HorizontalLineData } from '../LiqudationLines';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookLiqIF } from '~/utils/orderbook/OrderBookIFs';
+import { useLiqChartStore, type LiqLevel } from '~/stores/LiqChartStore';
 
 export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
     const { symbolInfo } = useTradeDataStore();
 
     const { hrLiqBuys, hrLiqSells } = useOrderBookStore();
 
-    const markPx = symbolInfo?.markPx;
     const markPxRef = useRef(symbolInfo?.markPx);
     markPxRef.current = symbolInfo?.markPx;
     const [lines, setLines] = useState<HorizontalLineData[]>([]);
     const liqLevelDiffRef = useRef(0);
+    const { liqLevels } = useLiqChartStore();
 
-    const getColor = (ratio: number) => {
-        if (ratio >= 80) return '#FDE725';
-        if (ratio > 70) return '#2BAE7D';
-        if (ratio > 50) return '#287D8D';
-        return '#461668';
-    };
+    const getColor = useCallback(
+        (ratio: number) => {
+            // if (ratio >= 80) return '#FDE725';
+            // if (ratio > 70) return '#2BAE7D';
+            // if (ratio > 50) return '#287D8D';
+            // return '#461668';
+
+            let foundLevel;
+            liqLevels.forEach((level) => {
+                if (
+                    ratio >= (level.minRatio ?? 0) &&
+                    ratio < (level.maxRatio ?? 100)
+                ) {
+                    foundLevel = level;
+                    return;
+                }
+            });
+
+            return foundLevel ? (foundLevel as LiqLevel).color : '#461668';
+        },
+        [liqLevels],
+    );
 
     const calculatLineWidth = useCallback((): number => {
         if (scaleData) {

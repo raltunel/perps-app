@@ -302,7 +302,8 @@ export const TradingViewProvider: React.FC<{
                 settingsButton: liquidationsSettingsButton,
             } = createCustomToolbarButton(liquidationsWrapper, {
                 text: 'Liquidations',
-                id: 'liquidations-settings-button',
+                id: 'liquidations-button',
+                settingsButtonId: 'liquidations-settings-button',
                 iconHtml: CustomToolbarBtnIcons.liquidations,
                 settingsButton: true,
             });
