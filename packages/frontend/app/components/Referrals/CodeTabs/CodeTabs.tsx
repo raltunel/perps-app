@@ -16,14 +16,12 @@ import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
 import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
-import { FaCheck, FaRegCircle, FaSpinner } from 'react-icons/fa';
-import { GiCancel } from 'react-icons/gi';
-import { LuCopy } from 'react-icons/lu';
+import { FaSpinner } from 'react-icons/fa';
 import useClipboard from '~/hooks/useClipboard';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useFuul } from '~/contexts/FuulContext';
 import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
-import VolumeProgressBar from '../VolumeProgressBar/VolumeProgressBar';
+import CreateCode from '../CreateCode/CreateCode';
 
 interface PropsIF {
     initialTab?: string;
@@ -661,241 +659,6 @@ export default function CodeTabs(props: PropsIF) {
         return true;
     }
 
-    const affiliateCodeElem = isSessionEstablished ? (
-        affiliateCode && !editModeAffiliate ? (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.createCodeContent}>
-                    <p>
-                        <Trans
-                            i18nKey='referrals.yourCodeIs'
-                            values={{ affiliateCode }}
-                            components={[
-                                <span style={{ color: 'var(--accent3)' }} />,
-                            ]}
-                        />
-                    </p>
-                    <div
-                        className={styles.with_copy_clipboard}
-                        style={{
-                            backgroundColor: justCopied
-                                ? 'var(--green)'
-                                : 'transparent',
-                            transition: 'background-color 0.2s',
-                            padding: 'var(--padding-s)',
-                        }}
-                        onClick={() => {
-                            copy('https://' + trackingLink);
-                            setJustCopied(true);
-                        }}
-                    >
-                        {trackingLink && (
-                            <div className={styles.walletLink}>
-                                {trackingLink}
-                            </div>
-                        )}
-                        <div className={styles.clipboard_wrapper}>
-                            {justCopied ? (
-                                <FaCheck size={14} />
-                            ) : (
-                                <LuCopy size={14} />
-                            )}
-                        </div>
-                    </div>
-                    <p className={styles.trackingLinkExplanation}>
-                        <Trans
-                            i18nKey='referrals.trackingLinkExplanation'
-                            values={{
-                                affiliatePercent: AFFILIATE_PERCENT,
-                                userPercent: USER_PERCENT,
-                            }}
-                            components={[<span />, <span />]}
-                        />
-                    </p>
-                    <p className={styles.trackingLinkExplanation}>
-                        {t('referrals.toCustomizeAffiliateCode')}
-                    </p>
-                    <VolumeProgressBar
-                        volume={referralStore.totVolume ?? 0}
-                        volumeFormatted={formatNum(
-                            referralStore.totVolume ?? 0,
-                            2,
-                            true,
-                            true,
-                        )}
-                        barWidth={AFFILIATE_EDIT_VOLUME_THRESHOLD}
-                    />
-                    <p className={styles.trackingLinkExplanation}>
-                        {t('common.seeDocsForMore')}
-                    </p>
-                </div>
-                {
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            setTemporaryAffiliateCode(affiliateCode);
-                            setEditModeAffiliate(true);
-                        }}
-                    >
-                        {t('common.edit')}
-                    </SimpleButton>
-                }
-            </section>
-        ) : (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.enterCodeContent}>
-                    {canEditAffiliateCode ? (
-                        <>
-                            <h6>{t('referrals.createAnAffiliateCode')}</h6>
-                            <input
-                                type='text'
-                                value={temporaryAffiliateCode}
-                                onChange={(e) => {
-                                    console.log(
-                                        'Affiliate code input changed:',
-                                        e.target.value,
-                                    );
-                                    setTemporaryAffiliateCode(e.target.value);
-                                }}
-                                onKeyDown={async (e) => {
-                                    if (
-                                        e.key === 'Enter' &&
-                                        temporaryAffiliateCode.trim()
-                                    ) {
-                                        editModeAffiliate
-                                            ? updateAffiliateCode()
-                                            : createAffiliateCode();
-                                    }
-                                }}
-                            />
-                            <div className={styles.validation_item}>
-                                {temporaryAffiliateCode.length > 0 ? (
-                                    temporaryAffiliateCode.length >= 2 &&
-                                    temporaryAffiliateCode.length <= 30 &&
-                                    tempAffiliateCodeCharsValidate ? (
-                                        <FaCheck
-                                            size={10}
-                                            color='var(--green)'
-                                        />
-                                    ) : (
-                                        <GiCancel
-                                            size={10}
-                                            color='var(--red)'
-                                        />
-                                    )
-                                ) : (
-                                    <FaRegCircle
-                                        size={10}
-                                        color='var(--text3)'
-                                    />
-                                )}
-                                <p>
-                                    2 - 30 letters, numbers, hyphens (A-Z, a-z,
-                                    0-9, -)
-                                </p>
-                            </div>
-                            <div className={styles.validation_item}>
-                                {temporaryAffiliateCode.length > 0 ? (
-                                    isTemporaryAffiliateCodeValid === true ? (
-                                        <FaCheck
-                                            size={10}
-                                            color='var(--green)'
-                                        />
-                                    ) : (
-                                        <GiCancel
-                                            size={10}
-                                            color='var(--red)'
-                                        />
-                                    )
-                                ) : (
-                                    <FaRegCircle
-                                        size={10}
-                                        color='var(--text3)'
-                                    />
-                                )}
-                                <p>Code is available</p>
-                            </div>
-                            <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
-                        </>
-                    ) : (
-                        <>
-                            <p>
-                                <Trans
-                                    i18nKey='referrals.yourCodeIs'
-                                    values={{
-                                        affiliateCode:
-                                            affiliateCode ||
-                                            defaultAffiliateCode ||
-                                            '—',
-                                    }}
-                                    components={[
-                                        <span
-                                            style={{ color: 'var(--accent3)' }}
-                                        />,
-                                    ]}
-                                />
-                            </p>
-                            <p>{t('referrals.toCustomizeAffiliateCode')}</p>
-                        </>
-                    )}
-                    <VolumeProgressBar
-                        volume={referralStore.totVolume ?? 0}
-                        volumeFormatted={formatNum(
-                            referralStore.totVolume ?? 0,
-                            2,
-                            true,
-                            true,
-                        )}
-                        barWidth={AFFILIATE_EDIT_VOLUME_THRESHOLD}
-                    />
-                </div>
-                <div className={styles.refferal_code_buttons}>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            if (editModeAffiliate && canEditAffiliateCode) {
-                                void updateAffiliateCode();
-                            } else {
-                                void createAffiliateCode();
-                            }
-                        }}
-                    >
-                        {t(
-                            editModeAffiliate
-                                ? 'common.update'
-                                : 'common.activate',
-                        )}
-                    </SimpleButton>
-                    {editModeAffiliate &&
-                        affiliateCode &&
-                        canEditAffiliateCode && (
-                            <SimpleButton
-                                bg='dark4'
-                                hoverBg='accent1'
-                                onClick={() => {
-                                    setEditModeAffiliate(false);
-                                    setTemporaryAffiliateCode('');
-                                }}
-                            >
-                                {t('common.cancel')}
-                            </SimpleButton>
-                        )}
-                </div>
-            </section>
-        )
-    ) : (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>{t('referrals.connectYourWallet.affiliate')}</h6>
-            </div>
-            <div
-                className={styles.sessionButtonWrapper}
-                style={{ height: '100%' }}
-            >
-                <SessionButton />
-            </div>
-        </section>
-    );
-
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
@@ -972,7 +735,42 @@ export default function CodeTabs(props: PropsIF) {
                 ) {
                     return spinner;
                 }
-                return affiliateCodeElem;
+                return (
+                    <CreateCode
+                        isSessionEstablished={isSessionEstablished}
+                        affiliateCode={affiliateCode}
+                        editModeAffiliate={editModeAffiliate}
+                        setEditModeAffiliate={setEditModeAffiliate}
+                        temporaryAffiliateCode={temporaryAffiliateCode}
+                        setTemporaryAffiliateCode={setTemporaryAffiliateCode}
+                        isTemporaryAffiliateCodeValid={
+                            isTemporaryAffiliateCodeValid
+                        }
+                        tempAffiliateCodeCharsValidate={
+                            tempAffiliateCodeCharsValidate
+                        }
+                        canEditAffiliateCode={canEditAffiliateCode}
+                        defaultAffiliateCode={defaultAffiliateCode}
+                        trackingLink={trackingLink}
+                        justCopied={justCopied}
+                        setJustCopied={setJustCopied}
+                        copy={copy}
+                        totVolume={referralStore.totVolume}
+                        totVolumeFormatted={formatNum(
+                            referralStore.totVolume ?? 0,
+                            2,
+                            true,
+                            true,
+                        )}
+                        affiliateEditVolumeThreshold={
+                            AFFILIATE_EDIT_VOLUME_THRESHOLD
+                        }
+                        affiliatePercent={AFFILIATE_PERCENT}
+                        userPercent={USER_PERCENT}
+                        createAffiliateCode={createAffiliateCode}
+                        updateAffiliateCode={updateAffiliateCode}
+                    />
+                );
             // handlers for claiming rewards
             case 'common.claim':
                 return claimElem;
