@@ -56,6 +56,8 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     const isSettingsOpen = activePanel === 'settings';
     const isAnyPanelOpen = activePanel !== 'none';
 
+    const footerMainRef = useRef<HTMLDivElement>(null);
+
     const resetDragState = useCallback(() => {
         setDragY(0);
         setIsDragging(false);
@@ -101,12 +103,15 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
 
     const panelRef = useOutsideClick<HTMLDivElement>((event) => {
         const target = event.target as Node;
+
         if (
             menuToggleRef.current?.contains(target) ||
-            settingsToggleRef.current?.contains(target)
+            settingsToggleRef.current?.contains(target) ||
+            footerMainRef.current?.contains(target)
         ) {
             return;
         }
+
         closePanel();
     }, isAnyPanelOpen);
 
@@ -258,7 +263,7 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
                     )}
                 </AnimatePresence>
 
-                <div className={styles.footerMainRow}>
+                <div ref={footerMainRef} className={styles.footerMainRow}>
                     <div className={styles.navItemsRow}>
                         {navItems.map((item) => (
                             <NavItem key={item.name} item={item} />

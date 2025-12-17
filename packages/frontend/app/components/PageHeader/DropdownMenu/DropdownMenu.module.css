@@ -177,11 +177,17 @@
     .version {
         margin-top: auto;
     }
+    .logoutButtonContainer {
+        padding: var(--padding-s) 0;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
     .logoutButton {
-        margin-top: var(--margin-xs);
-        padding-left: var(--padding-m);
-        width: 80% !important;
+        min-width: 80%;
     }
     .logoRow {
         display: flex;

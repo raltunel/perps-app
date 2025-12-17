@@ -226,15 +226,17 @@ const DropdownMenu = ({
                     ))}
                 </section>
                 {isEstablished(sessionState) && (
-                    <button
-                        className={styles.logoutButton}
-                        onClick={() => {
-                            sessionState.endSession();
-                            setIsDropdownMenuOpen(false);
-                        }}
-                    >
-                        {t('navigation.logout')}
-                    </button>
+                    <div className={styles.logoutButtonContainer}>
+                        <button
+                            className={styles.logoutButton}
+                            onClick={() => {
+                                sessionState.endSession();
+                                setIsDropdownMenuOpen(false);
+                            }}
+                        >
+                            {t('navigation.logout')}
+                        </button>
+                    </div>
                 )}
             </motion.div>
         </motion.div>

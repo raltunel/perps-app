@@ -243,7 +243,11 @@ export default function AppOptions(props: AppOptionsProps) {
                 {!isDefaults && (
                     <div
                         className={styles.apply_defaults}
-                        style={{ color: 'var(--text2)' }}
+                        style={{
+                            background: 'var(--accent1)',
+                            padding: 'var(--padding-xs',
+                            borderRadius: '0.375rem',
+                        }}
                         onClick={() => {
                             activeOptions.applyDefaults();
                             setNumFormat(NumFormatTypes[0]);

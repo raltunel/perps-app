@@ -58,6 +58,14 @@
 .change_applied {
     animation: fadeInOut 2s ease-in-out;
 }
+.actions_container button {
+    background: var(--accent-1);
+    border-radius: 0.375rem !important;
+    cursor: pointer !important;
+}
+.actions_container button:hover {
+    background-color: color-mix(in srgb, var(--accent1) 90%, black);
+}
 
 @keyframes fadeInOut {
     0% {
