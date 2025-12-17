@@ -171,7 +171,6 @@ export default function CodeTabs(props: PropsIF) {
         } else if (Number.isNaN(referralStore.totVolume)) {
             return formatNum(0, 2, true, true);
         }
-        console.log('totVolume: ', referralStore.totVolume);
         return formatNum(
             referralStore.totVolume,
             referralStore.totVolume < 0.01 ? 3 : 2,
@@ -879,7 +878,7 @@ export default function CodeTabs(props: PropsIF) {
                         </>
                     ) : (
                         <>
-                            <h6>
+                            <p>
                                 <Trans
                                     i18nKey='referrals.yourCodeIs'
                                     values={{
@@ -894,41 +893,39 @@ export default function CodeTabs(props: PropsIF) {
                                         />,
                                     ]}
                                 />
-                            </h6>
-                            <p>{t('referrals.pleaseClickCreate')}</p>
-                            <p>{t('referrals.toCustomizeAffiliateCode')}</p>
-                            {/* <p>
-                                {t('referrals.defaultCodeVolumeExplanation', {
-                                    threshold: formatNum(
-                                        AFFILIATE_EDIT_VOLUME_THRESHOLD,
-                                        0,
-                                        true,
-                                        true,
-                                    ),
-                                })}
                             </p>
-                            <p>
-                                <Trans
-                                    i18nKey='referrals.defaultCodeDescription'
-                                    values={{
-                                        defaultCode:
-                                            defaultAffiliateCode || '—',
-                                    }}
-                                    components={[
-                                        <span
-                                            style={{ color: 'var(--accent3)' }}
-                                        />,
-                                    ]}
-                                />
-                            </p> */}
-                            {isTemporaryAffiliateCodeValid === false && (
-                                <p style={{ color: 'var(--red)' }}>
-                                    Default code unavailable. Please reach out
-                                    to support.
-                                </p>
-                            )}
+                            <p>{t('referrals.toCustomizeAffiliateCode')}</p>
                         </>
                     )}
+                    <div className={styles.volume_progress_bar}>
+                        <div className={styles.volume_progress_bar_labels}>
+                            <p>Your volume:</p>
+                            <p>
+                                {formatNum(
+                                    referralStore.totVolume ?? 0,
+                                    2,
+                                    true,
+                                    true,
+                                )}
+                            </p>
+                        </div>
+                        {!referralStore.totVolume && (
+                            <div className={styles.volume_progress_bar_body}>
+                                {!!referralStore.totVolume && (
+                                    <div
+                                        style={{
+                                            width: `${Math.min(
+                                                100,
+                                                (referralStore.totVolume /
+                                                    AFFILIATE_EDIT_VOLUME_THRESHOLD) *
+                                                    100,
+                                            )}%`,
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
@@ -944,7 +941,7 @@ export default function CodeTabs(props: PropsIF) {
                         {t(
                             editModeAffiliate
                                 ? 'common.update'
-                                : 'common.create',
+                                : 'common.activate',
                         )}
                     </SimpleButton>
                     {editModeAffiliate &&

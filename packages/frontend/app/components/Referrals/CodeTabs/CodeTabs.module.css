@@ -145,6 +145,11 @@
         color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
 }
 
+.enterCodeContent > p {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+}
+
 .max_character_count {
     display: flex;
     flex-direction: row;
@@ -209,9 +214,12 @@
 }
 
 .volume_progress_bar {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
+    color: var(--text2);
+    font-size: var(--font-size-xs);
 }
 
 .volume_progress_bar_labels {
