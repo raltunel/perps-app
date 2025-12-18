@@ -24,6 +24,7 @@ const shortcutCategories: ShortcutCategory[] = [
         shortcuts: [
             { keys: ['Shift', '/'], description: 'Open keyboard shortcuts' },
             { keys: ['Esc'], description: 'Close modal / Cancel' },
+            { keys: ['C'], description: 'Open/close wallet connector' },
             { keys: ['D'], description: 'Open deposit' },
             { keys: ['W'], description: 'Open withdraw' },
         ],

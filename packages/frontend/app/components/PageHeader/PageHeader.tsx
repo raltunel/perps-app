@@ -180,6 +180,14 @@ export default function PageHeader() {
     useEffect(() => {
         if (isKeyboardShortcutsOpen || isAnyPortfolioModalOpen) return;
 
+        const clickSessionButton = () => {
+            const wrapper = sessionButtonRef.current;
+            const el = wrapper?.querySelector(
+                'button, [role="button"]',
+            ) as HTMLElement | null;
+            el?.click();
+        };
+
         const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
             if (!target) return false;
 
@@ -211,6 +219,12 @@ export default function PageHeader() {
             if (shouldIgnoreDueToTyping(target)) return;
 
             const key = e.key.toLowerCase();
+
+            if (key === 'c') {
+                e.preventDefault();
+                clickSessionButton();
+                return;
+            }
 
             if (key === 'd') {
                 e.preventDefault();
