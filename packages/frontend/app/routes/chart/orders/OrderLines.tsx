@@ -62,6 +62,8 @@ export default function OrderLines({
         ];
 
         const updatedLines = linesData.map((line) => {
+            //handle lines with undefined oid
+            if (!line.oid) return line;
             if (
                 line.type !== 'PNL' &&
                 selectedLine &&

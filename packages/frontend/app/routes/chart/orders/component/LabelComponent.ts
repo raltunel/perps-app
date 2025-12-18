@@ -627,6 +627,7 @@ const LabelComponent = ({
                 canvas.style.cursor = 'grabbing';
                 dragStateRef.current.tempSelectedLine = isLabel;
                 dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
+                dragStateRef.current.isDragging = true;
                 setIsDrag(true);
                 useTradeDataStore.getState().setIsMidModeActive(false);
             }
