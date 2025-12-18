@@ -42,7 +42,7 @@ const shortcutCategories: ShortcutCategory[] = [
         title: 'Navigation',
         shortcuts: [
             { keys: ['T'], description: 'Go to Trade page' },
-            { keys: ['P'], description: 'Go to Portfolio page' },
+            // { keys: ['P'], description: 'Go to Portfolio page' },
             { keys: ['H'], description: 'Go to Home page' },
         ],
     },
