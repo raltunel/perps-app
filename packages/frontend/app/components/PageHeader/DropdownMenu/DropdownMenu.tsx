@@ -3,6 +3,7 @@ import {
     FaCommentAlt,
     FaUserSecret,
     FaFileAlt,
+    FaKeyboard,
 } from 'react-icons/fa';
 import { RiTwitterXFill } from 'react-icons/ri';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
@@ -14,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { animate, motion, useMotionValue, type PanInfo } from 'framer-motion';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { useEffect, useRef } from 'react';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 
 interface DropdownMenuProps {
     setIsDropdownMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,7 +27,7 @@ const SIDEBAR_WIDTH = 320;
 const SNAP = {
     type: 'tween' as const,
     duration: 0.06,
-    ease: 'linear',
+    ease: [0, 0, 1, 1] as const,
 };
 
 const DropdownMenu = ({
@@ -49,10 +51,14 @@ const DropdownMenu = ({
             return;
         }
 
-        animate(x, SIDEBAR_WIDTH, {
-            ...SNAP,
-            onComplete: () => setIsDropdownMenuOpen(false),
-        });
+        animate(
+            { x },
+            { x: [SIDEBAR_WIDTH] },
+            {
+                ...SNAP,
+                onComplete: () => setIsDropdownMenuOpen(false),
+            },
+        );
     }, [location.pathname]);
 
     /**
@@ -65,7 +71,7 @@ const DropdownMenu = ({
      */
     useEffect(() => {
         if (isMobile) {
-            animate(x, 0, SNAP);
+            animate({ x }, { x: [0] }, SNAP);
         }
     }, [isMobile, x]);
 
@@ -80,10 +86,14 @@ const DropdownMenu = ({
             return;
         }
 
-        animate(x, SIDEBAR_WIDTH, {
-            ...SNAP,
-            onComplete: () => setIsDropdownMenuOpen(false),
-        });
+        animate(
+            { x },
+            { x: [SIDEBAR_WIDTH] },
+            {
+                ...SNAP,
+                onComplete: () => setIsDropdownMenuOpen(false),
+            },
+        );
     };
 
     /**
@@ -96,16 +106,27 @@ const DropdownMenu = ({
         const shouldClose =
             info.offset.x > SIDEBAR_WIDTH * 0.2 || info.velocity.x > 300;
 
-        animate(x, shouldClose ? SIDEBAR_WIDTH : 0, {
-            ...SNAP,
-            onComplete: shouldClose
-                ? () => setIsDropdownMenuOpen(false)
-                : undefined,
-        });
+        animate(
+            { x },
+            { x: [shouldClose ? SIDEBAR_WIDTH : 0] },
+            {
+                ...SNAP,
+                onComplete: shouldClose
+                    ? () => setIsDropdownMenuOpen(false)
+                    : undefined,
+            },
+        );
     };
 
     const handleFeedbackClick = () => {
         onFeedbackClick();
+        closeMenu();
+    };
+
+    const { open: openKeyboardShortcuts } = useKeyboardShortcuts();
+
+    const handleKeyboardShortcutsClick = () => {
+        openKeyboardShortcuts();
         closeMenu();
     };
 
@@ -124,6 +145,11 @@ const DropdownMenu = ({
             name: t('feedback.menuLabel'),
             icon: <FaCommentAlt />,
             onClick: handleFeedbackClick,
+        },
+        {
+            name: 'Keyboard Shortcuts',
+            icon: <FaKeyboard />,
+            onClick: handleKeyboardShortcutsClick,
         },
         {
             name: t('docs.menuPrivacy'),
@@ -202,7 +228,7 @@ const DropdownMenu = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.05, ease: 'linear' }}
+            transition={{ duration: 0.05, ease: [0, 0, 1, 1] }}
         >
             <motion.div
                 className={styles.container}

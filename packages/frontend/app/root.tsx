@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect } from 'react';
 import './i18n'; // i18n MUST be imported before any components
 import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { init as initPlausible } from '@plausible-analytics/tracker';
 
 // Components
@@ -21,6 +21,10 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider, Network } from '@fogo/sessions-sdk-react';
 import { WsProvider } from './contexts/WsContext';
+import {
+    KeyboardShortcutsProvider,
+    useKeyboardShortcuts,
+} from './contexts/KeyboardShortcutsContext';
 
 // Config
 import {
@@ -42,6 +46,76 @@ import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndic
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
+import KeyboardShortcutsModal from './components/KeyboardShortcutsModal/KeyboardShortcutsModal';
+
+// Wrapper component that uses the keyboard shortcuts context
+function KeyboardShortcutsModalWrapper() {
+    const { isOpen, close, toggle } = useKeyboardShortcuts();
+    const navigate = useNavigate();
+
+    // Global keyboard shortcut listener for Shift+/ (?) to open keyboard shortcuts
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            const keyLower = e.key.toLowerCase();
+            const isShortcut =
+                e.shiftKey &&
+                (e.key === '?' || e.code === 'Slash') &&
+                !e.altKey &&
+                !e.ctrlKey &&
+                !e.metaKey;
+
+            const isNavigationShortcut =
+                !e.altKey &&
+                !e.ctrlKey &&
+                !e.metaKey &&
+                (keyLower === 't' || keyLower === 'p' || keyLower === 'h');
+
+            if (!isShortcut && !isNavigationShortcut) return;
+
+            const target = e.target as HTMLElement | null;
+
+            const isOptedInField = !!target?.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+
+            if (!isOptedInField && target) {
+                if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                    return;
+                }
+
+                if (target.tagName === 'INPUT') {
+                    const input = target as HTMLInputElement;
+                    const isNumericInput = input.inputMode === 'numeric';
+                    if (!isNumericInput) {
+                        return;
+                    }
+                }
+            }
+
+            if (isShortcut) {
+                e.preventDefault();
+                toggle();
+                return;
+            }
+
+            if (isOpen) return;
+
+            e.preventDefault();
+            navigate(
+                keyLower === 't'
+                    ? '/v2/trade'
+                    : keyLower === 'h'
+                      ? '/'
+                      : '/v2/portfolio',
+            );
+        };
+
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [toggle, navigate, isOpen]);
+
+    return <KeyboardShortcutsModal isOpen={isOpen} onClose={close} />;
+}
 
 // Check if error is a chunk/module loading failure (typically happens offline)
 function isChunkLoadError(error: Error): boolean {
@@ -172,61 +246,68 @@ export default function App() {
             privacyPolicyUrl='/v2/privacy'
         >
             <AppProvider>
-                <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
-                    <UnifiedMarginDataProvider>
-                        <MarketDataProvider>
-                            <SdkProvider
-                                environment={wsEnvironment}
-                                marketEndpoint={MARKET_WS_ENDPOINT}
-                                userEndpoint={USER_WS_ENDPOINT}
-                            >
-                                <TutorialProvider>
-                                    <GlobalModalHost>
-                                        <ErrorBoundary>
-                                            <WsConnectionChecker />
-                                            <WebSocketDebug />
-                                            <div className='root-container'>
-                                                <div className='header-area'>
-                                                    <AnnouncementBannerHost />
-                                                    <PageHeader />
-                                                </div>
-                                                <main
-                                                    className={`content ${isHomePage ? 'home-page' : ''}`}
-                                                >
-                                                    <Suspense
-                                                        fallback={
-                                                            <LogoLoadingIndicator />
-                                                        }
+                <KeyboardShortcutsProvider>
+                    <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
+                        <UnifiedMarginDataProvider>
+                            <MarketDataProvider>
+                                <SdkProvider
+                                    environment={wsEnvironment}
+                                    marketEndpoint={MARKET_WS_ENDPOINT}
+                                    userEndpoint={USER_WS_ENDPOINT}
+                                >
+                                    <TutorialProvider>
+                                        <GlobalModalHost>
+                                            <ErrorBoundary>
+                                                <WsConnectionChecker />
+                                                <WebSocketDebug />
+                                                <div className='root-container'>
+                                                    <div className='header-area'>
+                                                        <AnnouncementBannerHost />
+                                                        <PageHeader />
+                                                    </div>
+                                                    <main
+                                                        className={`content ${isHomePage ? 'home-page' : ''}`}
                                                     >
-                                                        <Outlet />
-                                                    </Suspense>
-                                                </main>
-                                                <MobileFooter />
-                                                <Notifications />
-                                                {restrictedSiteModal.isOpen && (
-                                                    <Modal
-                                                        close={() =>
-                                                            restrictedSiteModal.close()
-                                                        }
-                                                        position={'center'}
-                                                        title=''
-                                                    >
-                                                        <RestrictedSiteMessage
-                                                            onClose={
-                                                                restrictedSiteModal.close
+                                                        <Suspense
+                                                            fallback={
+                                                                <LogoLoadingIndicator />
                                                             }
-                                                        />
-                                                    </Modal>
-                                                )}
-                                            </div>
-                                            <RuntimeDomManipulation />
-                                        </ErrorBoundary>
-                                    </GlobalModalHost>
-                                </TutorialProvider>
-                            </SdkProvider>
-                        </MarketDataProvider>
-                    </UnifiedMarginDataProvider>
-                </WsProvider>
+                                                        >
+                                                            <Outlet />
+                                                        </Suspense>
+                                                    </main>
+                                                    <MobileFooter
+                                                        onFeedbackClick={() => {
+                                                            return;
+                                                        }}
+                                                    />
+                                                    <Notifications />
+                                                    {restrictedSiteModal.isOpen && (
+                                                        <Modal
+                                                            close={() =>
+                                                                restrictedSiteModal.close()
+                                                            }
+                                                            position={'center'}
+                                                            title=''
+                                                        >
+                                                            <RestrictedSiteMessage
+                                                                onClose={
+                                                                    restrictedSiteModal.close
+                                                                }
+                                                            />
+                                                        </Modal>
+                                                    )}
+                                                </div>
+                                                <RuntimeDomManipulation />
+                                                <KeyboardShortcutsModalWrapper />
+                                            </ErrorBoundary>
+                                        </GlobalModalHost>
+                                    </TutorialProvider>
+                                </SdkProvider>
+                            </MarketDataProvider>
+                        </UnifiedMarginDataProvider>
+                    </WsProvider>
+                </KeyboardShortcutsProvider>
             </AppProvider>
         </FogoSessionProvider>
     );

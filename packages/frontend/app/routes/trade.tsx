@@ -38,6 +38,7 @@ import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import useMediaQuery from '~/hooks/useMediaQuery';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -51,8 +52,15 @@ export default function Trade() {
     const isFogoPresale =
         import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER === 'fogoPresale';
     console.log({ isFogoPresale });
-    const { symbol, selectedTradeTab, setSelectedTradeTab } =
-        useTradeDataStore();
+    const {
+        symbol,
+        selectedTradeTab,
+        setSelectedTradeTab,
+        setTradeDirection,
+        setMarketOrderType,
+    } = useTradeDataStore();
+
+    const { isOpen: isKeyboardShortcutsOpen } = useKeyboardShortcuts();
     // Mobile-only dropdown state
     type PortfolioViewKey =
         | 'common.positions'
@@ -726,6 +734,81 @@ export default function Trade() {
         PortfolioModalsRenderer,
         isAnyPortfolioModalOpen,
     } = usePortfolioModals();
+
+    useEffect(() => {
+        if (isAnyPortfolioModalOpen || isKeyboardShortcutsOpen) return;
+
+        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
+            if (!target) return false;
+
+            const isOptedInField = !!target.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+            if (isOptedInField) return false;
+
+            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                return true;
+            }
+
+            if (target.tagName === 'INPUT') {
+                const input = target as HTMLInputElement;
+                const isNumericInput = input.inputMode === 'numeric';
+                return !isNumericInput;
+            }
+
+            return false;
+        };
+
+        const focusById = (id: string) => {
+            const el = document.getElementById(id) as HTMLInputElement | null;
+            el?.focus();
+            el?.select?.();
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.altKey || e.ctrlKey || e.metaKey) return;
+
+            const target = e.target as HTMLElement | null;
+            if (shouldIgnoreDueToTyping(target)) return;
+
+            const key = e.key.toLowerCase();
+
+            if (key === 'b') {
+                e.preventDefault();
+                setTradeDirection('buy');
+                focusById('trade-module-size-input');
+                return;
+            }
+
+            if (key === 's') {
+                e.preventDefault();
+                setTradeDirection('sell');
+                focusById('trade-module-size-input');
+                return;
+            }
+
+            if (key === 'l') {
+                e.preventDefault();
+                setMarketOrderType('limit');
+                setTimeout(() => focusById('trade-module-price-input'), 0);
+                return;
+            }
+
+            if (key === 'm') {
+                e.preventDefault();
+                setMarketOrderType('market');
+                setTimeout(() => focusById('trade-module-size-input'), 0);
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        isAnyPortfolioModalOpen,
+        isKeyboardShortcutsOpen,
+        setMarketOrderType,
+        setTradeDirection,
+    ]);
 
     const isTableCollapsed = () => {
         const available = getAvailable();

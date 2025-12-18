@@ -185,7 +185,6 @@ function OrderInput({
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
-    const [marketOrderType, setMarketOrderType] = useState<string>('market');
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
 
@@ -216,13 +215,6 @@ function OrderInput({
 
     const [sizeDisplay, setSizeDisplay] = useState('');
 
-    const isPriceInvalid = useMemo(() => {
-        return (
-            marketOrderType === 'limit' &&
-            (price === '' || price === '0' || price === '0.0')
-        );
-    }, [price, marketOrderType]);
-
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -249,9 +241,18 @@ function OrderInput({
         setOrderInputPriceValue,
         tradeDirection,
         setTradeDirection,
+        marketOrderType,
+        setMarketOrderType,
         setIsMidModeActive,
         isMidModeActive,
     } = useTradeDataStore();
+
+    const isPriceInvalid = useMemo(() => {
+        return (
+            marketOrderType === 'limit' &&
+            (price === '' || price === '0' || price === '0.0')
+        );
+    }, [price, marketOrderType]);
 
     useEffect(() => {
         if (!marginBucket) return;
