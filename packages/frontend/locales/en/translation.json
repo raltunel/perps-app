@@ -578,5 +578,8 @@
         "menuPrivacy": "Privacy",
         "terms": "CROCODILE Labs Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Shortcuts"
     }
 }

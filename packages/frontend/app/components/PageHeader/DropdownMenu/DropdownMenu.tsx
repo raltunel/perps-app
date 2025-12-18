@@ -147,7 +147,7 @@ const DropdownMenu = ({
             onClick: handleFeedbackClick,
         },
         {
-            name: 'Keyboard Shortcuts',
+            name: t('keyboardShortcuts.menuLabel'),
             icon: <FaKeyboard />,
             onClick: handleKeyboardShortcutsClick,
         },
