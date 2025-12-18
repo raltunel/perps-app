@@ -177,7 +177,7 @@ function OrderInput({
     // Track if the OrderInput component is focused
     const [isFocused, setIsFocused] = useState(false);
     const orderInputRef = useRef<HTMLDivElement>(null);
-    const submitButtonRef = useRef<HTMLElement | null>(null);
+    const submitButtonRef = useRef<HTMLButtonElement | null>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
@@ -2533,6 +2533,7 @@ function OrderInput({
                                 disabled={!isDisabled}
                             >
                                 <button
+                                    ref={submitButtonRef}
                                     data-testid='submit-order-button'
                                     className={`${styles.submit_button}`}
                                     style={{
