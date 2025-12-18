@@ -464,10 +464,9 @@
         display: flex !important;
     }
 
-    .depositButtonPlaceholder {
-        display: none;
-    }
-    .ambientmm {
+    .depositButtonPlaceholder,
+    .ambientmm,
+    .internationalButton {
         display: none;
     }
 }
@@ -477,7 +476,6 @@
     font-size: 12px !important;
     width: 160px !important;
     padding: 0 8px !important;
-    background-color: red;
 }
 
 .depositSlot {
@@ -490,7 +488,6 @@
     /* width: 120px !important; */
     font-size: 12px !important;
 }
-
 @media (max-width: 600px) {
     .activeSessionWrap :global(button) {
         width: 70px !important;
