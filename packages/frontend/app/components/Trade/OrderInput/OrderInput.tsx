@@ -2263,9 +2263,11 @@ function OrderInput({
 
     useEffect(() => {
         if (typeof document !== 'undefined') {
-            submitButtonRef.current = document.querySelector(
+            const el = document.querySelector(
                 '[data-testid="submit-order-button"]',
-            ) as HTMLElement | null;
+            );
+            submitButtonRef.current =
+                el instanceof HTMLButtonElement ? el : null;
         }
     }, []);
 
