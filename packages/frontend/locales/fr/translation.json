@@ -597,21 +597,6 @@
                         "description": "Afficher les raccourcis"
                     },
                     {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Ouvrir le connecteur de wallet"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Ouvrir la fenêtre de dépôt"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["r"],
-                        "description": "Ouvrir la fenêtre de retrait"
-                    },
-                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "Fermer la fenêtre / annuler"
@@ -660,6 +645,21 @@
                         "id": "navigation.portfolio",
                         "keys": ["p"],
                         "description": "Aller au portfolio"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Ouvrir le connecteur de wallet"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Ouvrir la fenêtre de dépôt"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["r"],
+                        "description": "Ouvrir la fenêtre de retrait"
                     },
                     {
                         "id": "portfolio.latestTx",

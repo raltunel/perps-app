@@ -597,21 +597,6 @@
                         "description": "ショートカットを表示"
                     },
                     {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "ウォレット接続を開く"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "入金モーダルを開く"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "出金モーダルを開く"
-                    },
-                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "モーダルを閉じる / キャンセル"
@@ -660,6 +645,21 @@
                         "id": "navigation.portfolio",
                         "keys": ["p"],
                         "description": "ポートフォリオへ移動"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "ウォレット接続を開く"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "入金モーダルを開く"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "出金モーダルを開く"
                     },
                     {
                         "id": "portfolio.latestTx",

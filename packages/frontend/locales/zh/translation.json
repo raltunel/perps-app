@@ -597,21 +597,6 @@
                         "description": "显示快捷键"
                     },
                     {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "打开钱包连接"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "打开充值弹窗"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "打开提现弹窗"
-                    },
-                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "关闭弹窗 / 取消"
@@ -660,6 +645,21 @@
                         "id": "navigation.portfolio",
                         "keys": ["p"],
                         "description": "前往资产页面"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "打开钱包连接"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "打开充值弹窗"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "打开提现弹窗"
                     },
                     {
                         "id": "portfolio.latestTx",

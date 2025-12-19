@@ -597,21 +597,6 @@
                         "description": "단축키 보기"
                     },
                     {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "지갑 연결 열기"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "입금 모달 열기"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "출금 모달 열기"
-                    },
-                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "모달 닫기 / 취소"
@@ -660,6 +645,21 @@
                         "id": "navigation.portfolio",
                         "keys": ["p"],
                         "description": "포트폴리오로 이동"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "지갑 연결 열기"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "입금 모달 열기"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "출금 모달 열기"
                     },
                     {
                         "id": "portfolio.latestTx",
