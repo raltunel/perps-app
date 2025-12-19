@@ -440,6 +440,7 @@
         "enableBackgroundFillNotif": "Hintergrundausführungs-Benachrichtigung aktivieren",
         "navigationKeyboardShortcuts": "Navigationstastenkürzel aktivieren",
         "tradingKeyboardShortcuts": "Handelstastenkürzel aktivieren",
+        "viewKeyboardShortcuts": "Tastenkürzel anzeigen",
         "numberFormat": "Zahlenformat",
         "color": "Farbe",
         "language": "Sprache"

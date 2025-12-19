@@ -65,6 +65,26 @@
     background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }
 
+.shortcutsLinkRow {
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 2.25rem;
+}
+
+.shortcutsLink {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    text-decoration: underline;
+}
+
+.shortcutsLink:hover {
+    color: var(--text1);
+}
+
 @keyframes fadeInOut {
     0% {
         opacity: 0;

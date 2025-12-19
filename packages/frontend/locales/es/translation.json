@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "Habilitar notificaciones de ejecución en segundo plano",
         "navigationKeyboardShortcuts": "Habilitar atajos de teclado de navegación",
         "tradingKeyboardShortcuts": "Habilitar atajos de teclado de trading",
+        "viewKeyboardShortcuts": "Ver atajos de teclado",
         "numberFormat": "Formato numérico",
         "color": "Color",
         "language": "Idioma"

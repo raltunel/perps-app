@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "Activer les notifications d'exécution en arrière-plan",
         "navigationKeyboardShortcuts": "Activer les raccourcis clavier de navigation",
         "tradingKeyboardShortcuts": "Activer les raccourcis clavier de trading",
+        "viewKeyboardShortcuts": "Voir les raccourcis clavier",
         "numberFormat": "Format de nombre",
         "color": "Couleur",
         "language": "Langue"

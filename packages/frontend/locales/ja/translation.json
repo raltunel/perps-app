@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "バックグラウンド約定通知を有効",
         "navigationKeyboardShortcuts": "ナビゲーションのキーボードショートカットを有効",
         "tradingKeyboardShortcuts": "取引のキーボードショートカットを有効",
+        "viewKeyboardShortcuts": "キーボードショートカットを表示",
         "numberFormat": "数字形式",
         "color": "色",
         "language": "言語"

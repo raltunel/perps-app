@@ -254,8 +254,9 @@ export default function PageHeader() {
 
             if (!isRelevantShortcut) return;
 
+            if (!navigationKeyboardShortcutsEnabled) return;
+
             if (
-                navigationKeyboardShortcutsEnabled &&
                 connectWalletShortcut &&
                 matchesShortcutEvent(e, connectWalletShortcut.keys)
             ) {
@@ -637,7 +638,7 @@ export default function PageHeader() {
                     position={'center'}
                     title={t('appSettings.title')}
                 >
-                    <AppOptions />
+                    <AppOptions closePanel={() => appSettingsModal.close()} />
                 </Modal>
             )}
             {PortfolioModalsRenderer}

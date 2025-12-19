@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "Arkaplan Dolum Bildirimini Aç",
         "navigationKeyboardShortcuts": "Gezinme klavye kısayollarını etkinleştir",
         "tradingKeyboardShortcuts": "Alım-satım klavye kısayollarını etkinleştir",
+        "viewKeyboardShortcuts": "Klavye kısayollarını görüntüle",
         "numberFormat": "Sayı Formatı",
         "color": "Renk",
         "language": "Dil"

@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "Enable Background Fill Notifications",
         "navigationKeyboardShortcuts": "Enable Navigation Keyboard Shortcuts",
         "tradingKeyboardShortcuts": "Enable Trading Keyboard Shortcuts",
+        "viewKeyboardShortcuts": "View keyboard shortcuts",
         "numberFormat": "Number Format",
         "color": "Color",
         "language": "Language"

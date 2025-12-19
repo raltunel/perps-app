@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "启用后台成交通知",
         "navigationKeyboardShortcuts": "启用导航键盘快捷键",
         "tradingKeyboardShortcuts": "启用交易键盘快捷键",
+        "viewKeyboardShortcuts": "查看键盘快捷键",
         "numberFormat": "数字格式",
         "color": "颜色",
         "language": "语言"

@@ -3,6 +3,7 @@ import { MdClose } from 'react-icons/md';
 import { FaKeyboard } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import styles from './KeyboardShortcutsModal.module.css';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 import {
     formatKeyboardShortcutKey,
@@ -20,6 +21,39 @@ const KeyboardShortcutsModal = ({
 }: KeyboardShortcutsModalProps) => {
     const { t } = useTranslation();
     const shortcutCategories = getKeyboardShortcutCategories(t);
+    const {
+        navigationKeyboardShortcutsEnabled,
+        setNavigationKeyboardShortcutsEnabled,
+        tradingKeyboardShortcutsEnabled,
+        setTradingKeyboardShortcutsEnabled,
+    } = useAppSettings();
+
+    const getToggleKindForCategory = (
+        category: (typeof shortcutCategories)[number],
+    ): 'navigation' | 'trading' | null => {
+        if (
+            category.shortcuts.some((s) =>
+                s.id.toLowerCase().startsWith('trading.'),
+            )
+        ) {
+            return 'trading';
+        }
+
+        if (
+            category.shortcuts.some((s) => {
+                const id = s.id.toLowerCase();
+                return (
+                    id.startsWith('navigation.') ||
+                    id.startsWith('wallet.') ||
+                    id.startsWith('portfolio.')
+                );
+            })
+        ) {
+            return 'navigation';
+        }
+
+        return null;
+    };
 
     useEffect(() => {
         if (!isOpen) return;
@@ -63,58 +97,135 @@ const KeyboardShortcutsModal = ({
                 </header>
 
                 <div className={styles.content}>
-                    {shortcutCategories.map((category) => (
-                        <section
-                            key={category.title}
-                            className={styles.category}
-                        >
-                            <h3 className={styles.categoryTitle}>
-                                {category.title}
-                            </h3>
-                            <ul className={styles.shortcutList}>
-                                {category.shortcuts.map((shortcut, index) => (
-                                    <li
-                                        key={index}
-                                        className={styles.shortcutItem}
-                                    >
-                                        <span className={styles.description}>
-                                            {shortcut.description}
-                                        </span>
-                                        <span className={styles.keys}>
-                                            {shortcut.keys.map(
-                                                (key, keyIndex) => (
-                                                    <span key={keyIndex}>
-                                                        <kbd
-                                                            className={
-                                                                styles.key
-                                                            }
-                                                        >
-                                                            {formatKeyboardShortcutKey(
-                                                                key,
-                                                                t,
-                                                            )}
-                                                        </kbd>
-                                                        {keyIndex <
-                                                            shortcut.keys
-                                                                .length -
-                                                                1 && (
-                                                            <span
-                                                                className={
-                                                                    styles.keySeparator
-                                                                }
-                                                            >
-                                                                +
-                                                            </span>
+                    {shortcutCategories.map((category) =>
+                        (() => {
+                            const toggleKind =
+                                getToggleKindForCategory(category);
+                            const isDisabled =
+                                toggleKind === 'navigation'
+                                    ? !navigationKeyboardShortcutsEnabled
+                                    : toggleKind === 'trading'
+                                      ? !tradingKeyboardShortcutsEnabled
+                                      : false;
+                            const toggle =
+                                toggleKind === 'navigation'
+                                    ? () =>
+                                          setNavigationKeyboardShortcutsEnabled(
+                                              !navigationKeyboardShortcutsEnabled,
+                                          )
+                                    : toggleKind === 'trading'
+                                      ? () =>
+                                            setTradingKeyboardShortcutsEnabled(
+                                                !tradingKeyboardShortcutsEnabled,
+                                            )
+                                      : null;
+                            const toggleLabel =
+                                toggleKind === 'navigation'
+                                    ? t(
+                                          'appSettings.navigationKeyboardShortcuts',
+                                      )
+                                    : toggleKind === 'trading'
+                                      ? t(
+                                            'appSettings.tradingKeyboardShortcuts',
+                                        )
+                                      : '';
+
+                            return (
+                                <section
+                                    key={category.title}
+                                    className={styles.category}
+                                    data-disabled={
+                                        isDisabled ? 'true' : 'false'
+                                    }
+                                >
+                                    <div className={styles.categoryHeader}>
+                                        <h3 className={styles.categoryTitle}>
+                                            {category.title}
+                                        </h3>
+                                        {toggleKind && toggle && (
+                                            <button
+                                                type='button'
+                                                className={
+                                                    styles.categoryToggle
+                                                }
+                                                data-enabled={
+                                                    !isDisabled
+                                                        ? 'true'
+                                                        : 'false'
+                                                }
+                                                aria-pressed={!isDisabled}
+                                                aria-label={toggleLabel}
+                                                onClick={toggle}
+                                            >
+                                                <span
+                                                    className={
+                                                        styles.categoryToggleKnob
+                                                    }
+                                                />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <ul className={styles.shortcutList}>
+                                        {category.shortcuts.map(
+                                            (shortcut, index) => (
+                                                <li
+                                                    key={index}
+                                                    className={
+                                                        styles.shortcutItem
+                                                    }
+                                                >
+                                                    <span
+                                                        className={
+                                                            styles.description
+                                                        }
+                                                    >
+                                                        {shortcut.description}
+                                                    </span>
+                                                    <span
+                                                        className={styles.keys}
+                                                    >
+                                                        {shortcut.keys.map(
+                                                            (key, keyIndex) => (
+                                                                <span
+                                                                    key={
+                                                                        keyIndex
+                                                                    }
+                                                                >
+                                                                    <kbd
+                                                                        className={
+                                                                            styles.key
+                                                                        }
+                                                                    >
+                                                                        {formatKeyboardShortcutKey(
+                                                                            key,
+                                                                            t,
+                                                                        )}
+                                                                    </kbd>
+                                                                    {keyIndex <
+                                                                        shortcut
+                                                                            .keys
+                                                                            .length -
+                                                                            1 && (
+                                                                        <span
+                                                                            className={
+                                                                                styles.keySeparator
+                                                                            }
+                                                                        >
+                                                                            +
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            ),
                                                         )}
                                                     </span>
-                                                ),
-                                            )}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </section>
-                    ))}
+                                                </li>
+                                            ),
+                                        )}
+                                    </ul>
+                                </section>
+                            );
+                        })(),
+                    )}
                 </div>
 
                 <footer className={styles.footer}>

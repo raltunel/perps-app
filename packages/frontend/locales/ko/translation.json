@@ -442,6 +442,7 @@
         "enableBackgroundFillNotif": "백그라운드 체결 알림 활성화",
         "navigationKeyboardShortcuts": "내비게이션 키보드 단축키 활성화",
         "tradingKeyboardShortcuts": "거래 키보드 단축키 활성화",
+        "viewKeyboardShortcuts": "키보드 단축키 보기",
         "numberFormat": "숫자 형식",
         "color": "색상",
         "language": "언어"

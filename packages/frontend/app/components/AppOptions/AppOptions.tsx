@@ -22,6 +22,7 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { getDefaultLanguage } from '~/utils/functions/getDefaultLanguage';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -35,6 +36,7 @@ interface AppOptionsProps {
 export default function AppOptions(props: AppOptionsProps) {
     const { footer } = props;
     const activeOptions: useAppOptionsIF = useAppOptions();
+    const { open: openKeyboardShortcuts } = useKeyboardShortcuts();
 
     const isMobileVersion = useMediaQuery('(max-width: 768px)');
 
@@ -193,6 +195,18 @@ export default function AppOptions(props: AppOptionsProps) {
                         }
                     }}
                 />
+                <li className={styles.shortcutsLinkRow}>
+                    <button
+                        type='button'
+                        className={styles.shortcutsLink}
+                        onClick={() => {
+                            props.closePanel?.();
+                            openKeyboardShortcuts();
+                        }}
+                    >
+                        {t('appSettings.viewKeyboardShortcuts')}
+                    </button>
+                </li>
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
