@@ -440,6 +440,8 @@
         "skipOpenOrderConfirm": "Omettre la confirmation de l'ordre ouvert",
         "enableTxNotifications": "Activer les notifications de transaction",
         "enableBackgroundFillNotif": "Activer les notifications d'exécution en arrière-plan",
+        "navigationKeyboardShortcuts": "Activer les raccourcis clavier de navigation",
+        "tradingKeyboardShortcuts": "Activer les raccourcis clavier de trading",
         "numberFormat": "Format de nombre",
         "color": "Couleur",
         "language": "Langue"

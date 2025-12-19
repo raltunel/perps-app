@@ -440,6 +440,8 @@
         "skipOpenOrderConfirm": "Açık Emir Onayını Atla",
         "enableTxNotifications": "İşlem Bildirimlerini Aç",
         "enableBackgroundFillNotif": "Arkaplan Dolum Bildirimini Aç",
+        "navigationKeyboardShortcuts": "Gezinme klavye kısayollarını etkinleştir",
+        "tradingKeyboardShortcuts": "Alım-satım klavye kısayollarını etkinleştir",
         "numberFormat": "Sayı Formatı",
         "color": "Renk",
         "language": "Dil"

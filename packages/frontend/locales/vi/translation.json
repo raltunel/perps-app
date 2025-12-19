@@ -438,6 +438,8 @@
         "skipOpenOrderConfirm": "Bỏ qua xác nhận lệnh mở",
         "enableTxNotifications": "Bật thông báo giao dịch",
         "enableBackgroundFillNotif": "Bật thông báo khớp lệnh nền",
+        "navigationKeyboardShortcuts": "Bật phím tắt bàn phím điều hướng",
+        "tradingKeyboardShortcuts": "Bật phím tắt bàn phím giao dịch",
         "numberFormat": "Định dạng số",
         "color": "Màu sắc",
         "language": "Ngôn ngữ"

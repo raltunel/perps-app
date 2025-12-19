@@ -38,6 +38,7 @@ import packageJson from '../package.json';
 import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import { useDebugStore } from './stores/DebugStore';
+import { useAppSettings } from './stores/AppSettingsStore';
 
 // Styles
 import './css/app.css';
@@ -59,6 +60,7 @@ function KeyboardShortcutsModalWrapper() {
     const { isOpen, close, toggle } = useKeyboardShortcuts();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     // Global keyboard shortcut listener for Shift+/ (?) to open keyboard shortcuts
     useEffect(() => {
@@ -86,12 +88,13 @@ function KeyboardShortcutsModalWrapper() {
                 matchesShortcutEvent(e, shortcutsModalShortcut.keys);
 
             const isNavigationShortcut =
-                (!!navHomeShortcut &&
+                navigationKeyboardShortcutsEnabled &&
+                ((!!navHomeShortcut &&
                     matchesShortcutEvent(e, navHomeShortcut.keys)) ||
-                (!!navTradeShortcut &&
-                    matchesShortcutEvent(e, navTradeShortcut.keys)) ||
-                (!!navPortfolioShortcut &&
-                    matchesShortcutEvent(e, navPortfolioShortcut.keys));
+                    (!!navTradeShortcut &&
+                        matchesShortcutEvent(e, navTradeShortcut.keys)) ||
+                    (!!navPortfolioShortcut &&
+                        matchesShortcutEvent(e, navPortfolioShortcut.keys)));
 
             if (!isShortcut && !isNavigationShortcut) return;
 
@@ -149,7 +152,7 @@ function KeyboardShortcutsModalWrapper() {
 
         window.addEventListener('keydown', handleGlobalKeyDown);
         return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [toggle, navigate, isOpen, t]);
+    }, [toggle, navigate, isOpen, t, navigationKeyboardShortcutsEnabled]);
 
     return <KeyboardShortcutsModal isOpen={isOpen} onClose={close} />;
 }

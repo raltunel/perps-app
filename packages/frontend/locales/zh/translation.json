@@ -440,6 +440,8 @@
         "skipOpenOrderConfirm": "跳过未成交订单确认",
         "enableTxNotifications": "启用交易通知",
         "enableBackgroundFillNotif": "启用后台成交通知",
+        "navigationKeyboardShortcuts": "启用导航键盘快捷键",
+        "tradingKeyboardShortcuts": "启用交易键盘快捷键",
         "numberFormat": "数字格式",
         "color": "颜色",
         "language": "语言"

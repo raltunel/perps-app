@@ -44,6 +44,7 @@ import {
     getKeyboardShortcutCategories,
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -80,6 +81,7 @@ export default function PageHeader() {
 
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
     const { notifications, latestTx } = useNotificationStore();
+    const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     useEffect(() => {
         const button = sessionButtonRef.current;
@@ -253,6 +255,7 @@ export default function PageHeader() {
             if (!isRelevantShortcut) return;
 
             if (
+                navigationKeyboardShortcutsEnabled &&
                 connectWalletShortcut &&
                 matchesShortcutEvent(e, connectWalletShortcut.keys)
             ) {

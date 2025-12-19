@@ -440,6 +440,8 @@
         "skipOpenOrderConfirm": "注文確認をスキップ",
         "enableTxNotifications": "取引通知を有効",
         "enableBackgroundFillNotif": "バックグラウンド約定通知を有効",
+        "navigationKeyboardShortcuts": "ナビゲーションのキーボードショートカットを有効",
+        "tradingKeyboardShortcuts": "取引のキーボードショートカットを有効",
         "numberFormat": "数字形式",
         "color": "色",
         "language": "言語"

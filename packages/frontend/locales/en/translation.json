@@ -440,6 +440,8 @@
         "skipOpenOrderConfirm": "Skip Open Order Confirmation",
         "enableTxNotifications": "Enable Transaction Notifications",
         "enableBackgroundFillNotif": "Enable Background Fill Notifications",
+        "navigationKeyboardShortcuts": "Enable Navigation Keyboard Shortcuts",
+        "tradingKeyboardShortcuts": "Enable Trading Keyboard Shortcuts",
         "numberFormat": "Number Format",
         "color": "Color",
         "language": "Language"

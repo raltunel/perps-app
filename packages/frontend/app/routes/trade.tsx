@@ -157,6 +157,7 @@ export default function Trade() {
         resetLayoutHeights,
         isWalletCollapsed,
         setIsWalletCollapsed,
+        tradingKeyboardShortcutsEnabled,
     } = useAppSettings();
 
     const { marketId } = useParams<{ marketId: string }>();
@@ -740,7 +741,12 @@ export default function Trade() {
     } = usePortfolioModals();
 
     useEffect(() => {
-        if (isAnyPortfolioModalOpen || isKeyboardShortcutsOpen) return;
+        if (
+            isAnyPortfolioModalOpen ||
+            isKeyboardShortcutsOpen ||
+            !tradingKeyboardShortcutsEnabled
+        )
+            return;
 
         const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
             if (!target) return false;
@@ -840,6 +846,7 @@ export default function Trade() {
     }, [
         isAnyPortfolioModalOpen,
         isKeyboardShortcutsOpen,
+        tradingKeyboardShortcutsEnabled,
         setMarketOrderType,
         setTradeDirection,
         t,

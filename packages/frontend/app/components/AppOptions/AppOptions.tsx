@@ -38,8 +38,17 @@ export default function AppOptions(props: AppOptionsProps) {
 
     const isMobileVersion = useMediaQuery('(max-width: 768px)');
 
-    const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
-        useAppSettings();
+    const {
+        numFormat,
+        setNumFormat,
+        bsColor,
+        setBsColor,
+        getBsColor,
+        navigationKeyboardShortcutsEnabled,
+        setNavigationKeyboardShortcutsEnabled,
+        tradingKeyboardShortcutsEnabled,
+        setTradingKeyboardShortcutsEnabled,
+    } = useAppSettings();
     const { i18n, t } = useTranslation();
 
     const [showChangeApplied, setShowChangeApplied] = useState(false);
@@ -51,6 +60,8 @@ export default function AppOptions(props: AppOptionsProps) {
         activeOptions['skipOpenOrderConfirm'] === false &&
         activeOptions['enableTxNotifications'] === true &&
         activeOptions['enableBackgroundFillNotif'] === true &&
+        navigationKeyboardShortcutsEnabled === true &&
+        tradingKeyboardShortcutsEnabled === true &&
         numFormat.label === NumFormatTypes[0].label &&
         bsColor === 'colors.default' &&
         (i18n?.language?.split('-')[0] || 'en') === defaultLanguage;
@@ -138,6 +149,45 @@ export default function AppOptions(props: AppOptionsProps) {
                                     value: !activeOptions[
                                         'enableBackgroundFillNotif'
                                     ],
+                                },
+                            });
+                        }
+                    }}
+                />
+            </ul>
+            <ul>
+                <OptionLine
+                    text={t('appSettings.navigationKeyboardShortcuts')}
+                    isChecked={navigationKeyboardShortcutsEnabled}
+                    toggle={() => {
+                        setNavigationKeyboardShortcutsEnabled(
+                            !navigationKeyboardShortcutsEnabled,
+                        );
+                        showChangeAppliedMessage();
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting:
+                                        'navigationKeyboardShortcutsEnabled',
+                                    value: !navigationKeyboardShortcutsEnabled,
+                                },
+                            });
+                        }
+                    }}
+                />
+                <OptionLine
+                    text={t('appSettings.tradingKeyboardShortcuts')}
+                    isChecked={tradingKeyboardShortcutsEnabled}
+                    toggle={() => {
+                        setTradingKeyboardShortcutsEnabled(
+                            !tradingKeyboardShortcutsEnabled,
+                        );
+                        showChangeAppliedMessage();
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'tradingKeyboardShortcutsEnabled',
+                                    value: !tradingKeyboardShortcutsEnabled,
                                 },
                             });
                         }
@@ -267,6 +317,8 @@ export default function AppOptions(props: AppOptionsProps) {
                                 setNumFormat(NumFormatTypes[0]);
                                 setBsColor('colors.default');
                                 useAppSettings.getState().resetLayoutHeights();
+                                setNavigationKeyboardShortcutsEnabled(true);
+                                setTradingKeyboardShortcutsEnabled(true);
 
                                 const defaultLanguage = getDefaultLanguage();
                                 i18n.changeLanguage(defaultLanguage);
