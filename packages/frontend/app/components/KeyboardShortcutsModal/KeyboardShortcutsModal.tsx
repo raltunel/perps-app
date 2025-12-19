@@ -36,7 +36,7 @@ const shortcutCategories: ShortcutCategory[] = [
             { keys: ['S'], description: 'Switch to sell direction' },
             { keys: ['M'], description: 'Start market order' },
             { keys: ['L'], description: 'Start limit order' },
-            { keys: ['Enter'], description: 'Submit order' },
+            { keys: ['Enter / Return'], description: 'Submit order' },
         ],
     },
     {
