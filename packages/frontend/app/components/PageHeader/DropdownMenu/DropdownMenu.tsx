@@ -38,6 +38,11 @@ const DropdownMenu = ({
     const navigate = useNavigate();
     const location = useLocation();
 
+    /**
+     * Drawer position
+     */
+    const x = useMotionValue(SIDEBAR_WIDTH);
+
     const isMobile = useMediaQuery('(max-width: 768px)');
     const initialPathRef = useRef(location.pathname);
     useEffect(() => {
@@ -51,27 +56,18 @@ const DropdownMenu = ({
             return;
         }
 
-        animate(
-            { x },
-            { x: [SIDEBAR_WIDTH] },
-            {
-                ...SNAP,
-                onComplete: () => setIsDropdownMenuOpen(false),
-            },
-        );
+        animate(x, SIDEBAR_WIDTH, {
+            ...SNAP,
+            onComplete: () => setIsDropdownMenuOpen(false),
+        });
     }, [location.pathname]);
-
-    /**
-     * Drawer position
-     */
-    const x = useMotionValue(SIDEBAR_WIDTH);
 
     /**
      * Open immediately on mount
      */
     useEffect(() => {
         if (isMobile) {
-            animate({ x }, { x: [0] }, SNAP);
+            animate(x, 0, SNAP);
         }
     }, [isMobile, x]);
 
@@ -86,14 +82,10 @@ const DropdownMenu = ({
             return;
         }
 
-        animate(
-            { x },
-            { x: [SIDEBAR_WIDTH] },
-            {
-                ...SNAP,
-                onComplete: () => setIsDropdownMenuOpen(false),
-            },
-        );
+        animate(x, SIDEBAR_WIDTH, {
+            ...SNAP,
+            onComplete: () => setIsDropdownMenuOpen(false),
+        });
     };
 
     /**
@@ -106,16 +98,12 @@ const DropdownMenu = ({
         const shouldClose =
             info.offset.x > SIDEBAR_WIDTH * 0.2 || info.velocity.x > 300;
 
-        animate(
-            { x },
-            { x: [shouldClose ? SIDEBAR_WIDTH : 0] },
-            {
-                ...SNAP,
-                onComplete: shouldClose
-                    ? () => setIsDropdownMenuOpen(false)
-                    : undefined,
-            },
-        );
+        animate(x, shouldClose ? SIDEBAR_WIDTH : 0, {
+            ...SNAP,
+            onComplete: shouldClose
+                ? () => setIsDropdownMenuOpen(false)
+                : undefined,
+        });
     };
 
     const handleFeedbackClick = () => {
