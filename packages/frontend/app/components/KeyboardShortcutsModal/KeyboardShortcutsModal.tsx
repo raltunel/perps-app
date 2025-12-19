@@ -22,29 +22,33 @@ const shortcutCategories: ShortcutCategory[] = [
     {
         title: 'General',
         shortcuts: [
-            { keys: ['Shift', '/'], description: 'Display shortcuts' },
-            { keys: ['C'], description: 'Open wallet connector' },
-            { keys: ['D'], description: 'Open deposit modal' },
-            { keys: ['W'], description: 'Open withdraw modal' },
-            { keys: ['Esc'], description: 'Close modal / Cancel' },
+            { keys: ['Shift', '/'], description: 'Display Shortcuts' },
+            { keys: ['C'], description: 'Open Wallet Connector' },
+            { keys: ['D'], description: 'Open Deposit Modal' },
+            { keys: ['W'], description: 'Open Withdraw Modal' },
+            { keys: ['Esc'], description: 'Close Modal / Cancel' },
         ],
     },
     {
         title: 'Trading',
         shortcuts: [
-            { keys: ['B'], description: 'Switch to buy direction' },
-            { keys: ['S'], description: 'Switch to sell direction' },
-            { keys: ['M'], description: 'Start market order' },
-            { keys: ['L'], description: 'Start limit order' },
-            { keys: ['Enter / Return'], description: 'Submit order' },
+            { keys: ['B'], description: 'Switch to Buy' },
+            { keys: ['S'], description: 'Switch to Sell' },
+            { keys: ['M'], description: 'Start Market Order' },
+            { keys: ['L'], description: 'Start Limit Order' },
+            { keys: ['Enter / Return'], description: 'Submit Order' },
         ],
     },
     {
         title: 'Navigation',
         shortcuts: [
-            { keys: ['T'], description: 'Go to Trade page' },
+            { keys: ['T'], description: 'Go to Trade Page' },
             // { keys: ['P'], description: 'Go to Portfolio page' },
-            { keys: ['H'], description: 'Go to Home page' },
+            { keys: ['H'], description: 'Go to Home Page' },
+            {
+                keys: ['E'],
+                description: 'View Latest TX in Block Explorer',
+            },
         ],
     },
 ];

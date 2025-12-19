@@ -38,6 +38,7 @@ import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
 import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost';
 import { ACTIVE_ANNOUNCEMENT_BANNER } from '~/utils/Constants';
 import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import { useNotificationStore } from '~/stores/NotificationStore';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -73,6 +74,7 @@ export default function PageHeader() {
     const isUserConnected = isEstablished(sessionState);
 
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
+    const { notifications, latestTx } = useNotificationStore();
 
     useEffect(() => {
         const button = sessionButtonRef.current;
@@ -226,6 +228,15 @@ export default function PageHeader() {
                 return;
             }
 
+            if (key === 'e') {
+                e.preventDefault();
+                const latest = latestTx;
+                if (latest?.txLink) {
+                    window.open(latest.txLink, '_blank', 'noopener,noreferrer');
+                }
+                return;
+            }
+
             if (key === 'd') {
                 e.preventDefault();
                 openDepositModal();
@@ -245,6 +256,7 @@ export default function PageHeader() {
         isKeyboardShortcutsOpen,
         openDepositModal,
         openWithdrawModal,
+        latestTx,
     ]);
 
     // Holds previous user connection status

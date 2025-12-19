@@ -51,7 +51,6 @@ export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 export default function Trade() {
     const isFogoPresale =
         import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER === 'fogoPresale';
-    console.log({ isFogoPresale });
     const {
         symbol,
         selectedTradeTab,
