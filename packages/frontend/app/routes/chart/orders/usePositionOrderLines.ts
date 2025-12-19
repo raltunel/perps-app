@@ -13,6 +13,7 @@ import {
 import { LIQ_PRICE_LINE_COLOR } from './orderLineUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { t } from 'i18next';
+import { buildChartElementId } from './component/LineComponent';
 
 export const usePositionOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
@@ -43,46 +44,66 @@ export const usePositionOrderLines = (): LineData[] => {
             return;
         }
 
-        const newLines: LineData[] = filteredPositions.flatMap((order) => {
-            const result: LineData[] = [];
-            const pnl = Number(order.pnl.toFixed(2));
+        const newLines: LineData[] = filteredPositions.flatMap(
+            (order, index) => {
+                const result: LineData[] = [];
+                const pnl = Number(order.pnl.toFixed(2));
 
-            if (order.price > 0) {
-                result.push({
-                    xLoc: 0.1,
-                    yPrice: order.price,
-                    textValue: { type: 'PNL', pnl } as LineLabel,
-                    quantityTextValue: order.szi,
-                    quantityText: quantityTextFormatWithComma(order.szi),
-                    color: pnl > 0 ? getBsColor().buy : getBsColor().sell,
-                    type: 'PNL',
-                    lineStyle: 3,
-                    lineWidth: 1,
-                });
-            }
+                if (order.price > 0) {
+                    const pnlId = buildChartElementId({
+                        type: 'position',
+                        scope: 'pnl',
+                        key: String(order.price),
+                        variant: String(index),
+                    });
 
-            if (order.liqPrice > 0) {
-                result.push({
-                    xLoc: 0.2,
-                    yPrice: order.liqPrice,
-                    textValue: {
-                        type: 'Liq',
-                        text: `${t('chart.liqPrice')}`,
-                    } as LineLabel,
-                    quantityTextValue: order.liqPrice,
-                    quantityText: formatLiquidationPrice(
-                        order.liqPrice,
-                        formatNum,
-                    ),
-                    color: LIQ_PRICE_LINE_COLOR,
-                    type: 'LIQ',
-                    lineStyle: 3,
-                    lineWidth: 2,
-                });
-            }
+                    result.push({
+                        id: pnlId,
+                        xLoc: 0.1,
+                        yPrice: order.price,
+                        textValue: { type: 'PNL', pnl } as LineLabel,
+                        quantityTextValue: order.szi,
+                        quantityText: quantityTextFormatWithComma(order.szi),
+                        color: pnl > 0 ? getBsColor().buy : getBsColor().sell,
+                        type: 'PNL',
+                        lineStyle: 3,
+                        lineWidth: 1,
+                        selectable: false,
+                    });
+                }
 
-            return result;
-        });
+                if (order.liqPrice > 0) {
+                    const liqId = buildChartElementId({
+                        type: 'position',
+                        scope: 'liq',
+                        key: String(order.liqPrice),
+                        variant: String(index),
+                    });
+
+                    result.push({
+                        id: liqId,
+                        xLoc: 0.2,
+                        yPrice: order.liqPrice,
+                        textValue: {
+                            type: 'Liq',
+                            text: `${t('chart.liqPrice')}`,
+                        } as LineLabel,
+                        quantityTextValue: order.liqPrice,
+                        quantityText: formatLiquidationPrice(
+                            order.liqPrice,
+                            formatNum,
+                        ),
+                        color: LIQ_PRICE_LINE_COLOR,
+                        type: 'LIQ',
+                        lineStyle: 3,
+                        lineWidth: 2,
+                        selectable: false,
+                    });
+                }
+
+                return result;
+            },
+        );
 
         setLines(newLines);
     }, [

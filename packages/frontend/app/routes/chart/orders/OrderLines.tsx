@@ -11,6 +11,13 @@ import {
 } from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
+import { ChartElementControlPanel } from '../core/ChartElementControlPanel';
+import {
+    useChartElementKeyboard,
+    useChartElementStore,
+} from '~/stores/ChartElementStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -35,6 +42,26 @@ export default function OrderLines({
     const openLines = useOpenOrderLines();
     const positionLines = usePositionOrderLines();
 
+    const symbolInfo = useTradeDataStore((state) => state.symbolInfo);
+
+    const calculateStep = () => {
+        if (!symbolInfo) return 0.01;
+
+        const resolutionList = getResolutionListForSymbol(symbolInfo);
+        if (resolutionList.length === 0) return 0.01;
+
+        return resolutionList[0].val;
+    };
+
+    // Enable keyboard control for chart elements
+    useChartElementKeyboard(true, calculateStep);
+
+    // Get focused element from store
+    const focusedElement = useChartElementStore(
+        (state) => state.focusedElement,
+    );
+    const previewPrice = useChartElementStore((state) => state.previewPrice);
+
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);
 
@@ -55,7 +82,7 @@ export default function OrderLines({
 
         const linesData = [...openLines, ...positionLines];
 
-        const updatedLines = linesData.map((line) => {
+        let updatedLines = linesData.map((line) => {
             if (
                 line.type !== 'PNL' &&
                 selectedLine &&
@@ -67,12 +94,32 @@ export default function OrderLines({
             return line;
         });
 
+        if (focusedElement && previewPrice !== null) {
+            updatedLines = updatedLines.filter(
+                (line) => line.id !== focusedElement.id,
+            );
+
+            const originalLine = linesData.find(
+                (line) => line.id === focusedElement.id,
+            );
+
+            if (originalLine) {
+                const previewLine: LineData = {
+                    ...originalLine,
+                    id: `${focusedElement.id}:preview`,
+                    yPrice: previewPrice,
+                };
+
+                updatedLines.push(previewLine);
+            }
+        }
+
         if (selectedLine && !matchFound) {
             setSelectedLine(undefined);
         }
 
         setLines(updatedLines);
-    }, [openLines, positionLines, selectedLine]);
+    }, [openLines, positionLines, selectedLine, focusedElement, previewPrice]);
 
     useEffect(() => {
         if (!chart || !scaleData) return;
@@ -207,6 +254,11 @@ export default function OrderLines({
                     }
                 />
             )}
+            <ChartElementControlPanel
+                chart={chart}
+                canvasHeight={canvasSize?.height || 0}
+                canvasWidth={canvasSize?.width || 0}
+            />
         </>
     );
 }

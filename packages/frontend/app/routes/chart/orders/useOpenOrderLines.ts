@@ -8,6 +8,7 @@ import {
 } from './customOrderLineUtils';
 import type { LineData } from './component/LineComponent';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { buildChartElementId } from './component/LineComponent';
 
 export const useOpenOrderLines = (): LineData[] => {
     const { bsColor, getBsColor } = useAppSettings();
@@ -98,7 +99,14 @@ export const useOpenOrderLines = (): LineData[] => {
                     quantityTextValue = sz || pnlSzi || 0;
                 }
 
+                const id = buildChartElementId({
+                    type: 'order',
+                    scope: 'limit',
+                    key: String(oid),
+                });
+
                 return {
+                    id,
                     xLoc,
                     yPrice,
                     textValue: label,
@@ -111,6 +119,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     lineStyle: 3,
                     lineWidth: 1,
                     side: side,
+                    selectable: true,
                 };
             });
 

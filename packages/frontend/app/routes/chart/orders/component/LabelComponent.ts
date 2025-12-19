@@ -21,6 +21,7 @@ import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import { t } from 'i18next';
+import { useChartElementStore } from '~/stores/ChartElementStore';
 
 interface LabelProps {
     lines: LineData[];
@@ -65,6 +66,11 @@ const LabelComponent = ({
     const { executeCancelOrder } = useCancelOrderService();
     const { executeLimitOrder } = useLimitOrderService();
     const ctx = overlayCanvasRef.current?.getContext('2d');
+
+    const focusElement = useChartElementStore((state) => state.focus);
+    const focusedElement = useChartElementStore(
+        (state) => state.focusedElement,
+    );
 
     const [isDrag, setIsDrag] = useState(false);
     const dragStateRef = useRef<{
@@ -199,6 +205,48 @@ const LabelComponent = ({
             });
 
             drawnLabelsRef.current = linesWithLabels;
+
+            if (focusedElement) {
+                const focusedLine = linesWithLabels.find(
+                    (line) =>
+                        line.id === `${focusedElement.id}:preview` ||
+                        line.id === focusedElement.id,
+                );
+
+                if (focusedLine?.labelLocations) {
+                    const dpr = window.devicePixelRatio || 1;
+                    const borderPadding = 4 * dpr;
+                    const borderWidth = 2 * dpr;
+                    const borderRadius = 4 * dpr;
+
+                    const labels = focusedLine.labelLocations;
+                    if (labels.length > 0) {
+                        const minY = Math.min(...labels.map((l) => l.y));
+                        const maxY = Math.max(
+                            ...labels.map((l) => l.y + l.height),
+                        );
+                        const x = 0;
+                        const y = minY - borderPadding;
+                        const width = widthAttr;
+                        const height = maxY - minY + borderPadding * 2;
+
+                        ctx.save();
+
+                        ctx.fillStyle = 'rgba(59, 130, 246, 0.1)'; // Blue with 10% opacity
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, width, height, borderRadius);
+                        ctx.fill();
+
+                        ctx.strokeStyle = '#3b82f6';
+                        ctx.lineWidth = borderWidth;
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, width, height, borderRadius);
+                        ctx.stroke();
+
+                        ctx.restore();
+                    }
+                }
+            }
         };
 
         if (zoomChanged && animationFrameId === null) {
@@ -226,6 +274,7 @@ const LabelComponent = ({
         zoomChanged,
         canvasSize,
         selectedLine,
+        focusedElement,
     ]);
 
     useLayoutEffect(() => {
@@ -507,15 +556,37 @@ const LabelComponent = ({
                             drawnLabelsRef.current,
                         );
 
-                        if (
-                            found &&
-                            found.matchType === 'onLabel' &&
-                            found.label.type === 'Cancel'
-                        ) {
-                            console.log({ found });
-                            if (found.parentLine.oid)
-                                handleCancel(found.parentLine);
-                            console.log(found.parentLine.textValue);
+                        console.log({ found });
+
+                        if (found) {
+                            if (
+                                found.matchType === 'onLabel' &&
+                                found.label.type === 'Cancel'
+                            ) {
+                                console.log({ found });
+                                if (found.parentLine.oid)
+                                    handleCancel(found.parentLine);
+                                console.log(found.parentLine.textValue);
+                            } else if (
+                                (found.matchType === 'onLabel' ||
+                                    found.matchType === 'onLine') &&
+                                found.parentLine.selectable
+                            ) {
+                                focusElement({
+                                    id: found.parentLine.id,
+                                    type: found.parentLine.type,
+                                    price: found.parentLine.yPrice,
+                                    hitbox: {
+                                        top: found.label.y,
+                                        bottom:
+                                            found.label.y + found.label.height,
+                                    },
+                                    label: formatLineLabel(
+                                        found.parentLine.textValue,
+                                    ),
+                                    data: found,
+                                });
+                            }
                         }
                     }
                 }
@@ -562,6 +633,7 @@ const LabelComponent = ({
                 isLabel &&
                 isLabel.matchType === 'onLabel' &&
                 isLabel.label.type !== 'Cancel' &&
+                isLabel.parentLine.selectable &&
                 (isLabel.parentLine.type === 'LIMIT' ||
                     (isLabel.parentLine.type === 'LIQ' &&
                         isLiqPriceLineDraggable))
@@ -572,6 +644,18 @@ const LabelComponent = ({
                 dragStateRef.current.isDragging = true;
                 setSelectedLine(isLabel);
                 setIsDrag(true);
+
+                focusElement({
+                    id: isLabel.parentLine.id,
+                    type: isLabel.parentLine.type,
+                    price: isLabel.parentLine.yPrice,
+                    hitbox: {
+                        top: isLabel.label.y,
+                        bottom: isLabel.label.y + isLabel.label.height,
+                    },
+                    label: formatLineLabel(isLabel.parentLine.textValue),
+                    data: isLabel,
+                });
             }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

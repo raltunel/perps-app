@@ -5,7 +5,30 @@ import type { EntityId, IChartingLibraryWidget } from '~/tv/charting_library';
 import { addCustomOrderLine, type LineLabel } from '../customOrderLineUtils';
 import type { LabelLocation } from '../orderLineUtils';
 
+// Element Types
+type ElementType = 'order' | 'position' | 'indicator';
+type Scope = 'limit' | 'pnl' | 'liq' | 'market';
+
+/**
+ * Build deterministic chart element ID
+ * Format: type:scope:key[:variant]
+ */
+export function buildChartElementId({
+    type,
+    scope,
+    key,
+    variant,
+}: {
+    type: ElementType;
+    scope: Scope;
+    key: string;
+    variant?: string;
+}): string {
+    return `${type}:${scope}:${key}${variant ? `:${variant}` : ''}`;
+}
+
 export type LineData = {
+    id: string; // Deterministic ID: type:scope:key[:variant]
     xLoc: number;
     yPrice: number;
     textValue: LineLabel;
@@ -18,6 +41,7 @@ export type LineData = {
     lineStyle: number;
     lineWidth: number;
     side?: 'buy' | 'sell';
+    selectable: boolean;
 };
 
 interface LineProps {
