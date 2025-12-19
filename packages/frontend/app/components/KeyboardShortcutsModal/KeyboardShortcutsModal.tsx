@@ -1,62 +1,26 @@
 import { useEffect } from 'react';
 import { MdClose } from 'react-icons/md';
 import { FaKeyboard } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 import styles from './KeyboardShortcutsModal.module.css';
 
-interface KeyboardShortcut {
-    keys: string[];
-    description: string;
-}
-
-interface ShortcutCategory {
-    title: string;
-    shortcuts: KeyboardShortcut[];
-}
+import {
+    formatKeyboardShortcutKey,
+    getKeyboardShortcutCategories,
+} from '~/utils/keyboardShortcuts';
 
 interface KeyboardShortcutsModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-const shortcutCategories: ShortcutCategory[] = [
-    {
-        title: 'General',
-        shortcuts: [
-            { keys: ['Shift', '/'], description: 'Display Shortcuts' },
-            { keys: ['C'], description: 'Open Wallet Connector' },
-            { keys: ['D'], description: 'Open Deposit Modal' },
-            { keys: ['W'], description: 'Open Withdraw Modal' },
-            { keys: ['Esc'], description: 'Close Modal / Cancel' },
-        ],
-    },
-    {
-        title: 'Trading',
-        shortcuts: [
-            { keys: ['B'], description: 'Switch to Buy' },
-            { keys: ['S'], description: 'Switch to Sell' },
-            { keys: ['M'], description: 'Start Market Order' },
-            { keys: ['L'], description: 'Start Limit Order' },
-            { keys: ['Enter / Return'], description: 'Submit Order' },
-        ],
-    },
-    {
-        title: 'Navigation',
-        shortcuts: [
-            { keys: ['T'], description: 'Go to Trade Page' },
-            // { keys: ['P'], description: 'Go to Portfolio page' },
-            { keys: ['H'], description: 'Go to Home Page' },
-            {
-                keys: ['E'],
-                description: 'View Latest TX in Block Explorer',
-            },
-        ],
-    },
-];
-
 const KeyboardShortcutsModal = ({
     isOpen,
     onClose,
 }: KeyboardShortcutsModalProps) => {
+    const { t } = useTranslation();
+    const shortcutCategories = getKeyboardShortcutCategories(t);
+
     useEffect(() => {
         if (!isOpen) return;
 
@@ -86,13 +50,13 @@ const KeyboardShortcutsModal = ({
                     <div className={styles.titleRow}>
                         <FaKeyboard className={styles.titleIcon} />
                         <h2 id='keyboard-shortcuts-title'>
-                            Keyboard Shortcuts
+                            {t('keyboardShortcuts.title')}
                         </h2>
                     </div>
                     <button
                         className={styles.closeButton}
                         onClick={onClose}
-                        aria-label='Close keyboard shortcuts'
+                        aria-label={t('keyboardShortcuts.aria.close')}
                     >
                         <MdClose size={20} />
                     </button>
@@ -125,7 +89,10 @@ const KeyboardShortcutsModal = ({
                                                                 styles.key
                                                             }
                                                         >
-                                                            {key}
+                                                            {formatKeyboardShortcutKey(
+                                                                key,
+                                                                t,
+                                                            )}
                                                         </kbd>
                                                         {keyIndex <
                                                             shortcut.keys
@@ -152,7 +119,11 @@ const KeyboardShortcutsModal = ({
 
                 <footer className={styles.footer}>
                     <span className={styles.hint}>
-                        Press <kbd className={styles.key}>Esc</kbd> to close
+                        {t('keyboardShortcuts.hintPress')}{' '}
+                        <kbd className={styles.key}>
+                            {formatKeyboardShortcutKey('esc', t)}
+                        </kbd>{' '}
+                        {t('keyboardShortcuts.hintToClose')}
                     </span>
                 </footer>
             </div>

@@ -39,6 +39,11 @@ import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost
 import { ACTIVE_ANNOUNCEMENT_BANNER } from '~/utils/Constants';
 import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -214,21 +219,52 @@ export default function PageHeader() {
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
-            if (e.altKey || e.ctrlKey || e.metaKey) return;
-            if (e.shiftKey) return;
-
             const target = e.target as HTMLElement | null;
             if (shouldIgnoreDueToTyping(target)) return;
 
-            const key = e.key.toLowerCase();
+            const categories = getKeyboardShortcutCategories(t);
+            const connectWalletShortcut = getKeyboardShortcutById(
+                categories,
+                'wallet.connect',
+            );
+            const depositShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.deposit',
+            );
+            const withdrawShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.withdraw',
+            );
+            const latestTxShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.latestTx',
+            );
 
-            if (key === 'c') {
+            const isRelevantShortcut =
+                (!!connectWalletShortcut &&
+                    matchesShortcutEvent(e, connectWalletShortcut.keys)) ||
+                (!!depositShortcut &&
+                    matchesShortcutEvent(e, depositShortcut.keys)) ||
+                (!!withdrawShortcut &&
+                    matchesShortcutEvent(e, withdrawShortcut.keys)) ||
+                (!!latestTxShortcut &&
+                    matchesShortcutEvent(e, latestTxShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (
+                connectWalletShortcut &&
+                matchesShortcutEvent(e, connectWalletShortcut.keys)
+            ) {
                 e.preventDefault();
                 clickSessionButton();
                 return;
             }
 
-            if (key === 'e') {
+            if (
+                latestTxShortcut &&
+                matchesShortcutEvent(e, latestTxShortcut.keys)
+            ) {
                 e.preventDefault();
                 const latest = latestTx;
                 if (latest?.txLink) {
@@ -237,13 +273,19 @@ export default function PageHeader() {
                 return;
             }
 
-            if (key === 'd') {
+            if (
+                depositShortcut &&
+                matchesShortcutEvent(e, depositShortcut.keys)
+            ) {
                 e.preventDefault();
                 openDepositModal();
                 return;
             }
 
-            if (key === 'w') {
+            if (
+                withdrawShortcut &&
+                matchesShortcutEvent(e, withdrawShortcut.keys)
+            ) {
                 e.preventDefault();
                 openWithdrawModal();
             }
@@ -257,6 +299,7 @@ export default function PageHeader() {
         openDepositModal,
         openWithdrawModal,
         latestTx,
+        t,
     ]);
 
     // Holds previous user connection status

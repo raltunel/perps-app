@@ -47,28 +47,51 @@ import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal/KeyboardShortcutsModal';
+import { useTranslation } from 'react-i18next';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from './utils/keyboardShortcuts';
 
 // Wrapper component that uses the keyboard shortcuts context
 function KeyboardShortcutsModalWrapper() {
     const { isOpen, close, toggle } = useKeyboardShortcuts();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     // Global keyboard shortcut listener for Shift+/ (?) to open keyboard shortcuts
     useEffect(() => {
         const handleGlobalKeyDown = (e: KeyboardEvent) => {
-            const keyLower = e.key.toLowerCase();
+            const categories = getKeyboardShortcutCategories(t);
+            const shortcutsModalShortcut = getKeyboardShortcutById(
+                categories,
+                'shortcuts.open',
+            );
+            const navHomeShortcut = getKeyboardShortcutById(
+                categories,
+                'navigation.home',
+            );
+            const navTradeShortcut = getKeyboardShortcutById(
+                categories,
+                'navigation.trade',
+            );
+            const navPortfolioShortcut = getKeyboardShortcutById(
+                categories,
+                'navigation.portfolio',
+            );
+
             const isShortcut =
-                e.shiftKey &&
-                (e.key === '?' || e.code === 'Slash') &&
-                !e.altKey &&
-                !e.ctrlKey &&
-                !e.metaKey;
+                !!shortcutsModalShortcut &&
+                matchesShortcutEvent(e, shortcutsModalShortcut.keys);
 
             const isNavigationShortcut =
-                !e.altKey &&
-                !e.ctrlKey &&
-                !e.metaKey &&
-                (keyLower === 't' || keyLower === 'p' || keyLower === 'h');
+                (!!navHomeShortcut &&
+                    matchesShortcutEvent(e, navHomeShortcut.keys)) ||
+                (!!navTradeShortcut &&
+                    matchesShortcutEvent(e, navTradeShortcut.keys)) ||
+                (!!navPortfolioShortcut &&
+                    matchesShortcutEvent(e, navPortfolioShortcut.keys));
 
             if (!isShortcut && !isNavigationShortcut) return;
 
@@ -101,18 +124,32 @@ function KeyboardShortcutsModalWrapper() {
             if (isOpen) return;
 
             e.preventDefault();
-            navigate(
-                keyLower === 't'
-                    ? '/v2/trade'
-                    : keyLower === 'h'
-                      ? '/'
-                      : '/v2/portfolio',
-            );
+
+            if (
+                navTradeShortcut &&
+                matchesShortcutEvent(e, navTradeShortcut.keys)
+            ) {
+                navigate('/v2/trade');
+                return;
+            }
+            if (
+                navHomeShortcut &&
+                matchesShortcutEvent(e, navHomeShortcut.keys)
+            ) {
+                navigate('/');
+                return;
+            }
+            if (
+                navPortfolioShortcut &&
+                matchesShortcutEvent(e, navPortfolioShortcut.keys)
+            ) {
+                navigate('/v2/portfolio');
+            }
         };
 
         window.addEventListener('keydown', handleGlobalKeyDown);
         return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [toggle, navigate, isOpen]);
+    }, [toggle, navigate, isOpen, t]);
 
     return <KeyboardShortcutsModal isOpen={isOpen} onClose={close} />;
 }

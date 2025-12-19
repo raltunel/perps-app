@@ -578,5 +578,130 @@
         "menuPrivacy": "Privacy",
         "terms": "CROCODILE Labs Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "단축키",
+        "title": "키보드 단축키",
+        "hintPress": "",
+        "hintToClose": "로 닫기",
+        "aria": {
+            "close": "키보드 단축키 닫기"
+        },
+        "categories": [
+            {
+                "title": "일반",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "단축키 보기"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "지갑 연결 열기"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "입금 모달 열기"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "출금 모달 열기"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "모달 닫기 / 취소"
+                    }
+                ]
+            },
+            {
+                "title": "거래",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "매수로 전환"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "매도로 전환"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "시장가 주문 시작"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "지정가 주문 시작"
+                    }
+                ]
+            },
+            {
+                "title": "내비게이션",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "거래 페이지로 이동"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "홈으로 이동"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "포트폴리오로 이동"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "최신 트랜잭션을 탐색기에서 보기"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

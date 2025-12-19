@@ -39,6 +39,11 @@ import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -770,30 +775,60 @@ export default function Trade() {
             const target = e.target as HTMLElement | null;
             if (shouldIgnoreDueToTyping(target)) return;
 
-            const key = e.key.toLowerCase();
+            const categories = getKeyboardShortcutCategories(t);
+            const buyShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.buy',
+            );
+            const sellShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.sell',
+            );
+            const marketShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.market',
+            );
+            const limitShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.limit',
+            );
 
-            if (key === 'b') {
+            const isRelevantShortcut =
+                (!!buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) ||
+                (!!sellShortcut &&
+                    matchesShortcutEvent(e, sellShortcut.keys)) ||
+                (!!marketShortcut &&
+                    matchesShortcutEvent(e, marketShortcut.keys)) ||
+                (!!limitShortcut &&
+                    matchesShortcutEvent(e, limitShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) {
                 e.preventDefault();
                 setTradeDirection('buy');
                 focusById('trade-module-size-input');
                 return;
             }
 
-            if (key === 's') {
+            if (sellShortcut && matchesShortcutEvent(e, sellShortcut.keys)) {
                 e.preventDefault();
                 setTradeDirection('sell');
                 focusById('trade-module-size-input');
                 return;
             }
 
-            if (key === 'l') {
+            if (limitShortcut && matchesShortcutEvent(e, limitShortcut.keys)) {
                 e.preventDefault();
                 setMarketOrderType('limit');
                 setTimeout(() => focusById('trade-module-price-input'), 0);
                 return;
             }
 
-            if (key === 'm') {
+            if (
+                marketShortcut &&
+                matchesShortcutEvent(e, marketShortcut.keys)
+            ) {
                 e.preventDefault();
                 setMarketOrderType('market');
                 setTimeout(() => focusById('trade-module-size-input'), 0);
@@ -807,6 +842,7 @@ export default function Trade() {
         isKeyboardShortcutsOpen,
         setMarketOrderType,
         setTradeDirection,
+        t,
     ]);
 
     const isTableCollapsed = () => {

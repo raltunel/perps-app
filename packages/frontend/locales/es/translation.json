@@ -578,5 +578,130 @@
         "menuPrivacy": "Privacy",
         "terms": "CROCODILE Labs Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Atajos",
+        "title": "Atajos de teclado",
+        "hintPress": "Pulsa",
+        "hintToClose": "para cerrar",
+        "aria": {
+            "close": "Cerrar atajos de teclado"
+        },
+        "categories": [
+            {
+                "title": "General",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Mostrar atajos"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["b"],
+                        "description": "Abrir conector de billetera"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Abrir modal de depósito"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["r"],
+                        "description": "Abrir modal de retiro"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Cerrar modal / cancelar"
+                    }
+                ]
+            },
+            {
+                "title": "Trading",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["c"],
+                        "description": "Cambiar a compra"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["v"],
+                        "description": "Cambiar a venta"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Iniciar orden de mercado"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Iniciar orden limitada"
+                    }
+                ]
+            },
+            {
+                "title": "Navegación",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Ir a la página de trading"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["i"],
+                        "description": "Ir a la página de inicio"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Ir a la página de portfolio"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "Ver la última transacción en el explorador"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }
