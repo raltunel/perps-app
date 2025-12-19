@@ -6,6 +6,7 @@ import {
     getMainSeriesPaneIndex,
     scaleDataRef,
     getPriceAxisContainer,
+    getPaneCanvasAndIFrameDoc,
 } from './overlayCanvasUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
@@ -24,6 +25,12 @@ const YAxisOverlayCanvas: React.FC = () => {
     const isNearOrderPriceRef = useRef(false);
     const isInitialSizeSetRef = useRef(false);
     const { updateYPosition } = usePreviewOrderLines();
+    const mouseOutOfFrameRef = useRef(false);
+
+    const dragStartPriceRef = useRef<number | undefined>(undefined);
+    const dragPriceRef = useRef<number | undefined>(undefined);
+    const dragFrozenPriceRef = useRef<number | undefined>(undefined);
+    const isDraggingRef = useRef(false);
 
     const { symbolInfo } = useTradeDataStore();
     const lastCandle = useChartStore((state) => state.lastCandle);
@@ -392,20 +399,21 @@ const YAxisOverlayCanvas: React.FC = () => {
         if (!canvasRef.current) return;
 
         const canvas = canvasRef.current;
-        let draggedPrice: number | undefined = undefined;
         let isDragging = false;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
-            draggedPrice = orderInputPriceValue.value;
-            isDragging = true;
+            dragPriceRef.current = orderInputPriceValue.value;
+            dragStartPriceRef.current = orderInputPriceValue.value;
+            isDraggingRef.current = true;
             setIsDrag(true);
             canvas.style.cursor = 'grabbing';
             useTradeDataStore.getState().setIsMidModeActive(false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
-            if (!isDragging) return;
+            if (!isDraggingRef.current) return;
+            if (mouseOutOfFrameRef.current) return;
 
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
@@ -431,23 +439,33 @@ const YAxisOverlayCanvas: React.FC = () => {
                 }
             }
 
-            draggedPrice = newPrice;
+            dragPriceRef.current = newPrice;
 
-            if (draggedPrice !== undefined) {
-                updateYPosition(draggedPrice);
+            if (newPrice !== undefined) {
+                // console.log('>>>>> updateYPosition', draggedPrice);
+                updateYPosition(newPrice);
             }
         };
 
         const handleDragEnd = () => {
-            if (!isDragging || draggedPrice === undefined) return;
+            if (!isDraggingRef.current || dragPriceRef.current === undefined)
+                return;
+
+            if (
+                mouseOutOfFrameRef.current &&
+                dragStartPriceRef.current !== undefined
+            ) {
+                dragPriceRef.current = dragStartPriceRef.current;
+            }
 
             useTradeDataStore.getState().setOrderInputPriceValue({
-                value: draggedPrice,
+                value: dragPriceRef.current,
                 changeType: 'dragEnd',
             });
+            updateYPosition(dragPriceRef.current);
 
-            isDragging = false;
-            draggedPrice = undefined;
+            isDraggingRef.current = false;
+            dragPriceRef.current = undefined;
             setIsDrag(false);
             canvas.style.cursor = 'grab';
         };
@@ -470,6 +488,44 @@ const YAxisOverlayCanvas: React.FC = () => {
             d3.select(canvas).on('.drag', null);
         };
     }, [canvasRef.current, chart, orderInputPriceValue.value, updateYPosition]);
+
+    useEffect(() => {
+        if (!chart) return;
+
+        const handleMouseLeave = () => {
+            mouseOutOfFrameRef.current = true;
+            dragFrozenPriceRef.current = dragPriceRef.current;
+        };
+
+        const handleMouseEnter = () => {
+            mouseOutOfFrameRef.current = false;
+        };
+
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                if (dragStartPriceRef.current !== undefined) {
+                    updateYPosition(dragStartPriceRef.current);
+                    isDraggingRef.current = false;
+                    dragPriceRef.current = undefined;
+                }
+            }
+        };
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        const iframeBody = iframeDoc?.body;
+
+        if (iframeBody) {
+            iframeBody.addEventListener('mouseleave', handleMouseLeave);
+            iframeBody.addEventListener('mouseenter', handleMouseEnter);
+            iframeBody.addEventListener('keydown', handleEscapeKey);
+
+            return () => {
+                iframeBody.removeEventListener('mouseleave', handleMouseLeave);
+                iframeBody.removeEventListener('mouseenter', handleMouseEnter);
+                iframeBody.removeEventListener('keydown', handleEscapeKey);
+            };
+        }
+    }, [chart]);
 
     return null;
 };

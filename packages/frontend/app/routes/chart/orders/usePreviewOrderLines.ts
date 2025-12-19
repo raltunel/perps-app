@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { LineData } from './component/LineComponent';
 import { quantityTextFormatWithComma } from './customOrderLineUtils';
@@ -9,13 +9,15 @@ export const usePreviewOrderLines = (): {
     updateYPosition: (yPrice: number) => void;
 } => {
     const { orderInputPriceValue, isPreviewOrderHovered } = useTradeDataStore();
+    const isPreviewOrderHoveredRef = useRef(isPreviewOrderHovered);
+    isPreviewOrderHoveredRef.current = isPreviewOrderHovered;
     const { obPreviewLine, setObPreviewLine } = useChartLinesStore();
 
     const updateYPosition = (yPrice: number) => {
         setObPreviewLine({
             xLoc: 0.4,
             yPrice: yPrice,
-            color: isPreviewOrderHovered ? '#d4cc45' : '#e9e980',
+            color: isPreviewOrderHoveredRef.current ? '#d4cc45' : '#e9e980',
             type: 'PREVIEW_ORDER',
             lineStyle: 2,
             lineWidth: 1,
@@ -30,13 +32,13 @@ export const usePreviewOrderLines = (): {
             setObPreviewLine({
                 xLoc: 0.4,
                 yPrice: orderInputPriceValue.value,
-                color: isPreviewOrderHovered ? '#d4cc45' : '#e9e980',
+                color: isPreviewOrderHoveredRef.current ? '#d4cc45' : '#e9e980',
                 type: 'PREVIEW_ORDER',
                 lineStyle: 2,
                 lineWidth: 1,
             });
         }
-    }, [orderInputPriceValue.value, isPreviewOrderHovered]);
+    }, [orderInputPriceValue.value]);
 
     return { obPreviewLine, updateYPosition };
 };
