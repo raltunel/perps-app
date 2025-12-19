@@ -1,0 +1,21 @@
+{
+  "name": "Ambient Affiliates",
+  "short_name": "Affiliates",
+  "description": "Ambient Finance affiliate program portal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06060c",
+  "theme_color": "#7371fc",
+  "icons": [
+    {
+      "src": "/ambient_icon_x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/ambient_icon_x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
