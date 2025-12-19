@@ -16,5 +16,8 @@ await fsp.cp('build/client', 'build', {
 });
 
 // Create _redirects file for SPA routing
-const redirectsContent = '/* /index.html 200';
+const redirectsContent = [
+    '/api/hubspot /.netlify/functions/hubspot 200',
+    '/* /index.html 200',
+].join('\n');
 await fsp.writeFile(path.join('build', '_redirects'), redirectsContent);

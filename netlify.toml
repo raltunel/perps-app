@@ -27,6 +27,11 @@ VITE_CONTEXT = "branch-deploy"
   publish = "build"
   autoLaunch = true
 
+ [[redirects]]
+   from = "/api/hubspot"
+   to = "/.netlify/functions/hubspot"
+   status = 200
+
 # Handle client-side routing
 [[redirects]]
   from = "/*"

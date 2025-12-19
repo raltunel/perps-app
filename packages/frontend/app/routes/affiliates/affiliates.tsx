@@ -3,6 +3,7 @@ import { IoReload } from 'react-icons/io5';
 import { ConnectWalletCard } from './components/ConnectWalletCard';
 import { YourStatsSection } from './components/YourStatsSection';
 import { DashboardTabsSection } from './components/DashboardTabsSection';
+import { AffiliateApplicationForm } from './components/AffiliateApplicationForm';
 import { useAffiliateAudience } from './hooks/useAffiliateData';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import styles from './affiliates.module.css';
@@ -81,43 +82,7 @@ export default function AffiliatesPage() {
                         >
                             Affiliate Application
                         </h1>
-                        <div className={styles['glass-card']}>
-                            <div
-                                style={{ textAlign: 'center', padding: '2rem' }}
-                            >
-                                <h2
-                                    style={{
-                                        marginBottom: '1rem',
-                                        fontSize: '1.25rem',
-                                        fontWeight: 600,
-                                        color: 'var(--aff-text-primary)',
-                                    }}
-                                >
-                                    Become an Affiliate
-                                </h2>
-                                <p
-                                    style={{
-                                        marginBottom: '1.5rem',
-                                        color: 'var(--aff-text-secondary)',
-                                        maxWidth: '32rem',
-                                        margin: '0 auto 1.5rem',
-                                    }}
-                                >
-                                    Join the Ambient Finance affiliate program
-                                    and earn commissions by referring traders to
-                                    our platform. Contact our team to apply for
-                                    the affiliate program.
-                                </p>
-                                <a
-                                    href='https://discord.gg/ambient-finance'
-                                    target='_blank'
-                                    rel='noopener noreferrer'
-                                    className={`${styles.btn} ${styles['btn-primary']} ${styles['btn-lg']}`}
-                                >
-                                    Contact Us on Discord
-                                </a>
-                            </div>
-                        </div>
+                        <AffiliateApplicationForm />
                     </div>
                 </div>
             </div>
