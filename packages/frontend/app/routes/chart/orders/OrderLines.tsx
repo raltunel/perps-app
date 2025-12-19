@@ -179,7 +179,9 @@ export default function OrderLines({
             const min = Math.min(minY, maxY);
             return (
                 (line.yPrice >= min && line.yPrice <= max && isVisibleEnough) ||
-                (selectedLine && line.oid === selectedLine?.parentLine.oid)
+                (selectedLine &&
+                    line.oid &&
+                    line.oid === selectedLine?.parentLine.oid)
             );
         });
 
