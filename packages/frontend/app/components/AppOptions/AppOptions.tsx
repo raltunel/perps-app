@@ -103,6 +103,7 @@ export default function AppOptions(props: AppOptionsProps) {
                 <OptionLine
                     text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
+                    autoFocus={!footer}
                     toggle={() => {
                         activeOptions.toggle('skipOpenOrderConfirm');
                         showChangeAppliedMessage();
@@ -319,7 +320,8 @@ export default function AppOptions(props: AppOptionsProps) {
                     </div>
                 ) : (
                     !isDefaults && (
-                        <div
+                        <button
+                            type='button'
                             className={styles.apply_defaults}
                             style={{
                                 background: 'var(--accent1)',
@@ -350,7 +352,7 @@ export default function AppOptions(props: AppOptionsProps) {
                             }}
                         >
                             {t('common.applyDefaults')}
-                        </div>
+                        </button>
                     )
                 )}
             </div>
