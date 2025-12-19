@@ -49,6 +49,7 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }, [FUUL_API_KEY]);
 
+    // just for pageview tracking
     const projects = [
         '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
         '0303273c-c574-4a64-825c-b67091ec6813',

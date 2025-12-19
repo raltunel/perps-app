@@ -42,7 +42,7 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
-const AFFILIATE_EDIT_VOLUME_THRESHOLD = 1;
+const AFFILIATE_EDIT_VOLUME_THRESHOLD = 1_000_000;
 const DEFAULT_AFFILIATE_CODE_LENGTH = 6;
 
 // fee amounts for affiliate and the referred user
