@@ -16,16 +16,18 @@ A modern affiliate dashboard built with Next.js 15 for managing referral program
 
 ## Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js 20+
+- pnpm 9+
 - A Fuul SDK API key
 
 ## Getting Started
 
+This project is part of a pnpm monorepo. Run all commands from the **repository root**.
+
 ### 1. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. Configure environment variables
@@ -52,22 +54,24 @@ HUBSPOT_PRIVATE_APP_TOKEN="your-hubspot-app-token"
 ### 3. Run the development server
 
 ```bash
-npm run dev
+pnpm --filter affiliates-portal dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Available Scripts
 
-| Command                | Description                             |
-| ---------------------- | --------------------------------------- |
-| `npm run dev`          | Start development server with Turbopack |
-| `npm run build`        | Build for production                    |
-| `npm run start`        | Start production server                 |
-| `npm run lint`         | Run ESLint                              |
-| `npm run lint:fix`     | Fix ESLint errors automatically         |
-| `npm run format`       | Format code with Prettier               |
-| `npm run format:check` | Check code formatting                   |
+Run from the repository root using `pnpm --filter affiliates-portal <script>`:
+
+| Command        | Description                             |
+| -------------- | --------------------------------------- |
+| `dev`          | Start development server with Turbopack |
+| `build`        | Build for production                    |
+| `start`        | Start production server                 |
+| `lint`         | Run ESLint                              |
+| `lint:fix`     | Fix ESLint errors automatically         |
+| `format`       | Format code with Prettier               |
+| `format:check` | Check code formatting                   |
 
 ## Project Structure
 
@@ -152,19 +156,27 @@ The portal integrates with the Fuul API for:
 The project uses ESLint and Prettier for code formatting. Run before committing:
 
 ```bash
-npm run lint:fix
-npm run format
+pnpm --filter affiliates-portal lint:fix
+pnpm --filter affiliates-portal format
 ```
 
 ### Adding UI Components
 
-This project uses shadcn/ui. To add new components:
+This project uses shadcn/ui. To add new components, run from `packages/affiliates-portal`:
 
 ```bash
-npx shadcn@latest add [component-name]
+pnpm dlx shadcn@latest add [component-name]
 ```
 
 ## Troubleshooting
+
+### Turbopack error: "Next.js package not found"
+
+This is a known issue with Turbopack in pnpm monorepos. Use this alternative command:
+
+```bash
+pnpm next dev
+```
 
 ### Build fails with PageNotFoundError
 
