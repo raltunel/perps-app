@@ -5,7 +5,12 @@ export default function ReferralsExtra() {
         <section className={styles.referrals_extra}>
             <h4>Join</h4>
             <div>
-                <button>Click to Become an Affiliate</button>
+                <button
+                    // navigate to /v2/affiliates
+                    onClick={() => (window.location.href = '/v2/affiliates')}
+                >
+                    Click to Become an Affiliate
+                </button>
             </div>
         </section>
     );
