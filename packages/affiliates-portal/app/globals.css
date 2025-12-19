@@ -1,0 +1,336 @@
+/**
+ * Ambient Finance - Affiliate Portal Styles
+ *
+ * Design system based on ambient-ts-app
+ * Features: Lexend fonts, Ambient color palette, glassmorphism effects
+ */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/**
+ * Dark mode custom variant
+ * Enables dark mode support with .dark class on parent elements
+ */
+@custom-variant dark (&:is(.dark *));
+
+/**
+ * Tailwind CSS v4 inline theme configuration
+ * Maps CSS custom properties to Tailwind utilities
+ */
+@theme inline {
+  /* Font families - Lexend */
+  --font-sans: var(--font-lexend-deca), system-ui, sans-serif;
+  --font-logo: var(--font-lexend-exa), system-ui, sans-serif;
+
+  /* Base colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+
+  /* Ambient accent colors */
+  --color-accent1: var(--accent1);
+  --color-accent2: var(--accent2);
+  --color-accent3: var(--accent3);
+  --color-accent4: var(--accent4);
+  --color-accent5: var(--accent5);
+
+  /* Dark backgrounds */
+  --color-dark1: var(--dark1);
+  --color-dark2: var(--dark2);
+  --color-dark3: var(--dark3);
+
+  /* Surface colors - for glassmorphism backgrounds */
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-active: var(--surface-active);
+  --color-surface-elevated: var(--surface-elevated);
+
+  /* Text colors - semantic text hierarchy */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+
+  /* Border colors - semantic border hierarchy */
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-border-hover: var(--border-hover);
+  --color-border-strong: var(--border-strong);
+
+  /* Status colors */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+
+  /* Border radius variants */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+}
+
+/**
+ * Ambient Finance Theme
+ *
+ * Design system based on ambient-ts-app
+ * Colors, typography, and spacing aligned with Ambient brand
+ */
+:root {
+  /* Base border radius - Ambient uses 4px */
+  --radius: 4px;
+
+  /* ========================================
+   * AMBIENT COLOR PALETTE
+   * ======================================== */
+
+  /* Dark backgrounds */
+  --dark1: #06060c;  /* Darkest - main background */
+  --dark2: #12121a;  /* Cards and elevated surfaces */
+  --dark3: #1e1e24;  /* Lighter dark for contrast */
+
+  /* Accent colors - Ambient brand */
+  --accent1: #7371fc;  /* Primary purple */
+  --accent2: #e480ff;  /* Pink/magenta */
+  --accent3: #5ffff2;  /* Cyan/teal */
+  --accent4: #62e6ff;  /* Light blue */
+  --accent5: #c084fc;  /* Violet */
+
+  /* Text colors - Ambient palette */
+  --ambient-text1: #f0f0f8;  /* Primary text */
+  --ambient-text2: #8b98a5;  /* Secondary text */
+  --ambient-text3: #61646f;  /* Muted text */
+
+  /* Status colors - Ambient */
+  --positive: #15be6f;  /* Green for success */
+  --negative: #f6385b;  /* Red for errors */
+  --other-positive: #5fff9f;  /* Bright green */
+  --other-negative: #fa7093;  /* Light red/pink */
+
+  /* ========================================
+   * SEMANTIC TOKENS (shadcn/ui compatible)
+   * ======================================== */
+
+  /* Primary brand color - Ambient purple */
+  --primary: #7371fc;
+  --primary-foreground: #f0f0f8;
+
+  /* Secondary color */
+  --secondary: #12121a;
+  --secondary-foreground: #f0f0f8;
+
+  /* Background colors */
+  --background: #06060c;
+  --foreground: #f0f0f8;
+
+  /* Card colors */
+  --card: #12121a;
+  --card-foreground: #f0f0f8;
+
+  /* Popover colors */
+  --popover: #12121a;
+  --popover-foreground: #f0f0f8;
+
+  /* Muted colors */
+  --muted: #1e1e24;
+  --muted-foreground: #8b98a5;
+
+  /* Accent colors - using cyan for highlights */
+  --accent: #1e1e24;
+  --accent-foreground: #5ffff2;
+
+  /* Destructive colors */
+  --destructive: #f6385b;
+  --destructive-foreground: #f0f0f8;
+
+  /* Border and input colors */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+
+  /* Focus ring color */
+  --ring: #7371fc;
+
+  /* Typography - Lexend family */
+  --font-family: 'Lexend Deca', system-ui, sans-serif;
+  --font-logo: 'Lexend Exa', system-ui, sans-serif;
+
+  /* Layout */
+  --max-width: 1200px;
+  --spacing: 0.25rem;
+
+  /* ========================================
+   * GLASSMORPHISM SURFACE TOKENS
+   * These preserve the glass effect with transparency
+   * ======================================== */
+
+  /* Surface colors - glass effect backgrounds */
+  --surface: rgb(255 255 255 / 0.05);           /* Subtle glass surface */
+  --surface-hover: rgb(255 255 255 / 0.10);     /* Hover state */
+  --surface-active: rgb(255 255 255 / 0.20);    /* Active/pressed */
+  --surface-elevated: rgb(255 255 255 / 0.40);  /* Elevated glass surfaces */
+
+  /* Text colors - using Ambient palette with opacity variants */
+  --text-primary: #f0f0f8;                      /* Primary text */
+  --text-secondary: #8b98a5;                    /* Secondary text */
+  --text-tertiary: rgb(139 152 165 / 0.85);     /* Tertiary text */
+  --text-muted: #7a7d8a;                        /* Muted text - lighter */
+  --text-subtle: #6b6e7a;                       /* Subtle/placeholder - visible */
+
+  /* Border colors - glass effect borders */
+  --border-subtle: rgb(255 255 255 / 0.05);     /* Very subtle */
+  --border-default: rgb(255 255 255 / 0.10);    /* Default border */
+  --border-hover: rgb(255 255 255 / 0.20);      /* Hover state */
+  --border-strong: rgb(255 255 255 / 0.30);     /* Strong/focus */
+
+  /* Status colors - Ambient palette */
+  --success: #15be6f;
+  --success-foreground: #f0f0f8;
+  --warning: #f0b90b;
+  --warning-foreground: #06060c;
+  --info: #5ffff2;
+  --info-foreground: #06060c;
+}
+
+/**
+ * Note: This theme is dark by default (Ambient Finance style)
+ * The .dark class is not needed but kept for compatibility
+ */
+.dark {
+  /* Dark mode inherits the same values - theme is dark by default */
+}
+
+/**
+ * Base Styles
+ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply text-foreground;
+    font-family: var(--font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #06060c;
+    background: linear-gradient(180deg, #06060c 0%, #0d0d14 50%, #12101a 100%);
+    background-attachment: fixed;
+  }
+}
+
+/**
+ * Utility Classes
+ */
+@layer utilities {
+  /* Container with max width */
+  .max-w-container {
+    max-width: var(--max-width);
+  }
+
+  /* Gradient text effect */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Smooth scrolling */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar while maintaining scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/**
+ * Custom Animations
+ *
+ * Additional animations beyond tw-animate-css
+ */
+@layer utilities {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.5s ease-out;
+  }
+}
+
+/**
+ * Animated Background
+ *
+ * Glowing wire-like lines that span the viewport width
+ * with a traveling light effect
+ */
+.animated-background {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.animated-path-primary {
+  width: 100%;
+  height: 100%;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+
+.animated-line {
+  filter: drop-shadow(0 0 2px var(--accent1)) drop-shadow(0 0 4px rgba(115, 113, 252, 0.5));
+}
