@@ -177,7 +177,7 @@ function OrderInput({
     // Track if the OrderInput component is focused
     const [isFocused, setIsFocused] = useState(false);
     const orderInputRef = useRef<HTMLDivElement>(null);
-    const submitButtonRef = useRef<HTMLElement | null>(null);
+    const submitButtonRef = useRef<HTMLButtonElement | null>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
@@ -185,7 +185,6 @@ function OrderInput({
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
-    const [marketOrderType, setMarketOrderType] = useState<string>('market');
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
 
@@ -216,13 +215,6 @@ function OrderInput({
 
     const [sizeDisplay, setSizeDisplay] = useState('');
 
-    const isPriceInvalid = useMemo(() => {
-        return (
-            marketOrderType === 'limit' &&
-            (price === '' || price === '0' || price === '0.0')
-        );
-    }, [price, marketOrderType]);
-
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -249,9 +241,18 @@ function OrderInput({
         setOrderInputPriceValue,
         tradeDirection,
         setTradeDirection,
+        marketOrderType,
+        setMarketOrderType,
         setIsMidModeActive,
         isMidModeActive,
     } = useTradeDataStore();
+
+    const isPriceInvalid = useMemo(() => {
+        return (
+            marketOrderType === 'limit' &&
+            (price === '' || price === '0' || price === '0.0')
+        );
+    }, [price, marketOrderType]);
 
     useEffect(() => {
         if (!marginBucket) return;
@@ -2262,9 +2263,11 @@ function OrderInput({
 
     useEffect(() => {
         if (typeof document !== 'undefined') {
-            submitButtonRef.current = document.querySelector(
+            const el = document.querySelector(
                 '[data-testid="submit-order-button"]',
-            ) as HTMLElement | null;
+            );
+            submitButtonRef.current =
+                el instanceof HTMLButtonElement ? el : null;
         }
     }, []);
 
@@ -2532,6 +2535,7 @@ function OrderInput({
                                 disabled={!isDisabled}
                             >
                                 <button
+                                    ref={submitButtonRef}
                                     data-testid='submit-order-button'
                                     className={`${styles.submit_button}`}
                                     style={{

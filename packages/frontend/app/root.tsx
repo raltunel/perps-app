@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect } from 'react';
 import './i18n'; // i18n MUST be imported before any components
 import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { init as initPlausible } from '@plausible-analytics/tracker';
 
 // Components
@@ -21,6 +21,10 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider, Network } from '@fogo/sessions-sdk-react';
 import { WsProvider } from './contexts/WsContext';
+import {
+    KeyboardShortcutsProvider,
+    useKeyboardShortcuts,
+} from './contexts/KeyboardShortcutsContext';
 
 // Config
 import {
@@ -34,6 +38,7 @@ import packageJson from '../package.json';
 import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import { useDebugStore } from './stores/DebugStore';
+import { useAppSettings } from './stores/AppSettingsStore';
 
 // Styles
 import './css/app.css';
@@ -174,61 +179,65 @@ export default function App() {
                 privacyPolicyUrl='/v2/privacy'
             >
                 <AppProvider>
-                    <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
-                        <UnifiedMarginDataProvider>
-                            <MarketDataProvider>
-                                <SdkProvider
-                                    environment={wsEnvironment}
-                                    marketEndpoint={MARKET_WS_ENDPOINT}
-                                    userEndpoint={USER_WS_ENDPOINT}
-                                >
-                                    <TutorialProvider>
-                                        <GlobalModalHost>
-                                            <ErrorBoundary>
-                                                <WsConnectionChecker />
-                                                <WebSocketDebug />
-                                                <div className='root-container'>
-                                                    <div className='header-area'>
-                                                        <AnnouncementBannerHost />
-                                                        <PageHeader />
-                                                    </div>
-                                                    <main
-                                                        className={`content ${isHomePage ? 'home-page' : ''}`}
-                                                    >
-                                                        <Suspense
-                                                            fallback={
-                                                                <LogoLoadingIndicator />
-                                                            }
+                    <KeyboardShortcutsProvider>
+                        <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
+                            <UnifiedMarginDataProvider>
+                                <MarketDataProvider>
+                                    <SdkProvider
+                                        environment={wsEnvironment}
+                                        marketEndpoint={MARKET_WS_ENDPOINT}
+                                        userEndpoint={USER_WS_ENDPOINT}
+                                    >
+                                        <TutorialProvider>
+                                            <GlobalModalHost>
+                                                <ErrorBoundary>
+                                                    <WsConnectionChecker />
+                                                    <WebSocketDebug />
+                                                    <div className='root-container'>
+                                                        <div className='header-area'>
+                                                            <AnnouncementBannerHost />
+                                                            <PageHeader />
+                                                        </div>
+                                                        <main
+                                                            className={`content ${isHomePage ? 'home-page' : ''}`}
                                                         >
-                                                            <Outlet />
-                                                        </Suspense>
-                                                    </main>
-                                                    <MobileFooter />
-                                                    <Notifications />
-                                                    {restrictedSiteModal.isOpen && (
-                                                        <Modal
-                                                            close={() =>
-                                                                restrictedSiteModal.close()
-                                                            }
-                                                            position={'center'}
-                                                            title=''
-                                                        >
-                                                            <RestrictedSiteMessage
-                                                                onClose={
-                                                                    restrictedSiteModal.close
+                                                            <Suspense
+                                                                fallback={
+                                                                    <LogoLoadingIndicator />
                                                                 }
-                                                            />
-                                                        </Modal>
-                                                    )}
-                                                </div>
-                                                <RuntimeDomManipulation />
-                                            </ErrorBoundary>
-                                        </GlobalModalHost>
-                                    </TutorialProvider>
-                                </SdkProvider>
-                            </MarketDataProvider>
-                        </UnifiedMarginDataProvider>
-                    </WsProvider>
+                                                            >
+                                                                <Outlet />
+                                                            </Suspense>
+                                                        </main>
+                                                        <MobileFooter />
+                                                        <Notifications />
+                                                        {restrictedSiteModal.isOpen && (
+                                                            <Modal
+                                                                close={() =>
+                                                                    restrictedSiteModal.close()
+                                                                }
+                                                                position={
+                                                                    'center'
+                                                                }
+                                                                title=''
+                                                            >
+                                                                <RestrictedSiteMessage
+                                                                    onClose={
+                                                                        restrictedSiteModal.close
+                                                                    }
+                                                                />
+                                                            </Modal>
+                                                        )}
+                                                    </div>
+                                                    <RuntimeDomManipulation />
+                                                </ErrorBoundary>
+                                            </GlobalModalHost>
+                                        </TutorialProvider>
+                                    </SdkProvider>
+                                </MarketDataProvider>
+                            </UnifiedMarginDataProvider>
+                        </WsProvider>
+                    </KeyboardShortcutsProvider>
                 </AppProvider>
             </FogoSessionProvider>
         </FuulProvider>

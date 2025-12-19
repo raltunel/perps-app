@@ -45,6 +45,14 @@ import { useTranslation } from 'react-i18next';
 import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
 import AnnouncementBannerHost from '../AnnouncementBanner/AnnouncementBannerHost';
 import { ACTIVE_ANNOUNCEMENT_BANNER } from '~/utils/Constants';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from '~/utils/keyboardShortcuts';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -102,6 +110,8 @@ export default function PageHeader() {
     const { isInitialized: isFuulInitialized } = useFuul();
 
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
+    const { notifications, latestTx } = useNotificationStore();
+    const { navigationKeyboardShortcutsEnabled } = useAppSettings();
 
     useEffect(() => {
         const button = sessionButtonRef.current;
@@ -178,6 +188,8 @@ export default function PageHeader() {
 
     // logic to open and close modals
     const appSettingsModal = useModal('closed');
+    const openAppSettingsModalRef = useRef(appSettingsModal.open);
+    openAppSettingsModalRef.current = appSettingsModal.open;
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -197,8 +209,146 @@ export default function PageHeader() {
     const shortB = useMediaQuery('(max-width: 600px)');
     const isShortScreen: boolean = shortA || shortB;
 
-    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
-        usePortfolioModals();
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        PortfolioModalsRenderer,
+        isAnyPortfolioModalOpen,
+    } = usePortfolioModals();
+
+    const { isOpen: isKeyboardShortcutsOpen } = useKeyboardShortcuts();
+
+    useEffect(() => {
+        if (isKeyboardShortcutsOpen || isAnyPortfolioModalOpen) return;
+
+        const clickSessionButton = () => {
+            const wrapper = sessionButtonRef.current;
+            const el = wrapper?.querySelector(
+                'button, [role="button"]',
+            ) as HTMLElement | null;
+            el?.click();
+        };
+
+        const shouldIgnoreDueToTyping = (target: HTMLElement | null) => {
+            if (!target) return false;
+
+            const isOptedInField = !!target.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+            if (isOptedInField) return false;
+
+            if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                return true;
+            }
+
+            if (target.tagName === 'INPUT') {
+                const input = target as HTMLInputElement;
+                const isNumericInput = input.inputMode === 'numeric';
+                if (!isNumericInput) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null;
+            if (shouldIgnoreDueToTyping(target)) return;
+
+            if (
+                e.altKey &&
+                !e.shiftKey &&
+                !e.ctrlKey &&
+                !e.metaKey &&
+                e.code === 'Comma'
+            ) {
+                e.preventDefault();
+                openAppSettingsModalRef.current();
+                return;
+            }
+
+            const categories = getKeyboardShortcutCategories(t);
+            const connectWalletShortcut = getKeyboardShortcutById(
+                categories,
+                'wallet.connect',
+            );
+            const depositShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.deposit',
+            );
+            const withdrawShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.withdraw',
+            );
+            const latestTxShortcut = getKeyboardShortcutById(
+                categories,
+                'portfolio.latestTx',
+            );
+
+            const isRelevantShortcut =
+                (!!connectWalletShortcut &&
+                    matchesShortcutEvent(e, connectWalletShortcut.keys)) ||
+                (!!depositShortcut &&
+                    matchesShortcutEvent(e, depositShortcut.keys)) ||
+                (!!withdrawShortcut &&
+                    matchesShortcutEvent(e, withdrawShortcut.keys)) ||
+                (!!latestTxShortcut &&
+                    matchesShortcutEvent(e, latestTxShortcut.keys));
+
+            if (!isRelevantShortcut) return;
+
+            if (!navigationKeyboardShortcutsEnabled) return;
+
+            if (
+                connectWalletShortcut &&
+                matchesShortcutEvent(e, connectWalletShortcut.keys)
+            ) {
+                e.preventDefault();
+                clickSessionButton();
+                return;
+            }
+
+            if (
+                latestTxShortcut &&
+                matchesShortcutEvent(e, latestTxShortcut.keys)
+            ) {
+                e.preventDefault();
+                const latest = latestTx;
+                if (latest?.txLink) {
+                    window.open(latest.txLink, '_blank', 'noopener,noreferrer');
+                }
+                return;
+            }
+
+            if (
+                depositShortcut &&
+                matchesShortcutEvent(e, depositShortcut.keys)
+            ) {
+                e.preventDefault();
+                openDepositModal();
+                return;
+            }
+
+            if (
+                withdrawShortcut &&
+                matchesShortcutEvent(e, withdrawShortcut.keys)
+            ) {
+                e.preventDefault();
+                openWithdrawModal();
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [
+        isAnyPortfolioModalOpen,
+        isKeyboardShortcutsOpen,
+        openDepositModal,
+        openWithdrawModal,
+        latestTx,
+        t,
+    ]);
 
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
@@ -543,6 +693,7 @@ export default function PageHeader() {
                     <section
                         style={{ position: 'relative' }}
                         ref={dropdownMenuRef}
+                        className={styles.menuButtonContainer}
                     >
                         <button
                             className={styles.menuButton}
@@ -569,7 +720,7 @@ export default function PageHeader() {
                     position={'center'}
                     title={t('appSettings.title')}
                 >
-                    <AppOptions />
+                    <AppOptions closePanel={() => appSettingsModal.close()} />
                 </Modal>
             )}
             {invalidRefCodeModal.isOpen && (

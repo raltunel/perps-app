@@ -466,6 +466,9 @@
         "skipOpenOrderConfirm": "Skip Open Order Confirmation",
         "enableTxNotifications": "Enable Transaction Notifications",
         "enableBackgroundFillNotif": "Enable Background Fill Notifications",
+        "navigationKeyboardShortcuts": "Enable Navigation Keyboard Shortcuts",
+        "tradingKeyboardShortcuts": "Enable Trading Keyboard Shortcuts",
+        "viewKeyboardShortcuts": "View keyboard shortcuts",
         "numberFormat": "Number Format",
         "color": "Color",
         "language": "Language"
@@ -604,5 +607,135 @@
         "menuPrivacy": "Privacy",
         "terms": "CROCODILE Labs Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Shortcuts",
+        "title": "Keyboard Shortcuts",
+        "hintPress": "Press",
+        "hintToClose": "to close",
+        "aria": {
+            "close": "Close keyboard shortcuts"
+        },
+        "categories": [
+            {
+                "title": "General",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Display shortcuts"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Open settings"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Close modal / cancel"
+                    }
+                ]
+            },
+            {
+                "title": "Trading",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Switch to buy"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Switch to sell"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Start market order"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Start limit order"
+                    }
+                ]
+            },
+            {
+                "title": "Navigation",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Go to trade page"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Go to home page"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Go to portfolio page"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Open wallet connector"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Open deposit modal"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Open withdraw modal"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "View latest transaction in block explorer"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

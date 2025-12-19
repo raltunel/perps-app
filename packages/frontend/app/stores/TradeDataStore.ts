@@ -49,6 +49,8 @@ type TradeDataStore = UserTradeDataStore & {
     setOrderInputPriceValue: (price: number) => void;
     tradeDirection: OrderSide;
     setTradeDirection: (direction: OrderSide) => void;
+    marketOrderType: string;
+    setMarketOrderType: (marketOrderType: string) => void;
     setIsMidModeActive: (isActive: boolean) => void;
     isMidModeActive: boolean;
 };
@@ -158,6 +160,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             tradeDirection: 'buy',
             setTradeDirection: (direction: OrderSide) =>
                 set({ tradeDirection: direction }),
+            marketOrderType: 'market',
+            setMarketOrderType: (marketOrderType: string) =>
+                set({ marketOrderType }),
             setIsMidModeActive: (isActive: boolean) =>
                 set({ isMidModeActive: isActive }),
             isMidModeActive: true,

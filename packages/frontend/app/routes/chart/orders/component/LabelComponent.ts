@@ -890,6 +890,65 @@ const LabelComponent = ({
         };
     }, [overlayCanvasRef.current, chart, selectedLine, drawnLabelsRef.current]);
 
+    // Handle ESC key press to cancel drag
+    useEffect(() => {
+        if (!chart) return;
+
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && dragStateRef.current.isDragging) {
+                const { tempSelectedLine, originalPrice } =
+                    dragStateRef.current;
+
+                if (tempSelectedLine && originalPrice !== undefined) {
+                    const restoredLine = {
+                        ...tempSelectedLine,
+                        parentLine: {
+                            ...tempSelectedLine.parentLine,
+                            yPrice: originalPrice,
+                        },
+                    };
+                    setSelectedLine(restoredLine);
+
+                    dragStateRef.current.tempSelectedLine = undefined;
+                    dragStateRef.current.originalPrice = undefined;
+                    dragStateRef.current.isDragging = false;
+                    dragStateRef.current.isOutsideArea = false;
+                    dragStateRef.current.frozenPrice = undefined;
+                    setIsDrag(false);
+                    setSelectedLine(undefined);
+
+                    if (chart) {
+                        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                        if (iframeDoc?.body) {
+                            iframeDoc.body.style.removeProperty('cursor');
+                        }
+                        if (iframeDoc?.documentElement) {
+                            iframeDoc.documentElement.style.removeProperty(
+                                'cursor',
+                            );
+                        }
+                    }
+
+                    if (overlayCanvasRef.current) {
+                        overlayCanvasRef.current.style.cursor = 'pointer';
+                        overlayCanvasRef.current.style.pointerEvents = 'none';
+                    }
+                }
+            }
+        };
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        const iframeBody = iframeDoc?.body;
+
+        if (iframeBody) {
+            iframeBody.addEventListener('keydown', handleEscapeKey);
+
+            return () => {
+                iframeBody.removeEventListener('keydown', handleEscapeKey);
+            };
+        }
+    }, [chart, overlayCanvasRef.current]);
+
     // Handle mouse leaving and entering chart during drag
     useEffect(() => {
         if (!chart) return;
