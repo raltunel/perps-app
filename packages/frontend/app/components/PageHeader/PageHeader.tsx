@@ -236,40 +236,26 @@ export default function PageHeader() {
             }
         }
 
-        // referralCodeFromURL.value &&
-        //     referralStore.cache(referralCodeFromURL.value);
-
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected, userDataStore.userAddress]);
-
-    // // Ensure URL parameter always overrides cached referral code
-    // useEffect(() => {
-    //     if (referralCodeFromURL.value) {
-    //         referralStore.cache(referralCodeFromURL.value);
-    //     }
-    // }, [referralCodeFromURL.value]);
 
     const { totVolume } = useReferralStore();
 
     // track page views with Fuul
     useEffect(() => {
-        const projects = [
-            '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
-            '0303273c-c574-4a64-825c-b67091ec6813',
-        ];
         if (
             isFuulInitialized &&
             totVolume !== undefined &&
             !Number.isNaN(totVolume) &&
-            totVolume < 10000
+            // totVolume < 10000 &&
+            userDataStore.userAddress
         ) {
             console.log('sending pageview for: ', location.pathname);
-            // Fuul.sendPageview(undefined, projects);
             trackPageView();
         } else {
             localStorage.removeItem('fuul.sent_pageview');
         }
-    }, [location, isFuulInitialized, totVolume]);
+    }, [location, isFuulInitialized, totVolume, userDataStore.userAddress]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
     const navigate = useNavigate();
