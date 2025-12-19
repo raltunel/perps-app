@@ -891,6 +891,10 @@ const LabelComponent = ({
                 };
                 setSelectedLine(restoredLine);
 
+                if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
+                    updateYPosition(originalPrice);
+                }
+
                 dragStateRef.current.tempSelectedLine = undefined;
                 dragStateRef.current.originalPrice = undefined;
                 dragStateRef.current.isDragging = false;
@@ -989,6 +993,10 @@ const LabelComponent = ({
                         },
                     };
                     setSelectedLine(restoredLine);
+
+                    if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
+                        updateYPosition(originalPrice);
+                    }
 
                     dragStateRef.current.tempSelectedLine = undefined;
                     dragStateRef.current.originalPrice = undefined;
