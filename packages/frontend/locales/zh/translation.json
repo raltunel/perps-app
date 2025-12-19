@@ -600,6 +600,11 @@
                         "description": "显示快捷键"
                     },
                     {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "打开设置"
+                    },
+                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "关闭弹窗 / 取消"

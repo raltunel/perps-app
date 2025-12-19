@@ -600,6 +600,11 @@
                         "description": "Mostrar atajos"
                     },
                     {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Abrir configuración"
+                    },
+                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "Cerrar modal / cancelar"

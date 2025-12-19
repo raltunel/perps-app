@@ -157,6 +157,7 @@ export default function AppOptions(props: AppOptionsProps) {
                     }}
                 />
             </ul>
+            <div className={styles.horizontal_divider} />
             <ul>
                 <OptionLine
                     text={t('appSettings.navigationKeyboardShortcuts')}

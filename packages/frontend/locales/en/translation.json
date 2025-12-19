@@ -600,6 +600,11 @@
                         "description": "Display shortcuts"
                     },
                     {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Open settings"
+                    },
+                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "Close modal / cancel"

@@ -600,6 +600,11 @@
                         "description": "Afficher les raccourcis"
                     },
                     {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Ouvrir les paramètres"
+                    },
+                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "Fermer la fenêtre / annuler"

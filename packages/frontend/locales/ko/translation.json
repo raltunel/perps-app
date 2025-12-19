@@ -600,6 +600,11 @@
                         "description": "단축키 보기"
                     },
                     {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "설정 열기"
+                    },
+                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "모달 닫기 / 취소"

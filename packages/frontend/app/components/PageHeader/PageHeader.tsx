@@ -158,6 +158,8 @@ export default function PageHeader() {
 
     // logic to open and close the app settings modal
     const appSettingsModal = useModal('closed');
+    const openAppSettingsModalRef = useRef(appSettingsModal.open);
+    openAppSettingsModalRef.current = appSettingsModal.open;
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -223,6 +225,18 @@ export default function PageHeader() {
         const onKeyDown = (e: KeyboardEvent) => {
             const target = e.target as HTMLElement | null;
             if (shouldIgnoreDueToTyping(target)) return;
+
+            if (
+                e.altKey &&
+                !e.shiftKey &&
+                !e.ctrlKey &&
+                !e.metaKey &&
+                e.code === 'Comma'
+            ) {
+                e.preventDefault();
+                openAppSettingsModalRef.current();
+                return;
+            }
 
             const categories = getKeyboardShortcutCategories(t);
             const connectWalletShortcut = getKeyboardShortcutById(

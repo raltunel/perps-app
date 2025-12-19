@@ -600,6 +600,11 @@
                         "description": "ショートカットを表示"
                     },
                     {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "設定を開く"
+                    },
+                    {
                         "id": "modal.close",
                         "keys": ["esc"],
                         "description": "モーダルを閉じる / キャンセル"
