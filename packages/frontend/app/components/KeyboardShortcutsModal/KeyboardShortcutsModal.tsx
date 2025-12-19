@@ -22,20 +22,20 @@ const shortcutCategories: ShortcutCategory[] = [
     {
         title: 'General',
         shortcuts: [
-            { keys: ['Shift', '/'], description: 'Open keyboard shortcuts' },
-            { keys: ['Esc'], description: 'Close modal / Cancel' },
+            { keys: ['Shift', '/'], description: 'Display shortcuts' },
             { keys: ['C'], description: 'Open wallet connector' },
             { keys: ['D'], description: 'Open deposit modal' },
             { keys: ['W'], description: 'Open withdraw modal' },
+            { keys: ['Esc'], description: 'Close modal / Cancel' },
         ],
     },
     {
         title: 'Trading',
         shortcuts: [
-            { keys: ['B'], description: 'Focus buy order' },
-            { keys: ['S'], description: 'Focus sell order' },
-            { keys: ['L'], description: 'Switch to limit order' },
-            { keys: ['M'], description: 'Switch to market order' },
+            { keys: ['B'], description: 'Switch to buy direction' },
+            { keys: ['S'], description: 'Switch to sell direction' },
+            { keys: ['M'], description: 'Start market order' },
+            { keys: ['L'], description: 'Start limit order' },
             { keys: ['Enter'], description: 'Submit order' },
         ],
     },
