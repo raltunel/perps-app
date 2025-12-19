@@ -67,8 +67,7 @@
 
 .shortcutsLinkRow {
     display: flex;
-    justify-content: flex-start;
-    margin-left: 2.25rem;
+    justify-content: center;
 }
 
 .shortcutsLink {
