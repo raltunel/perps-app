@@ -573,8 +573,33 @@
         "liqPrice": "Prix de liq."
     },
     "meta": {
-        "title": "Accueil | Ambient",
+        "title": "Ambient Finance | Contrats perpétuels sur Fogo",
         "content": "Trader des Perps avec Ambient"
+    },
+    "pageTitles": {
+        "portfolio": "Portefeuille",
+        "referrals": "Parrainages",
+        "points": "Points",
+        "leaderboard": "Classement",
+        "newStrategy": "Nouvelle Stratégie",
+        "editStrategy": "Modifier la Stratégie",
+        "strategy": "Stratégie",
+        "strategies": "Stratégies",
+        "vault": "Coffre",
+        "vaults": "Coffres",
+        "subAccounts": "Sous-comptes",
+        "positions": "Positions",
+        "openOrders": "Ordres Ouverts",
+        "orderHistory": "Historique des Ordres",
+        "tradeHistory": "Historique des Transactions",
+        "twapFillHistory": "Historique d'Exécution TWAP",
+        "twapHistory": "Historique TWAP",
+        "depositsAndWithdrawals": "Dépôts et Retraits",
+        "fundingHistory": "Historique de Financement",
+        "more": "Plus",
+        "termsOfService": "Conditions d'Utilisation",
+        "privacyPolicy": "Politique de Confidentialité",
+        "pageNotFound": "Page Non Trouvée"
     },
     "docs": {
         "menuTerms": "Terms of Service",
