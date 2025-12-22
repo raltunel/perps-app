@@ -63,6 +63,41 @@ const SOCIAL_PLATFORMS = [
     'Other',
 ];
 
+const isValidEmail = (email: string): boolean => {
+    const trimmed = email.trim();
+    if (!trimmed) return false;
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed);
+};
+
+const isValidPhone = (phone: string): boolean => {
+    const trimmed = phone.trim();
+    if (!trimmed) return false;
+    // Allow +, spaces, dashes, parentheses. Require at least 7 digits.
+    if (!/^[+\d\s().-]+$/.test(trimmed)) return false;
+    const digits = trimmed.replace(/\D/g, '');
+    return digits.length >= 7;
+};
+
+const isValidUrl = (raw: string): boolean => {
+    const trimmed = raw.trim();
+    if (!trimmed) return false;
+    try {
+        const url = new URL(trimmed);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+        return false;
+    }
+};
+
+const parseNonNegativeInt = (raw: string): number | null => {
+    const normalized = raw.trim().replace(/,/g, '');
+    if (!normalized) return null;
+    if (!/^\d+$/.test(normalized)) return null;
+    const n = Number(normalized);
+    if (!Number.isFinite(n) || n < 0) return null;
+    return n;
+};
+
 const LANGUAGE_OPTIONS = [
     'English',
     'Spanish',
@@ -119,6 +154,10 @@ export function AffiliateApplicationForm() {
     const [channelErrors, setChannelErrors] = useState<
         Record<string, Partial<Record<keyof SocialChannel, string>>>
     >({});
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const [touchedChannels, setTouchedChannels] = useState<
+        Record<string, Partial<Record<keyof SocialChannel, boolean>>>
+    >({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isCompleted = useMemo(() => {
@@ -134,6 +173,23 @@ export function AffiliateApplicationForm() {
         value: FormValues[K],
     ) => {
         setValues((prev) => ({ ...prev, [key]: value }));
+        setErrors((prev) => {
+            if (!(key in prev)) return prev;
+            const copy = { ...prev };
+            delete copy[key as string];
+            return copy;
+        });
+    };
+
+    const touchField = (key: keyof FormValues) => {
+        setTouched((prev) => ({ ...prev, [key]: true }));
+    };
+
+    const touchChannelField = (id: string, field: keyof SocialChannel) => {
+        setTouchedChannels((prev) => ({
+            ...prev,
+            [id]: { ...(prev[id] || {}), [field]: true },
+        }));
     };
 
     const updateChannel = (
@@ -147,6 +203,17 @@ export function AffiliateApplicationForm() {
                 c.id === id ? { ...c, [field]: value } : c,
             ),
         }));
+        setChannelErrors((prev) => {
+            const prevEntry = prev[id];
+            if (!prevEntry || !(field in prevEntry)) return prev;
+            const copy = { ...prev };
+            copy[id] = { ...prevEntry };
+            delete copy[id]?.[field];
+            if (copy[id] && Object.keys(copy[id] as object).length === 0) {
+                delete copy[id];
+            }
+            return copy;
+        });
     };
 
     const addSocialChannel = () => {
@@ -174,42 +241,56 @@ export function AffiliateApplicationForm() {
             delete copy[id];
             return copy;
         });
+        setTouchedChannels((prev) => {
+            const copy = { ...prev };
+            delete copy[id];
+            return copy;
+        });
     };
 
-    const validate = (): boolean => {
+    const getValidation = (v: FormValues) => {
         const nextErrors: Record<string, string> = {};
         const nextChannelErrors: Record<
             string,
             Partial<Record<keyof SocialChannel, string>>
         > = {};
 
-        if (!values.firstName.trim())
+        if (!v.firstName.trim())
             nextErrors.firstName = 'First name is required';
-        if (!values.lastName.trim())
-            nextErrors.lastName = 'Last name is required';
-        if (!values.email.trim()) nextErrors.email = 'Email is required';
-        if (values.email && !/^[^@]+@[^@]+\.[^@]+$/.test(values.email)) {
+        if (!v.lastName.trim()) nextErrors.lastName = 'Last name is required';
+
+        if (!v.email.trim()) nextErrors.email = 'Email is required';
+        else if (!isValidEmail(v.email))
             nextErrors.email = 'Invalid email address';
-        }
-        if (!values.phone.trim()) nextErrors.phone = 'Phone number is required';
-        if (!values.socialName.trim())
+
+        if (!v.phone.trim()) nextErrors.phone = 'Phone number is required';
+        else if (!isValidPhone(v.phone))
+            nextErrors.phone = 'Invalid phone number';
+
+        if (!v.socialName.trim())
             nextErrors.socialName = 'Social name is required';
 
-        if (!values.im) nextErrors.im = 'IM platform is required';
-        if (showIMOther && !values.imOther.trim()) {
+        if (!v.im) nextErrors.im = 'IM platform is required';
+        if (v.im === 'Others' && !v.imOther.trim()) {
             nextErrors.imOther = 'Please specify the IM platform';
         }
-        if (!values.imHandle.trim())
-            nextErrors.imHandle = 'IM handle is required';
+        if (!v.imHandle.trim()) nextErrors.imHandle = 'IM handle is required';
+        else if (/\s/.test(v.imHandle.trim())) {
+            nextErrors.imHandle = 'IM handle cannot contain spaces';
+        }
 
-        if (!values.upgradeRequest)
+        if (!v.upgradeRequest)
             nextErrors.upgradeRequest = 'Please select an option';
 
-        if (!values.agreementAccepted) {
+        if (v.recommenderEmail.trim() && !isValidEmail(v.recommenderEmail)) {
+            nextErrors.recommenderEmail = 'Invalid recommender email address';
+        }
+
+        if (!v.agreementAccepted) {
             nextErrors.agreementAccepted = 'You must accept the agreement';
         }
 
-        const channels = values.socialChannels;
+        const channels = v.socialChannels;
         if (!channels || channels.length === 0) {
             nextErrors.socialChannels =
                 'Please add at least one social channel';
@@ -218,22 +299,60 @@ export function AffiliateApplicationForm() {
                 const ce: Partial<Record<keyof SocialChannel, string>> = {};
                 if (!channel.platform) ce.platform = 'Platform is required';
                 if (!channel.link.trim()) ce.link = 'Link is required';
+                else if (!isValidUrl(channel.link))
+                    ce.link = 'Invalid URL (must start with http/https)';
+
                 if (!channel.followers.trim())
                     ce.followers = 'Followers count is required';
+                else if (parseNonNegativeInt(channel.followers) === null) {
+                    ce.followers = 'Followers must be a non-negative integer';
+                }
+
                 if (!channel.language) ce.language = 'Language is required';
+
                 if (Object.keys(ce).length > 0)
                     nextChannelErrors[channel.id] = ce;
             }
         }
 
+        return { nextErrors, nextChannelErrors };
+    };
+
+    const liveValidation = useMemo(() => getValidation(values), [values]);
+
+    const getFieldError = (key: keyof FormValues) => {
+        return (
+            errors[key as string] ||
+            (touched[key as string]
+                ? liveValidation.nextErrors[key as string]
+                : undefined)
+        );
+    };
+
+    const getChannelFieldError = (id: string, field: keyof SocialChannel) => {
+        const submitError = channelErrors[id]?.[field];
+        const isTouched = !!touchedChannels[id]?.[field];
+        const liveError = liveValidation.nextChannelErrors[id]?.[field];
+        return submitError || (isTouched ? liveError : undefined);
+    };
+
+    const validate = (): boolean => {
+        const { nextErrors, nextChannelErrors } = liveValidation;
         setErrors(nextErrors);
         setChannelErrors(nextChannelErrors);
-
         return (
             Object.keys(nextErrors).length === 0 &&
             Object.keys(nextChannelErrors).length === 0
         );
     };
+
+    const isFormValid = useMemo(() => {
+        const { nextErrors, nextChannelErrors } = liveValidation;
+        return (
+            Object.keys(nextErrors).length === 0 &&
+            Object.keys(nextChannelErrors).length === 0
+        );
+    }, [liveValidation]);
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -248,6 +367,34 @@ export function AffiliateApplicationForm() {
             );
             return;
         }
+
+        setTouched((prev) => ({
+            ...prev,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+            socialName: true,
+            im: true,
+            imOther: true,
+            imHandle: true,
+            upgradeRequest: true,
+            recommenderEmail: true,
+            agreementAccepted: true,
+        }));
+        setTouchedChannels((prev) => {
+            const next = { ...prev };
+            for (const channel of values.socialChannels) {
+                next[channel.id] = {
+                    ...(next[channel.id] || {}),
+                    platform: true,
+                    link: true,
+                    followers: true,
+                    language: true,
+                };
+            }
+            return next;
+        });
 
         if (!validate()) {
             notificationService.addNotification(
@@ -358,11 +505,13 @@ export function AffiliateApplicationForm() {
                             onChange={(e) =>
                                 setField('firstName', e.target.value)
                             }
+                            onBlur={() => touchField('firstName')}
                             placeholder='Enter your first name'
+                            required
                         />
-                        {errors.firstName && (
+                        {getFieldError('firstName') && (
                             <div className={styles['form-error']}>
-                                {errors.firstName}
+                                {getFieldError('firstName')}
                             </div>
                         )}
                     </div>
@@ -380,11 +529,13 @@ export function AffiliateApplicationForm() {
                             onChange={(e) =>
                                 setField('lastName', e.target.value)
                             }
+                            onBlur={() => touchField('lastName')}
                             placeholder='Enter your last name'
+                            required
                         />
-                        {errors.lastName && (
+                        {getFieldError('lastName') && (
                             <div className={styles['form-error']}>
-                                {errors.lastName}
+                                {getFieldError('lastName')}
                             </div>
                         )}
                     </div>
@@ -401,11 +552,13 @@ export function AffiliateApplicationForm() {
                             type='email'
                             value={values.email}
                             onChange={(e) => setField('email', e.target.value)}
+                            onBlur={() => touchField('email')}
                             placeholder='your@email.com'
+                            required
                         />
-                        {errors.email && (
+                        {getFieldError('email') && (
                             <div className={styles['form-error']}>
-                                {errors.email}
+                                {getFieldError('email')}
                             </div>
                         )}
                     </div>
@@ -422,11 +575,13 @@ export function AffiliateApplicationForm() {
                             type='tel'
                             value={values.phone}
                             onChange={(e) => setField('phone', e.target.value)}
+                            onBlur={() => touchField('phone')}
                             placeholder='+1234567890'
+                            required
                         />
-                        {errors.phone && (
+                        {getFieldError('phone') && (
                             <div className={styles['form-error']}>
-                                {errors.phone}
+                                {getFieldError('phone')}
                             </div>
                         )}
                     </div>
@@ -444,11 +599,13 @@ export function AffiliateApplicationForm() {
                             onChange={(e) =>
                                 setField('socialName', e.target.value)
                             }
+                            onBlur={() => touchField('socialName')}
                             placeholder='Enter your social name'
+                            required
                         />
-                        {errors.socialName && (
+                        {getFieldError('socialName') && (
                             <div className={styles['form-error']}>
-                                {errors.socialName}
+                                {getFieldError('socialName')}
                             </div>
                         )}
                     </div>
@@ -463,7 +620,12 @@ export function AffiliateApplicationForm() {
                         <select
                             className={styles.select}
                             value={values.im}
-                            onChange={(e) => setField('im', e.target.value)}
+                            onChange={(e) => {
+                                setField('im', e.target.value);
+                                touchField('im');
+                            }}
+                            onBlur={() => touchField('im')}
+                            required
                         >
                             <option value=''>Select IM platform</option>
                             {IM_PLATFORMS.map((p) => (
@@ -472,9 +634,9 @@ export function AffiliateApplicationForm() {
                                 </option>
                             ))}
                         </select>
-                        {errors.im && (
+                        {getFieldError('im') && (
                             <div className={styles['form-error']}>
-                                {errors.im}
+                                {getFieldError('im')}
                             </div>
                         )}
                     </div>
@@ -493,11 +655,13 @@ export function AffiliateApplicationForm() {
                                 onChange={(e) =>
                                     setField('imOther', e.target.value)
                                 }
+                                onBlur={() => touchField('imOther')}
                                 placeholder='Enter platform name'
+                                required
                             />
-                            {errors.imOther && (
+                            {getFieldError('imOther') && (
                                 <div className={styles['form-error']}>
-                                    {errors.imOther}
+                                    {getFieldError('imOther')}
                                 </div>
                             )}
                         </div>
@@ -517,15 +681,17 @@ export function AffiliateApplicationForm() {
                             onChange={(e) =>
                                 setField('imHandle', e.target.value)
                             }
+                            onBlur={() => touchField('imHandle')}
                             placeholder={
                                 values.im === 'Telegram'
                                     ? '@username'
                                     : 'Enter your handle'
                             }
+                            required
                         />
-                        {errors.imHandle && (
+                        {getFieldError('imHandle') && (
                             <div className={styles['form-error']}>
-                                {errors.imHandle}
+                                {getFieldError('imHandle')}
                             </div>
                         )}
                     </div>
@@ -562,7 +728,6 @@ export function AffiliateApplicationForm() {
                         }}
                     >
                         {values.socialChannels.map((channel) => {
-                            const ce = channelErrors[channel.id] || {};
                             return (
                                 <div
                                     key={channel.id}
@@ -626,6 +791,13 @@ export function AffiliateApplicationForm() {
                                                     e.target.value,
                                                 )
                                             }
+                                            onBlur={() =>
+                                                touchChannelField(
+                                                    channel.id,
+                                                    'platform',
+                                                )
+                                            }
+                                            required
                                         >
                                             <option value=''>
                                                 Select platform
@@ -636,11 +808,17 @@ export function AffiliateApplicationForm() {
                                                 </option>
                                             ))}
                                         </select>
-                                        {ce.platform && (
+                                        {getChannelFieldError(
+                                            channel.id,
+                                            'platform',
+                                        ) && (
                                             <div
                                                 className={styles['form-error']}
                                             >
-                                                {ce.platform}
+                                                {getChannelFieldError(
+                                                    channel.id,
+                                                    'platform',
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -668,13 +846,26 @@ export function AffiliateApplicationForm() {
                                                     e.target.value,
                                                 )
                                             }
+                                            onBlur={() =>
+                                                touchChannelField(
+                                                    channel.id,
+                                                    'link',
+                                                )
+                                            }
                                             placeholder='https://...'
+                                            required
                                         />
-                                        {ce.link && (
+                                        {getChannelFieldError(
+                                            channel.id,
+                                            'link',
+                                        ) && (
                                             <div
                                                 className={styles['form-error']}
                                             >
-                                                {ce.link}
+                                                {getChannelFieldError(
+                                                    channel.id,
+                                                    'link',
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -702,13 +893,27 @@ export function AffiliateApplicationForm() {
                                                     e.target.value,
                                                 )
                                             }
+                                            onBlur={() =>
+                                                touchChannelField(
+                                                    channel.id,
+                                                    'followers',
+                                                )
+                                            }
                                             placeholder='0'
+                                            inputMode='numeric'
+                                            required
                                         />
-                                        {ce.followers && (
+                                        {getChannelFieldError(
+                                            channel.id,
+                                            'followers',
+                                        ) && (
                                             <div
                                                 className={styles['form-error']}
                                             >
-                                                {ce.followers}
+                                                {getChannelFieldError(
+                                                    channel.id,
+                                                    'followers',
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -736,6 +941,13 @@ export function AffiliateApplicationForm() {
                                                     e.target.value,
                                                 )
                                             }
+                                            onBlur={() =>
+                                                touchChannelField(
+                                                    channel.id,
+                                                    'language',
+                                                )
+                                            }
+                                            required
                                         >
                                             <option value=''>
                                                 Select language
@@ -746,11 +958,17 @@ export function AffiliateApplicationForm() {
                                                 </option>
                                             ))}
                                         </select>
-                                        {ce.language && (
+                                        {getChannelFieldError(
+                                            channel.id,
+                                            'language',
+                                        ) && (
                                             <div
                                                 className={styles['form-error']}
                                             >
-                                                {ce.language}
+                                                {getChannelFieldError(
+                                                    channel.id,
+                                                    'language',
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -839,9 +1057,10 @@ export function AffiliateApplicationForm() {
                                 name='upgradeRequest'
                                 value='yes'
                                 checked={values.upgradeRequest === 'yes'}
-                                onChange={() =>
-                                    setField('upgradeRequest', 'yes')
-                                }
+                                onChange={() => {
+                                    setField('upgradeRequest', 'yes');
+                                    touchField('upgradeRequest');
+                                }}
                             />
                             <span
                                 style={{ color: 'var(--aff-text-secondary)' }}
@@ -856,9 +1075,10 @@ export function AffiliateApplicationForm() {
                                 name='upgradeRequest'
                                 value='na'
                                 checked={values.upgradeRequest === 'na'}
-                                onChange={() =>
-                                    setField('upgradeRequest', 'na')
-                                }
+                                onChange={() => {
+                                    setField('upgradeRequest', 'na');
+                                    touchField('upgradeRequest');
+                                }}
                             />
                             <span
                                 style={{ color: 'var(--aff-text-secondary)' }}
@@ -868,12 +1088,12 @@ export function AffiliateApplicationForm() {
                         </label>
                     </div>
 
-                    {errors.upgradeRequest && (
+                    {getFieldError('upgradeRequest') && (
                         <div
                             className={styles['form-error']}
                             style={{ marginTop: '0.5rem' }}
                         >
-                            {errors.upgradeRequest}
+                            {getFieldError('upgradeRequest')}
                         </div>
                     )}
 
@@ -927,8 +1147,18 @@ export function AffiliateApplicationForm() {
                             onChange={(e) =>
                                 setField('recommenderEmail', e.target.value)
                             }
+                            onBlur={() => touchField('recommenderEmail')}
                             placeholder='recommender@email.com (optional)'
                         />
+
+                        {getFieldError('recommenderEmail') && (
+                            <div
+                                className={styles['form-error']}
+                                style={{ marginTop: '0.5rem' }}
+                            >
+                                {getFieldError('recommenderEmail')}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -952,9 +1182,10 @@ export function AffiliateApplicationForm() {
                         <input
                             type='checkbox'
                             checked={values.agreementAccepted}
-                            onChange={(e) =>
-                                setField('agreementAccepted', e.target.checked)
-                            }
+                            onChange={(e) => {
+                                setField('agreementAccepted', e.target.checked);
+                                touchField('agreementAccepted');
+                            }}
                         />
                         <span
                             style={{
@@ -971,12 +1202,12 @@ export function AffiliateApplicationForm() {
                         </span>
                     </label>
 
-                    {errors.agreementAccepted && (
+                    {getFieldError('agreementAccepted') && (
                         <div
                             className={styles['form-error']}
                             style={{ marginTop: '0.5rem' }}
                         >
-                            {errors.agreementAccepted}
+                            {getFieldError('agreementAccepted')}
                         </div>
                     )}
                 </div>
@@ -984,7 +1215,7 @@ export function AffiliateApplicationForm() {
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <button
                         type='submit'
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !isFormValid}
                         className={`${styles.btn} ${styles['btn-primary']} ${styles['btn-lg']}`}
                     >
                         {isSubmitting ? 'Submitting…' : 'Submit'}
