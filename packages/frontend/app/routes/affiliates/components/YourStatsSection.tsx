@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { StatCard, StatCardSkeleton } from './StatCard';
 import { RebateRateCard, RebateRateCardSkeleton } from './RebateRateCard';
+import { AffiliateCurrentLevelCard } from './AffiliateCurrentLevelCard';
 import {
     useAffiliateStats,
     useUserReferrer,
@@ -137,16 +138,6 @@ export function YourStatsSection() {
                     )}
 
                     {isLoading ? (
-                        <StatCardSkeleton label={STATS_LABELS.ACTIVE_TRADERS} />
-                    ) : (
-                        <StatCard
-                            label={STATS_LABELS.ACTIVE_TRADERS}
-                            value={activeTraders}
-                            tooltip='Active Invitee who made at least one trade in the last 30 days'
-                        />
-                    )}
-
-                    {isLoading ? (
                         <RebateRateCardSkeleton />
                     ) : (
                         <RebateRateCard
@@ -159,6 +150,18 @@ export function YourStatsSection() {
                             rebatesEarned={formatLargeNumber(rebatesEarned)}
                         />
                     )}
+
+                    {isLoading ? (
+                        <StatCardSkeleton label={STATS_LABELS.ACTIVE_TRADERS} />
+                    ) : (
+                        <StatCard
+                            label={STATS_LABELS.ACTIVE_TRADERS}
+                            value={activeTraders}
+                            tooltip='Active Invitee who made at least one trade in the last 30 days'
+                        />
+                    )}
+
+                    <AffiliateCurrentLevelCard />
 
                     {isLoading ? (
                         <StatCardSkeleton label={STATS_LABELS.TRADING_VOLUME} />

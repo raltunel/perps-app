@@ -124,8 +124,130 @@
 
 @media (min-width: 1024px) {
     .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(5, 1fr);
     }
+}
+
+.current-level-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .current-level-card {
+        grid-column: span 2;
+    }
+}
+
+@media (min-width: 1024px) {
+    .current-level-card {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+}
+
+.current-level-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.current-level-title {
+    font-size: 0.875rem;
+    color: var(--aff-text-primary);
+    font-weight: 700;
+}
+
+.current-level-subtitle {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--aff-text-muted);
+}
+
+.current-level-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.current-level-metric-label {
+    font-size: 0.75rem;
+    color: var(--aff-text-muted);
+}
+
+.current-level-metric-value {
+    margin-top: 0.25rem;
+    color: var(--aff-text-primary);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.current-level-metric-hint {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--aff-text-muted);
+}
+
+.current-level-field-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.current-level-field {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--aff-surface);
+    border: 1px solid var(--aff-border-default);
+    border-radius: var(--aff-radius-lg);
+    color: var(--aff-text-primary);
+    font-size: 0.875rem;
+}
+
+.current-level-field-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.current-level-share {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.current-level-share-label {
+    font-size: 0.75rem;
+    color: var(--aff-text-muted);
+}
+
+.current-level-share-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.current-level-share-button {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    border: 1px solid var(--aff-border-default);
+    background: var(--aff-surface-hover);
+    color: var(--aff-text-primary);
+    cursor: pointer;
+}
+
+.current-level-share-button:hover {
+    border-color: var(--aff-border-hover);
+    background: var(--aff-surface-active);
 }
 
 /* Stat card */
