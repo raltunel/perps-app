@@ -573,8 +573,9 @@
         "liqPrice": "Liq. Price"
     },
     "meta": {
-        "title": "Home | Ambient",
-        "content": "Trade Perps With Ambient"
+        "title": "Ambient Finance | Perpetual Futures on Fogo",
+        "description": "Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution.",
+        "content": "Trade Perps With Ambient on Fogo"
     },
     "docs": {
         "menuTerms": "Terms of Service",
