@@ -577,8 +577,33 @@
         "liqPrice": "清算价格"
     },
     "meta": {
-        "title": "首页 | Ambient",
+        "title": "Ambient Finance | Fogo永续合约",
         "content": "在Ambient进行永续合约交易"
+    },
+    "pageTitles": {
+        "portfolio": "投资组合",
+        "referrals": "推荐",
+        "points": "积分",
+        "leaderboard": "排行榜",
+        "newStrategy": "新建策略",
+        "editStrategy": "编辑策略",
+        "strategy": "策略",
+        "strategies": "策略列表",
+        "vault": "金库",
+        "vaults": "金库列表",
+        "subAccounts": "子账户",
+        "positions": "持仓",
+        "openOrders": "未成交订单",
+        "orderHistory": "订单历史",
+        "tradeHistory": "交易历史",
+        "twapFillHistory": "TWAP成交历史",
+        "twapHistory": "TWAP历史",
+        "depositsAndWithdrawals": "存取款",
+        "fundingHistory": "资金费率历史",
+        "more": "更多",
+        "termsOfService": "服务条款",
+        "privacyPolicy": "隐私政策",
+        "pageNotFound": "页面未找到"
     },
     "docs": {
         "menuTerms": "Terms of Service",

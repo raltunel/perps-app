@@ -577,8 +577,33 @@
         "liqPrice": "Precio liq."
     },
     "meta": {
-        "title": "Inicio | Ambient",
+        "title": "Ambient Finance | Futuros perpetuos en Fogo",
         "content": "Opera Perps con Ambient"
+    },
+    "pageTitles": {
+        "portfolio": "Portafolio",
+        "referrals": "Referidos",
+        "points": "Puntos",
+        "leaderboard": "Clasificación",
+        "newStrategy": "Nueva Estrategia",
+        "editStrategy": "Editar Estrategia",
+        "strategy": "Estrategia",
+        "strategies": "Estrategias",
+        "vault": "Bóveda",
+        "vaults": "Bóvedas",
+        "subAccounts": "Subcuentas",
+        "positions": "Posiciones",
+        "openOrders": "Órdenes Abiertas",
+        "orderHistory": "Historial de Órdenes",
+        "tradeHistory": "Historial de Operaciones",
+        "twapFillHistory": "Historial de Ejecución TWAP",
+        "twapHistory": "Historial TWAP",
+        "depositsAndWithdrawals": "Depósitos y Retiros",
+        "fundingHistory": "Historial de Financiamiento",
+        "more": "Más",
+        "termsOfService": "Términos de Servicio",
+        "privacyPolicy": "Política de Privacidad",
+        "pageNotFound": "Página No Encontrada"
     },
     "docs": {
         "menuTerms": "Terms of Service",

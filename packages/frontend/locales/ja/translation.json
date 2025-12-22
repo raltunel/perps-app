@@ -577,8 +577,33 @@
         "liqPrice": "清算価格"
     },
     "meta": {
-        "title": "ホーム | Ambient",
+        "title": "Ambient Finance | Fogo上の無期限先物",
         "content": "Ambientでパーペチュアル取引"
+    },
+    "pageTitles": {
+        "portfolio": "ポートフォリオ",
+        "referrals": "紹介",
+        "points": "ポイント",
+        "leaderboard": "リーダーボード",
+        "newStrategy": "新規戦略",
+        "editStrategy": "戦略を編集",
+        "strategy": "戦略",
+        "strategies": "戦略一覧",
+        "vault": "ボールト",
+        "vaults": "ボールト一覧",
+        "subAccounts": "サブアカウント",
+        "positions": "ポジション",
+        "openOrders": "未約定注文",
+        "orderHistory": "注文履歴",
+        "tradeHistory": "取引履歴",
+        "twapFillHistory": "TWAP約定履歴",
+        "twapHistory": "TWAP履歴",
+        "depositsAndWithdrawals": "入出金",
+        "fundingHistory": "資金調達履歴",
+        "more": "その他",
+        "termsOfService": "利用規約",
+        "privacyPolicy": "プライバシーポリシー",
+        "pageNotFound": "ページが見つかりません"
     },
     "docs": {
         "menuTerms": "Terms of Service",

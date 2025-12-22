@@ -577,8 +577,33 @@
         "liqPrice": "Lik. fiyatı"
     },
     "meta": {
-        "title": "Ana Sayfa | Ambient",
+        "title": "Ambient Finance | Fogo Süresiz Vadeli İşlemler",
         "content": "Ambient ile vadeli işlemleri alıp satın"
+    },
+    "pageTitles": {
+        "portfolio": "Portföy",
+        "referrals": "Referanslar",
+        "points": "Puanlar",
+        "leaderboard": "Sıralama",
+        "newStrategy": "Yeni Strateji",
+        "editStrategy": "Stratejiyi Düzenle",
+        "strategy": "Strateji",
+        "strategies": "Stratejiler",
+        "vault": "Kasa",
+        "vaults": "Kasalar",
+        "subAccounts": "Alt Hesaplar",
+        "positions": "Pozisyonlar",
+        "openOrders": "Açık Emirler",
+        "orderHistory": "Emir Geçmişi",
+        "tradeHistory": "İşlem Geçmişi",
+        "twapFillHistory": "TWAP Gerçekleşme Geçmişi",
+        "twapHistory": "TWAP Geçmişi",
+        "depositsAndWithdrawals": "Para Yatırma ve Çekme",
+        "fundingHistory": "Fonlama Geçmişi",
+        "more": "Daha Fazla",
+        "termsOfService": "Hizmet Şartları",
+        "privacyPolicy": "Gizlilik Politikası",
+        "pageNotFound": "Sayfa Bulunamadı"
     },
     "docs": {
         "menuTerms": "Terms of Service",

@@ -144,6 +144,79 @@ export default function App() {
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
     const restrictedSiteModal = useModal('closed');
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        const { pathname } = location;
+
+        if (pathname.startsWith('/v2/trade')) {
+            return;
+        }
+
+        let translatedPart = '';
+
+        if (pathname === '/' || pathname === '') {
+            document.title = t('meta.title');
+            return;
+        } else if (pathname.startsWith('/v2/portfolio')) {
+            translatedPart = t('pageTitles.portfolio');
+        } else if (pathname.startsWith('/v2/referrals')) {
+            translatedPart = t('pageTitles.referrals');
+        } else if (pathname.startsWith('/v2/points')) {
+            translatedPart = t('pageTitles.points');
+        } else if (pathname.startsWith('/v2/leaderboard')) {
+            translatedPart = t('pageTitles.leaderboard');
+        } else if (pathname.startsWith('/v2/strategies/new')) {
+            translatedPart = t('pageTitles.newStrategy');
+        } else if (
+            pathname.startsWith('/v2/strategies/') &&
+            pathname.endsWith('/edit')
+        ) {
+            translatedPart = t('pageTitles.editStrategy');
+        } else if (pathname.startsWith('/v2/strategies/')) {
+            translatedPart = t('pageTitles.strategy');
+        } else if (pathname.startsWith('/v2/strategies')) {
+            translatedPart = t('pageTitles.strategies');
+        } else if (pathname.startsWith('/v2/vaults/')) {
+            translatedPart = t('pageTitles.vault');
+        } else if (pathname.startsWith('/v2/vaults')) {
+            translatedPart = t('pageTitles.vaults');
+        } else if (pathname.startsWith('/v2/subaccounts')) {
+            translatedPart = t('pageTitles.subAccounts');
+        } else if (pathname.startsWith('/v2/positions')) {
+            translatedPart = t('pageTitles.positions');
+        } else if (pathname.startsWith('/v2/openOrders')) {
+            translatedPart = t('pageTitles.openOrders');
+        } else if (pathname.startsWith('/v2/orderHistory')) {
+            translatedPart = t('pageTitles.orderHistory');
+        } else if (pathname.startsWith('/v2/tradeHistory')) {
+            translatedPart = t('pageTitles.tradeHistory');
+        } else if (pathname.startsWith('/v2/twapFillHistory')) {
+            translatedPart = t('pageTitles.twapFillHistory');
+        } else if (pathname.startsWith('/v2/twapHistory')) {
+            translatedPart = t('pageTitles.twapHistory');
+        } else if (pathname.startsWith('/v2/depositsandwithdrawals')) {
+            translatedPart = t('pageTitles.depositsAndWithdrawals');
+        } else if (pathname.startsWith('/v2/fundingHistory')) {
+            translatedPart = t('pageTitles.fundingHistory');
+        } else if (pathname.startsWith('/v2/more')) {
+            translatedPart = t('pageTitles.more');
+        } else if (pathname.startsWith('/v2/terms')) {
+            translatedPart = t('pageTitles.termsOfService');
+        } else if (pathname.startsWith('/v2/privacy')) {
+            translatedPart = t('pageTitles.privacyPolicy');
+        } else if (pathname.startsWith('/v2/showcase')) {
+            translatedPart = 'Showcase';
+        } else if (pathname.startsWith('/v2/testpage')) {
+            translatedPart = 'Test Page';
+        } else {
+            translatedPart = t('pageTitles.pageNotFound');
+        }
+
+        document.title = translatedPart
+            ? `${translatedPart} | Ambient Finance`
+            : 'Ambient Finance';
+    }, [location, t]);
 
     useEffect(() => {
         // Load TradingView script
