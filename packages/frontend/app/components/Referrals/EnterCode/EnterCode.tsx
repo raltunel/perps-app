@@ -6,7 +6,6 @@ import styles from './EnterCode.module.css';
 
 interface PropsIF {
     isSessionEstablished: boolean;
-    isFetchingVolume: boolean | undefined;
     totVolume: number | undefined;
     totVolumeFormatted: string;
     cached: string;
@@ -25,7 +24,6 @@ interface PropsIF {
 export default function EnterCode(props: PropsIF) {
     const {
         isSessionEstablished,
-        isFetchingVolume,
         totVolume,
         totVolumeFormatted,
         cached,
@@ -187,11 +185,6 @@ export default function EnterCode(props: PropsIF) {
                 </div>
             </section>
         );
-    }
-
-    // Show spinner while fetching (only if volume isn't already loaded)
-    if (isFetchingVolume !== false && totVolume === undefined) {
-        return spinner;
     }
 
     // Only show content/error when volume is available

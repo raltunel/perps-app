@@ -287,10 +287,6 @@ export default function CodeTabs(props: PropsIF) {
         prevAffiliateAddress.current = affiliateAddress?.toString();
     }, [affiliateAddress]);
 
-    const [isFetchingVolume, setIsFetchingVolume] = useState<
-        boolean | undefined
-    >(undefined);
-
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
@@ -707,7 +703,6 @@ export default function CodeTabs(props: PropsIF) {
                 return (
                     <EnterCode
                         isSessionEstablished={isSessionEstablished}
-                        isFetchingVolume={isFetchingVolume}
                         totVolume={referralStore.totVolume}
                         totVolumeFormatted={totVolumeFormatted}
                         cached={referralStore.cached}
