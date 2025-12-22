@@ -22,6 +22,7 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { getDefaultLanguage } from '~/utils/functions/getDefaultLanguage';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -35,11 +36,21 @@ interface AppOptionsProps {
 export default function AppOptions(props: AppOptionsProps) {
     const { footer } = props;
     const activeOptions: useAppOptionsIF = useAppOptions();
+    const { open: openKeyboardShortcuts } = useKeyboardShortcuts();
 
     const isMobileVersion = useMediaQuery('(max-width: 768px)');
 
-    const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
-        useAppSettings();
+    const {
+        numFormat,
+        setNumFormat,
+        bsColor,
+        setBsColor,
+        getBsColor,
+        navigationKeyboardShortcutsEnabled,
+        setNavigationKeyboardShortcutsEnabled,
+        tradingKeyboardShortcutsEnabled,
+        setTradingKeyboardShortcutsEnabled,
+    } = useAppSettings();
     const { i18n, t } = useTranslation();
 
     const [showChangeApplied, setShowChangeApplied] = useState(false);
@@ -51,6 +62,8 @@ export default function AppOptions(props: AppOptionsProps) {
         activeOptions['skipOpenOrderConfirm'] === false &&
         activeOptions['enableTxNotifications'] === true &&
         activeOptions['enableBackgroundFillNotif'] === true &&
+        navigationKeyboardShortcutsEnabled === true &&
+        tradingKeyboardShortcutsEnabled === true &&
         numFormat.label === NumFormatTypes[0].label &&
         bsColor === 'colors.default' &&
         (i18n?.language?.split('-')[0] || 'en') === defaultLanguage;
@@ -90,6 +103,7 @@ export default function AppOptions(props: AppOptionsProps) {
                 <OptionLine
                     text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
+                    autoFocus={!footer}
                     toggle={() => {
                         activeOptions.toggle('skipOpenOrderConfirm');
                         showChangeAppliedMessage();
@@ -143,6 +157,58 @@ export default function AppOptions(props: AppOptionsProps) {
                         }
                     }}
                 />
+            </ul>
+            <div className={styles.horizontal_divider} />
+            <ul>
+                <OptionLine
+                    text={t('appSettings.navigationKeyboardShortcuts')}
+                    isChecked={navigationKeyboardShortcutsEnabled}
+                    toggle={() => {
+                        setNavigationKeyboardShortcutsEnabled(
+                            !navigationKeyboardShortcutsEnabled,
+                        );
+                        showChangeAppliedMessage();
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting:
+                                        'navigationKeyboardShortcutsEnabled',
+                                    value: !navigationKeyboardShortcutsEnabled,
+                                },
+                            });
+                        }
+                    }}
+                />
+                <OptionLine
+                    text={t('appSettings.tradingKeyboardShortcuts')}
+                    isChecked={tradingKeyboardShortcutsEnabled}
+                    toggle={() => {
+                        setTradingKeyboardShortcutsEnabled(
+                            !tradingKeyboardShortcutsEnabled,
+                        );
+                        showChangeAppliedMessage();
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'tradingKeyboardShortcutsEnabled',
+                                    value: !tradingKeyboardShortcutsEnabled,
+                                },
+                            });
+                        }
+                    }}
+                />
+                <li className={styles.shortcutsLinkRow}>
+                    <button
+                        type='button'
+                        className={styles.shortcutsLink}
+                        onClick={() => {
+                            props.closePanel?.();
+                            openKeyboardShortcuts();
+                        }}
+                    >
+                        {t('appSettings.viewKeyboardShortcuts')}
+                    </button>
+                </li>
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
@@ -254,7 +320,8 @@ export default function AppOptions(props: AppOptionsProps) {
                     </div>
                 ) : (
                     !isDefaults && (
-                        <div
+                        <button
+                            type='button'
                             className={styles.apply_defaults}
                             style={{
                                 background: 'var(--accent1)',
@@ -267,6 +334,8 @@ export default function AppOptions(props: AppOptionsProps) {
                                 setNumFormat(NumFormatTypes[0]);
                                 setBsColor('colors.default');
                                 useAppSettings.getState().resetLayoutHeights();
+                                setNavigationKeyboardShortcutsEnabled(true);
+                                setTradingKeyboardShortcutsEnabled(true);
 
                                 const defaultLanguage = getDefaultLanguage();
                                 i18n.changeLanguage(defaultLanguage);
@@ -283,7 +352,7 @@ export default function AppOptions(props: AppOptionsProps) {
                             }}
                         >
                             {t('common.applyDefaults')}
-                        </div>
+                        </button>
                     )
                 )}
             </div>

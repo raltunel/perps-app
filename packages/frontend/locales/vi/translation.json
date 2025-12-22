@@ -438,6 +438,9 @@
         "skipOpenOrderConfirm": "Bỏ qua xác nhận lệnh mở",
         "enableTxNotifications": "Bật thông báo giao dịch",
         "enableBackgroundFillNotif": "Bật thông báo khớp lệnh nền",
+        "navigationKeyboardShortcuts": "Bật phím tắt bàn phím điều hướng",
+        "tradingKeyboardShortcuts": "Bật phím tắt bàn phím giao dịch",
+        "viewKeyboardShortcuts": "Xem phím tắt bàn phím",
         "numberFormat": "Định dạng số",
         "color": "Màu sắc",
         "language": "Ngôn ngữ"
@@ -576,5 +579,135 @@
         "menuPrivacy": "Privacy",
         "terms": "CROCODILE Labs Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Phím tắt",
+        "title": "Phím tắt bàn phím",
+        "hintPress": "Nhấn",
+        "hintToClose": "để đóng",
+        "aria": {
+            "close": "Đóng phím tắt bàn phím"
+        },
+        "categories": [
+            {
+                "title": "Chung",
+                "shortcuts": [
+                    {
+                        "id": "shortcuts.open",
+                        "keys": ["shift", "?"],
+                        "description": "Hiển thị phím tắt"
+                    },
+                    {
+                        "id": "settings.open",
+                        "keys": ["alt", ","],
+                        "description": "Mở cài đặt"
+                    },
+                    {
+                        "id": "modal.close",
+                        "keys": ["esc"],
+                        "description": "Đóng hộp thoại / hủy"
+                    }
+                ]
+            },
+            {
+                "title": "Giao dịch",
+                "shortcuts": [
+                    {
+                        "id": "trading.buy",
+                        "keys": ["b"],
+                        "description": "Chuyển sang mua"
+                    },
+                    {
+                        "id": "trading.sell",
+                        "keys": ["s"],
+                        "description": "Chuyển sang bán"
+                    },
+                    {
+                        "id": "trading.market",
+                        "keys": ["m"],
+                        "description": "Bắt đầu lệnh thị trường"
+                    },
+                    {
+                        "id": "trading.limit",
+                        "keys": ["l"],
+                        "description": "Bắt đầu lệnh giới hạn"
+                    }
+                ]
+            },
+            {
+                "title": "Điều hướng",
+                "shortcuts": [
+                    {
+                        "id": "navigation.trade",
+                        "keys": ["t"],
+                        "description": "Đi tới trang giao dịch"
+                    },
+                    {
+                        "id": "navigation.home",
+                        "keys": ["h"],
+                        "description": "Đi tới trang chủ"
+                    },
+                    {
+                        "id": "navigation.portfolio",
+                        "keys": ["p"],
+                        "description": "Đi tới trang danh mục"
+                    },
+                    {
+                        "id": "wallet.connect",
+                        "keys": ["c"],
+                        "description": "Mở kết nối ví"
+                    },
+                    {
+                        "id": "portfolio.deposit",
+                        "keys": ["d"],
+                        "description": "Mở nạp tiền"
+                    },
+                    {
+                        "id": "portfolio.withdraw",
+                        "keys": ["w"],
+                        "description": "Mở rút tiền"
+                    },
+                    {
+                        "id": "portfolio.latestTx",
+                        "keys": ["e"],
+                        "description": "Xem giao dịch mới nhất trên trình khám phá"
+                    }
+                ]
+            }
+        ],
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

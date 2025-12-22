@@ -47,6 +47,12 @@ type AppSettingsStore = {
 
     isWalletCollapsed: boolean;
     setIsWalletCollapsed: (collapsed: boolean) => void;
+
+    navigationKeyboardShortcutsEnabled: boolean;
+    setNavigationKeyboardShortcutsEnabled: (enabled: boolean) => void;
+
+    tradingKeyboardShortcutsEnabled: boolean;
+    setTradingKeyboardShortcutsEnabled: (enabled: boolean) => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
@@ -77,12 +83,20 @@ export const useAppSettings = create<AppSettingsStore>()(
             isWalletCollapsed: DEFAULT_WALLET_COLLAPSED,
             setIsWalletCollapsed: (collapsed) =>
                 set({ isWalletCollapsed: collapsed }),
+
+            navigationKeyboardShortcutsEnabled: true,
+            setNavigationKeyboardShortcutsEnabled: (enabled) =>
+                set({ navigationKeyboardShortcutsEnabled: enabled }),
+
+            tradingKeyboardShortcutsEnabled: true,
+            setTradingKeyboardShortcutsEnabled: (enabled) =>
+                set({ tradingKeyboardShortcutsEnabled: enabled }),
         }),
 
         {
             name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
-            version: 4,
+            version: 5,
             migrate: (persistedState: unknown, version: number) => {
                 const state = persistedState as AppSettingsStore;
 
@@ -98,6 +112,13 @@ export const useAppSettings = create<AppSettingsStore>()(
                         isWalletCollapsed: DEFAULT_WALLET_COLLAPSED,
                     };
                 }
+                if (version < 5) {
+                    return {
+                        ...state,
+                        navigationKeyboardShortcutsEnabled: true,
+                        tradingKeyboardShortcutsEnabled: true,
+                    };
+                }
 
                 return persistedState;
             },
@@ -108,6 +129,10 @@ export const useAppSettings = create<AppSettingsStore>()(
                 // orderBookMode: state.orderBookMode,
                 chartTopHeight: state.chartTopHeight,
                 isWalletCollapsed: state.isWalletCollapsed,
+                navigationKeyboardShortcutsEnabled:
+                    state.navigationKeyboardShortcutsEnabled,
+                tradingKeyboardShortcutsEnabled:
+                    state.tradingKeyboardShortcutsEnabled,
             }),
         },
     ),
