@@ -141,9 +141,8 @@ VITE_CONTEXT = "branch-deploy"
   from = "/v2/*"
   to = "/index.html"
   status = 200
-
-# Handle client-side routing (must come AFTER country blocks above)
+  
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "http://ambient-finance-testnet.netlify.app/:splat" # TODO: update to http://ambient-finance.netlify.app/:splat
   status = 200
