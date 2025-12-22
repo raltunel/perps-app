@@ -574,6 +574,7 @@
     },
     "meta": {
         "title": "Ambient Finance | Fogo 무기한 선물",
+        "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",
         "content": "앰비언트에서 페페츄얼 거래"
     },
     "pageTitles": {
@@ -602,10 +603,10 @@
         "pageNotFound": "페이지를 찾을 수 없습니다"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "이용약관",
+        "menuPrivacy": "개인정보처리방침",
+        "terms": "CROCODILE Labs 이용약관",
+        "privacy": "개인정보처리방침"
     },
     "keyboardShortcuts": {
         "menuLabel": "단축키",
