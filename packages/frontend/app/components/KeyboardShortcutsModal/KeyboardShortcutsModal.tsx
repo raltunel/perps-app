@@ -28,6 +28,17 @@ const KeyboardShortcutsModal = ({
         setTradingKeyboardShortcutsEnabled,
     } = useAppSettings();
 
+    const reportSettingChange = (setting: string, value: boolean) => {
+        if (typeof plausible === 'function') {
+            plausible('Settings Change', {
+                props: {
+                    setting,
+                    value,
+                },
+            });
+        }
+    };
+
     const getToggleKindForCategory = (
         category: (typeof shortcutCategories)[number],
     ): 'navigation' | 'trading' | null => {
@@ -110,14 +121,30 @@ const KeyboardShortcutsModal = ({
                             const toggle =
                                 toggleKind === 'navigation'
                                     ? () =>
-                                          setNavigationKeyboardShortcutsEnabled(
-                                              !navigationKeyboardShortcutsEnabled,
-                                          )
+                                          (() => {
+                                              const nextEnabled =
+                                                  !navigationKeyboardShortcutsEnabled;
+                                              setNavigationKeyboardShortcutsEnabled(
+                                                  nextEnabled,
+                                              );
+                                              reportSettingChange(
+                                                  'navigationKeyboardShortcutsEnabled',
+                                                  nextEnabled,
+                                              );
+                                          })()
                                     : toggleKind === 'trading'
                                       ? () =>
-                                            setTradingKeyboardShortcutsEnabled(
-                                                !tradingKeyboardShortcutsEnabled,
-                                            )
+                                            (() => {
+                                                const nextEnabled =
+                                                    !tradingKeyboardShortcutsEnabled;
+                                                setTradingKeyboardShortcutsEnabled(
+                                                    nextEnabled,
+                                                );
+                                                reportSettingChange(
+                                                    'tradingKeyboardShortcutsEnabled',
+                                                    nextEnabled,
+                                                );
+                                            })()
                                       : null;
                             const toggleLabel =
                                 toggleKind === 'navigation'
