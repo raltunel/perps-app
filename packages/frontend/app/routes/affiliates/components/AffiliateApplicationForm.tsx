@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { IoAdd, IoClose } from 'react-icons/io5';
+import { IoAdd, IoClose, IoAlertCircle } from 'react-icons/io5';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { notificationService } from '~/services/notificationService';
 import { useFormStatusStore } from '../hooks/useFormStatusStore';
@@ -131,7 +131,7 @@ const initialChannel: SocialChannel = {
 
 export function AffiliateApplicationForm() {
     const { userAddress } = useUserDataStore();
-    const { addCompletedWallet, isWalletCompleted, _hasHydrated } =
+    const { addCompletedWallet, completedWallets, _hasHydrated } =
         useFormStatusStore();
 
     const [values, setValues] = useState<FormValues>({
@@ -159,12 +159,13 @@ export function AffiliateApplicationForm() {
         Record<string, Partial<Record<keyof SocialChannel, boolean>>>
     >({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const isCompleted = useMemo(() => {
         return _hasHydrated && userAddress
-            ? isWalletCompleted(userAddress)
+            ? completedWallets.includes(userAddress)
             : false;
-    }, [_hasHydrated, userAddress, isWalletCompleted]);
+    }, [_hasHydrated, userAddress, completedWallets]);
 
     const showIMOther = values.im === 'Others';
 
@@ -173,6 +174,7 @@ export function AffiliateApplicationForm() {
         value: FormValues[K],
     ) => {
         setValues((prev) => ({ ...prev, [key]: value }));
+        setSubmitError(null);
         setErrors((prev) => {
             if (!(key in prev)) return prev;
             const copy = { ...prev };
@@ -203,6 +205,7 @@ export function AffiliateApplicationForm() {
                 c.id === id ? { ...c, [field]: value } : c,
             ),
         }));
+        setSubmitError(null);
         setChannelErrors((prev) => {
             const prevEntry = prev[id];
             if (!prevEntry || !(field in prevEntry)) return prev;
@@ -356,6 +359,7 @@ export function AffiliateApplicationForm() {
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setSubmitError(null);
         if (!userAddress) {
             notificationService.addNotification(
                 `affiliate-form-${Date.now()}`,
@@ -436,7 +440,14 @@ export function AffiliateApplicationForm() {
 
             const json = await res.json().catch(() => ({}));
             if (!res.ok) {
-                throw new Error(json?.error || 'Failed to submit form');
+                const message =
+                    (typeof json?.error === 'string' && json.error) ||
+                    (typeof json?.message === 'string' && json.message) ||
+                    (typeof json?.details === 'string' && json.details) ||
+                    'Failed to submit form';
+
+                setSubmitError(message);
+                throw new Error(message);
             }
 
             notificationService.addNotification(
@@ -450,6 +461,12 @@ export function AffiliateApplicationForm() {
 
             addCompletedWallet(userAddress);
         } catch (err) {
+            const fallbackMessage =
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to submit application. Please try again.';
+            setSubmitError((prev) => prev ?? fallbackMessage);
+
             notificationService.addNotification(
                 `affiliate-form-${Date.now()}`,
                 {
@@ -1212,7 +1229,35 @@ export function AffiliateApplicationForm() {
                     )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.75rem',
+                    }}
+                >
+                    {submitError && (
+                        <div
+                            className={styles['submit-error']}
+                            role='alert'
+                            aria-live='polite'
+                        >
+                            <IoAlertCircle
+                                size={18}
+                                className={styles['submit-error-icon']}
+                            />
+                            <div>
+                                <div className={styles['submit-error-title']}>
+                                    Submission failed
+                                </div>
+                                <div className={styles['submit-error-message']}>
+                                    {submitError}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <button
                         type='submit'
                         disabled={isSubmitting || !isFormValid}
