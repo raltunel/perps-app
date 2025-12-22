@@ -27,6 +27,29 @@ VITE_CONTEXT = "branch-deploy"
   publish = "build"
   autoLaunch = true
 
+[[redirects]]
+  from = "/blocked.html"
+  to = "/blocked.html"
+  status = 200
+  conditions = {Country = [
+    "AF", "BY", "MM", "CF", "CU", "CD", "ET", "IR", "IQ", "LB", "LY", "ML", "NI", "KP", "RU", "SO", "SS", "SD", "VE", "YE", "ZW"
+  ]}
+
+[[redirects]]
+  from = "/blocked*"
+  to = "/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/blocked.html"
+  status = 302
+  force = true
+  conditions = {Country = [
+    "AF", "BY", "MM", "CF", "CU", "CD", "ET", "IR", "IQ", "LB", "LY", "ML", "NI", "KP", "RU", "SO", "SS", "SD", "VE", "YE", "ZW"
+  ]}
+
 # Handle client-side routing
 [[redirects]]
   from = "/*"
@@ -188,6 +211,42 @@ VITE_CONTEXT = "branch-deploy"
 # Catch-all for everything else under `/v2/` (e.g. /v2/something)
 [[redirects]]
   from = "/v2/*"
+  to = "/index.html"
+  status = 200
+
+# Block all pages for specified countries
+[[redirects]]
+  from = "/*"
+  to = "/blocked.html"
+  status = 302
+  force = true
+  conditions = {Country = [
+    "AF", # Afghanistan
+    "BY", # Belarus
+    "MM", # Burma
+    "CF", # Central Africa Republic
+    "CU", # Cuba
+    "CD", # Democratic Republic of Congo
+    "ET", # Ethiopia
+    "IR", # Iran
+    "IQ", # Iraq
+    "LB", # Lebanon
+    "LY", # Libya
+    "ML", # Mali
+    "NI", # Nicaragua
+    "KP", # North Korea
+    "RU", # Russia
+    "SO", # Somalia
+    "SS", # South Sudan
+    "SD", # Sudan
+    "VE", # Venezuela
+    "YE", # Yemen
+    "ZW"  # Zimbabwe
+  ]}
+
+# Handle client-side routing
+[[redirects]]
+  from = "/*"
   to = "/index.html"
   status = 200
 
