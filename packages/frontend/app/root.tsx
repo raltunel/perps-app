@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect } from 'react';
 import './i18n'; // i18n MUST be imported before any components
 import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { init as initPlausible } from '@plausible-analytics/tracker';
 
 // Components
@@ -21,10 +21,7 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider, Network } from '@fogo/sessions-sdk-react';
 import { WsProvider } from './contexts/WsContext';
-import {
-    KeyboardShortcutsProvider,
-    useKeyboardShortcuts,
-} from './contexts/KeyboardShortcutsContext';
+import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 
 // Config
 import {
@@ -38,7 +35,6 @@ import packageJson from '../package.json';
 import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import { useDebugStore } from './stores/DebugStore';
-import { useAppSettings } from './stores/AppSettingsStore';
 
 // Styles
 import './css/app.css';
@@ -48,6 +44,7 @@ import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
 import { FuulProvider } from './contexts/FuulContext';
+import { useTranslation } from 'react-i18next';
 
 // Check if error is a chunk/module loading failure (typically happens offline)
 function isChunkLoadError(error: Error): boolean {
