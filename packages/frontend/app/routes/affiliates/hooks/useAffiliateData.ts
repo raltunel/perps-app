@@ -2,6 +2,30 @@ import { useState, useEffect, useCallback } from 'react';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
 import type { ReferrerPayoutData } from '@fuul/sdk';
 
+function isNotFoundError(err: unknown): boolean {
+    if (err instanceof Error) {
+        const message = err.message.toLowerCase();
+        return (
+            message.includes('not found') ||
+            message.includes('404') ||
+            message.includes('status code 404')
+        );
+    }
+
+    if (typeof err === 'object' && err !== null) {
+        const errorObj = err as Record<string, unknown>;
+        if (errorObj.statusCode === 404 || errorObj.status === 404) {
+            return true;
+        }
+        if (errorObj.response && typeof errorObj.response === 'object') {
+            const response = errorObj.response as Record<string, unknown>;
+            return response.status === 404 || response.statusCode === 404;
+        }
+    }
+
+    return false;
+}
+
 // Types
 export interface ReferredUserData {
     volume: number;
@@ -145,9 +169,22 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
                 isRegistered: true,
             });
         } catch (err) {
-            setError(
-                err instanceof Error ? err : new Error('Failed to fetch stats'),
-            );
+            if (isNotFoundError(err)) {
+                setData({
+                    total_earnings: null,
+                    referred_volume: null,
+                    referred_users: null,
+                    newTraders: 0,
+                    activeTraders: 0,
+                    isRegistered: false,
+                });
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch stats'),
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -201,11 +238,15 @@ export function usePayoutsByReferrer(userIdentifier: string, enabled = true) {
 
             setData(transformedData);
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err
-                    : new Error('Failed to fetch payouts'),
-            );
+            if (isNotFoundError(err)) {
+                setData([]);
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch payouts'),
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -241,11 +282,18 @@ export function useUserReferrer(userIdentifier: string, enabled = true) {
 
             setData(response);
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err
-                    : new Error('Failed to fetch referrer'),
-            );
+            if (isNotFoundError(err)) {
+                setData({
+                    referrer_user_rebate_rate: null,
+                    referrer_code: null,
+                });
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch referrer'),
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -278,11 +326,20 @@ export function useUserPayoutMovements(userIdentifier: string, enabled = true) {
 
             setData(response);
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err
-                    : new Error('Failed to fetch payout movements'),
-            );
+            if (isNotFoundError(err)) {
+                setData({
+                    total_results: 0,
+                    page: 1,
+                    page_size: 10,
+                    results: [],
+                });
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch payout movements'),
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -321,11 +378,15 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
             );
             setData(response);
         } catch (err) {
-            setError(
-                err instanceof Error
-                    ? err
-                    : new Error('Failed to fetch affiliate code'),
-            );
+            if (isNotFoundError(err)) {
+                setData(null);
+            } else {
+                setError(
+                    err instanceof Error
+                        ? err
+                        : new Error('Failed to fetch affiliate code'),
+                );
+            }
         } finally {
             setIsLoading(false);
         }
