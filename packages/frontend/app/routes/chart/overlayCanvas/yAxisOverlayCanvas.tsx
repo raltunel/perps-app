@@ -18,7 +18,8 @@ import { usePositionOrderLines } from '../orders/usePositionOrderLines';
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart, isChartReady } = useTradingView();
-    const { orderInputPriceValue, symbol } = useTradeDataStore();
+    const { orderInputPriceValue, symbol, isMidModeActive } =
+        useTradeDataStore();
     const [isDrag, setIsDrag] = useState(false);
     const [mouseY, setMouseY] = useState(0);
     const [isPaneChanged, setIsPaneChanged] = useState(false);
@@ -370,16 +371,27 @@ const YAxisOverlayCanvas: React.FC = () => {
             return;
 
         const canvas = canvasRef.current;
-        const { orderLabel } = labelAnalysis;
+        const { orderLabel, allLabels } = labelAnalysis;
         const adjustedPixel = orderLabel.adjustedPixel;
         const tolerance = 10;
         const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
 
-        isNearOrderPriceRef.current = isNearOrderPrice;
+        let isNearClosePrice = false;
+        if (isMidModeActive) {
+            const closePriceLabel = allLabels.find((l) => l.isClosePrice);
+            if (closePriceLabel) {
+                isNearClosePrice =
+                    Math.abs(mouseY - closePriceLabel.adjustedPixel) <=
+                    tolerance;
+            }
+        }
 
-        useTradeDataStore.getState().setIsPreviewOrderHovered(isNearOrderPrice);
+        const isDraggable = isNearOrderPrice || isNearClosePrice;
+        isNearOrderPriceRef.current = isDraggable;
 
-        if (isNearOrderPrice) {
+        useTradeDataStore.getState().setIsPreviewOrderHovered(isDraggable);
+
+        if (isDraggable) {
             canvas.style.cursor = 'grab';
             canvas.style.pointerEvents = 'auto';
         } else {
@@ -393,13 +405,13 @@ const YAxisOverlayCanvas: React.FC = () => {
         isDrag,
         symbol,
         labelAnalysis,
+        isMidModeActive,
     ]);
 
     useEffect(() => {
         if (!canvasRef.current) return;
 
         const canvas = canvasRef.current;
-        let isDragging = false;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
