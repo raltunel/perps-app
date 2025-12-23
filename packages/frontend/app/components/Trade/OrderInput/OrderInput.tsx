@@ -205,6 +205,12 @@ function OrderInput({
     const orderInputPriceValueRef = useRef<number | undefined>(undefined);
     orderInputPriceValueRef.current = orderInputPriceValue.value;
 
+    // Track if direction change came from debounced price input (to prevent auto-focus)
+    const directionChangeFromInputRef = useRef(false);
+
+    // Debounce timer ref for price input changes
+    const priceInputDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
     const isMobileRef = useRef(false);
     const isMobile = useMobile();
     isMobileRef.current = isMobile;
@@ -306,11 +312,32 @@ function OrderInput({
     };
 
     const assignPrice = (price: string, changeType: OrderInputChangeType) => {
-        if (price && price.length > 0) {
-            const parsed = parseFormattedNum(price);
-            setOrderInputPriceValue({ value: parsed, changeType });
+        // For inputChange, debounce the store update by 1000ms
+        // This delays chart line updates and trade direction changes until user stops typing
+        if (changeType === 'inputChange') {
+            // Clear any pending debounce
+            if (priceInputDebounceRef.current) {
+                clearTimeout(priceInputDebounceRef.current);
+            }
+            // Update local price display immediately (handled by handlePriceChange setting price state)
+            // But debounce the store update that triggers chart line and direction changes
+            priceInputDebounceRef.current = setTimeout(() => {
+                directionChangeFromInputRef.current = true;
+                if (price && price.length > 0) {
+                    const parsed = parseFormattedNum(price);
+                    setOrderInputPriceValue({ value: parsed, changeType });
+                } else {
+                    setOrderInputPriceValue({ value: undefined, changeType });
+                }
+            }, 1000);
         } else {
-            setOrderInputPriceValue({ value: undefined, changeType });
+            // For other change types (obClick, dragEnd, midPriceChange, reset), update immediately
+            if (price && price.length > 0) {
+                const parsed = parseFormattedNum(price);
+                setOrderInputPriceValue({ value: parsed, changeType });
+            } else {
+                setOrderInputPriceValue({ value: undefined, changeType });
+            }
         }
     };
 
@@ -869,11 +896,11 @@ function OrderInput({
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
         if (typeof event === 'string') {
-            // setPrice(event);
-            assignPrice(event, 'inputChange');
+            setPrice(event); // Update local display immediately
+            assignPrice(event, 'inputChange'); // Debounced store update
         } else {
-            // setPrice(event.target.value);
-            assignPrice(event.target.value, 'inputChange');
+            setPrice(event.target.value); // Update local display immediately
+            assignPrice(event.target.value, 'inputChange'); // Debounced store update
             setIsMidModeActive(false);
         }
     };
@@ -934,7 +961,7 @@ function OrderInput({
         }
     }, [orderInputPriceValue.value, usualResolution]);
 
-    // Set direction with delay
+    // Set direction when price input value changes (already debounced via assignPrice)
     useEffect(() => {
         if (
             !midPriceRef.current ||
@@ -943,18 +970,15 @@ function OrderInput({
             return;
         }
 
-        const timeoutId = setTimeout(() => {
-            if (
-                orderInputPriceValue.value &&
-                orderInputPriceValue.value > midPriceRef.current!
-            ) {
-                setTradeDirection('sell');
-            } else {
-                setTradeDirection('buy');
-            }
-        }, 1000);
-
-        return () => clearTimeout(timeoutId);
+        // Direction change happens immediately since assignPrice already debounced the store update
+        if (
+            orderInputPriceValue.value &&
+            orderInputPriceValue.value > midPriceRef.current!
+        ) {
+            setTradeDirection('sell');
+        } else {
+            setTradeDirection('buy');
+        }
     }, [orderInputPriceValue.value, orderInputPriceValue.changeType]);
 
     const handlePriceBlur = () => {
@@ -1240,10 +1264,18 @@ function OrderInput({
     );
 
     // After mount on client, focus the size input on desktop widths
+    // Skip auto-focus when direction change came from debounced price input typing
     useEffect(() => {
         if (typeof window === 'undefined' || typeof document === 'undefined')
             return;
         if (window.innerWidth <= 768) return; // do not autofocus on mobile
+
+        // Skip auto-focus if direction change came from debounced price input
+        if (directionChangeFromInputRef.current) {
+            directionChangeFromInputRef.current = false;
+            return;
+        }
+
         const el = document.getElementById(
             'trade-module-size-input',
         ) as HTMLInputElement | null;
