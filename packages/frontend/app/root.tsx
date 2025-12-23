@@ -343,7 +343,6 @@ export default function App() {
 
     return (
         <FuulProvider>
-            {' '}
             <FogoSessionProvider
                 network={Network.Testnet}
                 domain='https://perps.ambient.finance'
