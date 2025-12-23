@@ -573,8 +573,34 @@
         "liqPrice": "Liq. Price"
     },
     "meta": {
-        "title": "Home | Ambient",
-        "content": "Trade Perps With Ambient"
+        "title": "Ambient Finance | Perpetual Futures on Fogo",
+        "description": "Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution.",
+        "content": "Trade Perps With Ambient on Fogo"
+    },
+    "pageTitles": {
+        "portfolio": "Portfolio",
+        "referrals": "Referrals",
+        "points": "Points",
+        "leaderboard": "Leaderboard",
+        "newStrategy": "New Strategy",
+        "editStrategy": "Edit Strategy",
+        "strategy": "Strategy",
+        "strategies": "Strategies",
+        "vault": "Vault",
+        "vaults": "Vaults",
+        "subAccounts": "Sub-Accounts",
+        "positions": "Positions",
+        "openOrders": "Open Orders",
+        "orderHistory": "Order History",
+        "tradeHistory": "Trade History",
+        "twapFillHistory": "TWAP Fill History",
+        "twapHistory": "TWAP History",
+        "depositsAndWithdrawals": "Deposits & Withdrawals",
+        "fundingHistory": "Funding History",
+        "more": "More",
+        "termsOfService": "Terms of Service",
+        "privacyPolicy": "Privacy Policy",
+        "pageNotFound": "Page Not Found"
     },
     "docs": {
         "menuTerms": "Terms of Service",

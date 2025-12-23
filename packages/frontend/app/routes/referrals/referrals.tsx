@@ -6,7 +6,7 @@ import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackgrou
 // export function meta({}: Route.MetaArgs) {
 export function meta() {
     return [
-        { title: 'Referrals | Ambient' },
+        { title: 'Referrals | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
