@@ -13,7 +13,7 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 export function meta() {
     return [
-        { title: 'Referrals | Ambient' },
+        { title: 'Referrals | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

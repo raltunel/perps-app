@@ -15,9 +15,5 @@ await fsp.cp('build/client', 'build', {
     filter: (src) => !src.includes('server'), // Exclude any residual server files
 });
 
-// Create _redirects file for SPA routing
-const redirectsContent = [
-    '/api/hubspot /.netlify/functions/hubspot 200',
-    '/* /index.html 200',
-].join('\n');
-await fsp.writeFile(path.join('build', '_redirects'), redirectsContent);
+// NOTE: SPA routing is handled in netlify.toml (not _redirects) so that
+// country-based geo-blocking redirects take precedence over the catch-all.

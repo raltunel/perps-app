@@ -22,6 +22,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useFuul } from '~/contexts/FuulContext';
 import EnterCode from '~/components/Referrals/EnterCode/EnterCode';
 import CreateCode from '../CreateCode/CreateCode';
+import { checkForPermittedCharacters, checkIfOwnRefCode } from '../functions';
 
 interface PropsIF {
     initialTab?: string;
@@ -137,29 +138,6 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         console.log('isRefCodeClaimed: ', isRefCodeClaimed);
     }, [isRefCodeClaimed]);
-
-    // fn to check if a given ref code is registered to a given wallet
-    async function checkIfOwnRefCode(
-        rc: string,
-        address: string,
-    ): Promise<boolean | undefined> {
-        const options = {
-            method: 'GET',
-            headers: { accept: 'application/json' },
-        };
-
-        const ENDPOINT = `https://api.fuul.xyz/api/v1/affiliates/${address}?identifier_type=solana_address`;
-
-        try {
-            const response = await fetch(ENDPOINT, options);
-            const res = await response.json();
-            // the FUUL system is case-sensitive, strings must match exactly
-            return res.code?.toLowerCase() === rc.toLowerCase();
-        } catch (err) {
-            console.error(err);
-            return undefined;
-        }
-    }
 
     const [_copiedData, copy] = useClipboard();
 
@@ -286,10 +264,6 @@ export default function CodeTabs(props: PropsIF) {
         }
         prevAffiliateAddress.current = affiliateAddress?.toString();
     }, [affiliateAddress]);
-
-    const [isFetchingVolume, setIsFetchingVolume] = useState<
-        boolean | undefined
-    >(undefined);
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
@@ -641,24 +615,6 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [affiliateCode]);
 
-    // fn to screen a text string for permissible characters (no regex)
-    function checkForPermittedCharacters(input: string): boolean {
-        if (input.length === 0) return true;
-        for (let i: number = 0; i < input.length; i++) {
-            const char: string = input[i];
-            const isAlphanumeric: boolean =
-                (char >= 'A' && char <= 'Z') ||
-                (char >= 'a' && char <= 'z') ||
-                (char >= '0' && char <= '9');
-            const isHyphen: boolean = char === '-';
-
-            if (!isAlphanumeric && !isHyphen) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
@@ -707,7 +663,6 @@ export default function CodeTabs(props: PropsIF) {
                 return (
                     <EnterCode
                         isSessionEstablished={isSessionEstablished}
-                        isFetchingVolume={isFetchingVolume}
                         totVolume={referralStore.totVolume}
                         totVolumeFormatted={totVolumeFormatted}
                         cached={referralStore.cached}
