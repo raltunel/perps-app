@@ -827,7 +827,6 @@ export default function Trade() {
             if (limitShortcut && matchesShortcutEvent(e, limitShortcut.keys)) {
                 e.preventDefault();
                 setMarketOrderType('limit');
-                setTimeout(() => focusById('trade-module-price-input'), 0);
                 return;
             }
 
