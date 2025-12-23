@@ -306,10 +306,8 @@ function OrderInput({
     };
 
     const assignPrice = (price: string, changeType: OrderInputChangeType) => {
-        // console.log('>>>>> assignPrice', price, changeType);
         if (price && price.length > 0) {
             const parsed = parseFormattedNum(price);
-            // console.log('>>>>>> parsed', parsed);
             setOrderInputPriceValue({ value: parsed, changeType });
         } else {
             setOrderInputPriceValue({ value: undefined, changeType });
@@ -891,11 +889,11 @@ function OrderInput({
         }
     }, [marketOrderType]);
 
+    // set input price when orderInputPriceValue changes
     useEffect(() => {
         if (orderInputPriceValue.value === undefined) {
             setPrice('');
         } else if (orderInputPriceValue.value === 0) {
-            console.log('>>>>>> 0');
             setPrice('0');
         } else {
             const resVal = usualResolution?.val || 1;
@@ -910,8 +908,7 @@ function OrderInput({
             if (
                 midPriceRef.current &&
                 (orderInputPriceValue.changeType == 'dragEnd' ||
-                    orderInputPriceValue.changeType == 'obClick' ||
-                    orderInputPriceValue.changeType == 'inputChange')
+                    orderInputPriceValue.changeType == 'obClick')
             ) {
                 if (orderInputPriceValue.value > midPriceRef.current) {
                     setTradeDirection('sell');
@@ -936,6 +933,29 @@ function OrderInput({
             }, 800);
         }
     }, [orderInputPriceValue.value, usualResolution]);
+
+    // Set direction with delay
+    useEffect(() => {
+        if (
+            !midPriceRef.current ||
+            orderInputPriceValue.changeType !== 'inputChange'
+        ) {
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            if (
+                orderInputPriceValue.value &&
+                orderInputPriceValue.value > midPriceRef.current!
+            ) {
+                setTradeDirection('sell');
+            } else {
+                setTradeDirection('buy');
+            }
+        }, 1000);
+
+        return () => clearTimeout(timeoutId);
+    }, [orderInputPriceValue.value, orderInputPriceValue.changeType]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
