@@ -7,6 +7,19 @@ import { useFormStatusStore } from '../hooks/useFormStatusStore';
 import { ApplicationPendingCard } from './ApplicationPendingCard';
 import styles from '../affiliates.module.css';
 
+type HubspotValidationDetails = {
+    status?: string;
+    message?: string;
+    errors?: Array<{
+        message?: string;
+        code?: string;
+        context?: {
+            propertyName?: string[];
+        };
+    }>;
+    category?: string;
+};
+
 interface SocialChannel {
     id: string;
     platform: string;
@@ -62,6 +75,42 @@ const SOCIAL_PLATFORMS = [
     'Rutube',
     'Other',
 ];
+
+const HUBSPOT_PREFIX_BY_PLATFORM: Record<string, string> = {
+    'X/Twitter': 'x_twitter',
+    Youtube: 'youtube',
+    Telegram: 'telegram',
+    Discord: 'discord',
+    Facebook: 'facebook',
+    Instagram: 'instagram',
+    Tiktok: 'tiktok',
+    Twitch: 'twitch',
+    Linkedin: 'linkedin',
+    'Weibo (微博)': 'weibo',
+    'WeChat (微信)': 'wechat',
+    'Xiaohongshu (小红书)': 'xiaohongshu',
+    'Douyin (抖音)': 'douyin',
+    KakaoTalk: 'kakaotalk',
+    Line: 'line',
+    VK: 'vk',
+    Odnoklassniki: 'odnoklassniki',
+    Rutube: 'rutube',
+    Other: 'others',
+};
+
+function tryParseHubspotValidationDetails(
+    rawDetails: unknown,
+): HubspotValidationDetails | null {
+    if (typeof rawDetails !== 'string') return null;
+    const trimmed = rawDetails.trim();
+    if (!trimmed) return null;
+
+    try {
+        return JSON.parse(trimmed) as HubspotValidationDetails;
+    } catch {
+        return null;
+    }
+}
 
 const isValidEmail = (email: string): boolean => {
     const trimmed = email.trim();
@@ -512,6 +561,135 @@ export function AffiliateApplicationForm() {
 
             const json = await res.json().catch(() => ({}));
             if (!res.ok) {
+                const detailsParsed = tryParseHubspotValidationDetails(
+                    json?.details,
+                );
+
+                if (
+                    json?.code === 'VALIDATION_ERROR' &&
+                    detailsParsed?.errors?.length
+                ) {
+                    const nextErrors: Record<string, string> = {};
+                    const nextChannelErrors: Record<
+                        string,
+                        Partial<Record<keyof SocialChannel, string>>
+                    > = {};
+                    let firstValidationMessage: string | null = null;
+
+                    for (const err of detailsParsed.errors) {
+                        const msg =
+                            (typeof err?.message === 'string' && err.message) ||
+                            (typeof detailsParsed?.message === 'string'
+                                ? detailsParsed.message
+                                : '') ||
+                            '';
+                        if (!firstValidationMessage && msg)
+                            firstValidationMessage = msg;
+
+                        const props = err?.context?.propertyName;
+                        if (!Array.isArray(props) || props.length === 0) {
+                            continue;
+                        }
+
+                        for (const propertyName of props) {
+                            if (typeof propertyName !== 'string') continue;
+
+                            if (propertyName === 'email') {
+                                if (msg) nextErrors.email = msg;
+                                continue;
+                            }
+                            if (propertyName === 'firstname') {
+                                if (msg) nextErrors.firstName = msg;
+                                continue;
+                            }
+                            if (propertyName === 'lastname') {
+                                if (msg) nextErrors.lastName = msg;
+                                continue;
+                            }
+                            if (propertyName === 'phone') {
+                                if (msg) nextErrors.phone = msg;
+                                continue;
+                            }
+
+                            if (
+                                propertyName.startsWith('im___') ||
+                                propertyName === 'hs_whatsapp_phone_number'
+                            ) {
+                                if (msg) nextErrors.imHandle = msg;
+                                continue;
+                            }
+
+                            const socialMatch = propertyName.match(
+                                /^(.+?)_(link|followers_subscribers|language)$/,
+                            );
+                            if (socialMatch) {
+                                const prefix = socialMatch[1];
+                                const suffix = socialMatch[2];
+                                const channel = values.socialChannels.find(
+                                    (c) =>
+                                        HUBSPOT_PREFIX_BY_PLATFORM[
+                                            c.platform
+                                        ] === prefix,
+                                );
+                                if (channel) {
+                                    const field: keyof SocialChannel =
+                                        suffix === 'link'
+                                            ? 'link'
+                                            : suffix === 'followers_subscribers'
+                                              ? 'followers'
+                                              : 'language';
+                                    if (msg) {
+                                        nextChannelErrors[channel.id] = {
+                                            ...(nextChannelErrors[channel.id] ||
+                                                {}),
+                                            [field]: msg,
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (
+                        Object.keys(nextErrors).length > 0 ||
+                        Object.keys(nextChannelErrors).length > 0
+                    ) {
+                        setErrors((prev) => ({ ...prev, ...nextErrors }));
+                        setChannelErrors((prev) => ({
+                            ...prev,
+                            ...nextChannelErrors,
+                        }));
+                        setTouched((prev) => ({
+                            ...prev,
+                            ...Object.fromEntries(
+                                Object.keys(nextErrors).map((k) => [k, true]),
+                            ),
+                        }));
+                        setTouchedChannels((prev) => {
+                            const next = { ...prev };
+                            for (const [channelId, fields] of Object.entries(
+                                nextChannelErrors,
+                            )) {
+                                next[channelId] = {
+                                    ...(next[channelId] || {}),
+                                    ...Object.fromEntries(
+                                        Object.keys(fields).map((k) => [
+                                            k,
+                                            true,
+                                        ]),
+                                    ),
+                                };
+                            }
+                            return next;
+                        });
+                    }
+
+                    if (firstValidationMessage) {
+                        setSubmitError(firstValidationMessage);
+                        throw new Error(firstValidationMessage);
+                    }
+                }
+
                 const message =
                     (typeof json?.error === 'string' && json.error) ||
                     (typeof json?.message === 'string' && json.message) ||
