@@ -49,8 +49,8 @@ export default function AffiliatesPage() {
         );
     }
 
-    // Show loading while checking audience
-    if (isLoadingAudience) {
+    // Show loading while checking audience (also show loader when data is null but we have a valid address)
+    if (isLoadingAudience || (audience === null && userAddress)) {
         return (
             <div
                 className={`${styles['affiliates-root']} ${styles['affiliates-container']}`}
