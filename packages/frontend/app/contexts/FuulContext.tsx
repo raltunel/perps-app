@@ -6,6 +6,11 @@ import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk'
 interface FuulContextType {
     isInitialized: boolean;
     trackPageView: () => void;
+    sendConversionEvent: (
+        userIdentifier: string,
+        identifierType: UserIdentifierType,
+        eventName: string,
+    ) => Promise<void>;
     isAffiliateCodeFree: (code: string) => Promise<boolean>;
     getAffiliateCode: (
         userIdentifier: string,
@@ -16,6 +21,7 @@ interface FuulContextType {
 const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
+    sendConversionEvent: () => Promise.resolve(),
     isAffiliateCodeFree: () => Promise.resolve(false),
     getAffiliateCode: () => Promise.resolve(null),
 });
@@ -65,11 +71,33 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
+    async function sendConversionEvent(
+        userIdentifier: string,
+        identifierType: UserIdentifierType,
+        eventName: string,
+    ): Promise<void> {
+        if (!isInitialized) {
+            console.warn(
+                'Cannot send conversion event before Fuul system is initialized',
+            );
+            return;
+        }
+        try {
+            await Fuul.sendEvent(eventName, {
+                user_id: userIdentifier,
+                user_id_type: identifierType,
+            });
+        } catch (error) {
+            console.error('Failed to send conversion event:', error);
+        }
+    }
+
     return (
         <FuulContext.Provider
             value={{
                 isInitialized,
                 trackPageView,
+                sendConversionEvent,
                 isAffiliateCodeFree: Fuul.isAffiliateCodeFree,
                 getAffiliateCode: Fuul.getAffiliateCode,
             }}
