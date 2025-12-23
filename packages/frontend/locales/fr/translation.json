@@ -13,6 +13,7 @@
         "error": "Erreur",
         "success": "Succès",
         "applyDefaults": "Appliquer les paramètres par défaut",
+        "changeApplied": "Modification appliquée",
         "learnMore": "En savoir plus",
         "deposit": "Déposer",
         "transfer": "Transférer",
@@ -578,6 +579,7 @@
     },
     "meta": {
         "title": "Ambient Finance | Contrats perpétuels sur Fogo",
+        "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",
         "content": "Trader des Perps avec Ambient"
     },
     "pageTitles": {
@@ -606,10 +608,10 @@
         "pageNotFound": "Page Non Trouvée"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "Conditions d'utilisation",
+        "menuPrivacy": "Confidentialité",
+        "terms": "Conditions d'utilisation de CROCODILE Labs",
+        "privacy": "Politique de confidentialité"
     },
     "keyboardShortcuts": {
         "menuLabel": "Raccourcis",
@@ -645,12 +647,12 @@
                 "shortcuts": [
                     {
                         "id": "trading.buy",
-                        "keys": ["a"],
+                        "keys": ["b"],
                         "description": "Passer en achat"
                     },
                     {
                         "id": "trading.sell",
-                        "keys": ["v"],
+                        "keys": ["s"],
                         "description": "Passer en vente"
                     },
                     {
@@ -695,7 +697,7 @@
                     },
                     {
                         "id": "portfolio.withdraw",
-                        "keys": ["r"],
+                        "keys": ["w"],
                         "description": "Ouvrir la fenêtre de retrait"
                     },
                     {

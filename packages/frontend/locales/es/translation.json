@@ -13,6 +13,7 @@
         "error": "Error",
         "success": "Éxito",
         "applyDefaults": "Aplicar predeterminados",
+        "changeApplied": "Cambio aplicado",
         "learnMore": "Más información",
         "deposit": "Depositar",
         "transfer": "Transferir",
@@ -578,6 +579,7 @@
     },
     "meta": {
         "title": "Ambient Finance | Futuros perpetuos en Fogo",
+        "description": "Opera futuros perpetuos en Fogo con Ambient Finance. Sin comisiones taker, hasta 100x de apalancamiento y ejecución ultrarrápida.",
         "content": "Opera Perps con Ambient"
     },
     "pageTitles": {
@@ -606,10 +608,10 @@
         "pageNotFound": "Página No Encontrada"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "Términos de Servicio",
+        "menuPrivacy": "Privacidad",
+        "terms": "Términos de Servicio de CROCODILE Labs",
+        "privacy": "Política de Privacidad"
     },
     "keyboardShortcuts": {
         "menuLabel": "Atajos",
@@ -645,12 +647,12 @@
                 "shortcuts": [
                     {
                         "id": "trading.buy",
-                        "keys": ["c"],
+                        "keys": ["b"],
                         "description": "Cambiar a compra"
                     },
                     {
                         "id": "trading.sell",
-                        "keys": ["v"],
+                        "keys": ["s"],
                         "description": "Cambiar a venta"
                     },
                     {
@@ -675,7 +677,7 @@
                     },
                     {
                         "id": "navigation.home",
-                        "keys": ["i"],
+                        "keys": ["h"],
                         "description": "Ir a la página de inicio"
                     },
                     {
@@ -685,7 +687,7 @@
                     },
                     {
                         "id": "wallet.connect",
-                        "keys": ["b"],
+                        "keys": ["c"],
                         "description": "Abrir conector de billetera"
                     },
                     {
@@ -695,7 +697,7 @@
                     },
                     {
                         "id": "portfolio.withdraw",
-                        "keys": ["r"],
+                        "keys": ["w"],
                         "description": "Abrir modal de retiro"
                     },
                     {

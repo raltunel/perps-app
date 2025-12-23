@@ -13,6 +13,7 @@
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
+        "changeApplied": "更改已应用",
         "learnMore": "了解更多",
         "deposit": "充值",
         "transfer": "转账",
@@ -578,6 +579,7 @@
     },
     "meta": {
         "title": "Ambient Finance | Fogo永续合约",
+        "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",
         "content": "在Ambient进行永续合约交易"
     },
     "pageTitles": {
@@ -606,10 +608,10 @@
         "pageNotFound": "页面未找到"
     },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "服务条款",
+        "menuPrivacy": "隐私",
+        "terms": "CROCODILE Labs 服务条款",
+        "privacy": "隐私政策"
     },
     "keyboardShortcuts": {
         "menuLabel": "快捷键",
