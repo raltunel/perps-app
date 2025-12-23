@@ -881,6 +881,48 @@ const LabelComponent = ({
                 return;
             }
 
+            const currentPrice = tempSelectedLine.parentLine.yPrice;
+            if (currentPrice < 0) {
+                const restoredLine = {
+                    ...tempSelectedLine,
+                    parentLine: {
+                        ...tempSelectedLine.parentLine,
+                        yPrice: originalPrice,
+                    },
+                };
+                setSelectedLine(restoredLine);
+
+                if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
+                    updateYPosition(originalPrice);
+                }
+
+                dragStateRef.current.tempSelectedLine = undefined;
+                dragStateRef.current.originalPrice = undefined;
+                dragStateRef.current.isDragging = false;
+                dragStateRef.current.isOutsideArea = false;
+                dragStateRef.current.frozenPrice = undefined;
+                setIsDrag(false);
+                setSelectedLine(undefined);
+
+                if (chart) {
+                    const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+                    if (iframeDoc?.body) {
+                        iframeDoc.body.style.removeProperty('cursor');
+                    }
+                    if (iframeDoc?.documentElement) {
+                        iframeDoc.documentElement.style.removeProperty(
+                            'cursor',
+                        );
+                    }
+                }
+
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
+                return;
+            }
+
             if (isOutsideArea) {
                 const restoredLine = {
                     ...tempSelectedLine,
