@@ -22,6 +22,7 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { getDefaultLanguage } from '~/utils/functions/getDefaultLanguage';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -35,22 +36,37 @@ interface AppOptionsProps {
 export default function AppOptions(props: AppOptionsProps) {
     const { footer } = props;
     const activeOptions: useAppOptionsIF = useAppOptions();
+    const { open: openKeyboardShortcuts } = useKeyboardShortcuts();
 
     const isMobileVersion = useMediaQuery('(max-width: 768px)');
 
-    const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
-        useAppSettings();
+    const {
+        numFormat,
+        setNumFormat,
+        bsColor,
+        setBsColor,
+        getBsColor,
+        navigationKeyboardShortcutsEnabled,
+        setNavigationKeyboardShortcutsEnabled,
+        tradingKeyboardShortcutsEnabled,
+        setTradingKeyboardShortcutsEnabled,
+    } = useAppSettings();
     const { i18n, t } = useTranslation();
+
+    // Get translation function for the user's default language (for Apply Defaults button)
+    const defaultLanguage = getDefaultLanguage();
+    const tDefault = i18n.getFixedT(defaultLanguage);
 
     const [showChangeApplied, setShowChangeApplied] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Check if current settings are defaults
-    const defaultLanguage = getDefaultLanguage();
     const isDefaults =
         activeOptions['skipOpenOrderConfirm'] === false &&
         activeOptions['enableTxNotifications'] === true &&
         activeOptions['enableBackgroundFillNotif'] === true &&
+        navigationKeyboardShortcutsEnabled === true &&
+        tradingKeyboardShortcutsEnabled === true &&
         numFormat.label === NumFormatTypes[0].label &&
         bsColor === 'colors.default' &&
         (i18n?.language?.split('-')[0] || 'en') === defaultLanguage;
@@ -90,6 +106,7 @@ export default function AppOptions(props: AppOptionsProps) {
                 <OptionLine
                     text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
+                    autoFocus={!footer}
                     toggle={() => {
                         activeOptions.toggle('skipOpenOrderConfirm');
                         showChangeAppliedMessage();
@@ -143,6 +160,58 @@ export default function AppOptions(props: AppOptionsProps) {
                         }
                     }}
                 />
+            </ul>
+            <div className={styles.horizontal_divider} />
+            <ul>
+                <OptionLine
+                    text={t('appSettings.navigationKeyboardShortcuts')}
+                    isChecked={navigationKeyboardShortcutsEnabled}
+                    toggle={() => {
+                        setNavigationKeyboardShortcutsEnabled(
+                            !navigationKeyboardShortcutsEnabled,
+                        );
+                        showChangeAppliedMessage();
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting:
+                                        'navigationKeyboardShortcutsEnabled',
+                                    value: !navigationKeyboardShortcutsEnabled,
+                                },
+                            });
+                        }
+                    }}
+                />
+                <OptionLine
+                    text={t('appSettings.tradingKeyboardShortcuts')}
+                    isChecked={tradingKeyboardShortcutsEnabled}
+                    toggle={() => {
+                        setTradingKeyboardShortcutsEnabled(
+                            !tradingKeyboardShortcutsEnabled,
+                        );
+                        showChangeAppliedMessage();
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'tradingKeyboardShortcutsEnabled',
+                                    value: !tradingKeyboardShortcutsEnabled,
+                                },
+                            });
+                        }
+                    }}
+                />
+                <li className={styles.shortcutsLinkRow}>
+                    <button
+                        type='button'
+                        className={styles.shortcutsLink}
+                        onClick={() => {
+                            props.closePanel?.();
+                            openKeyboardShortcuts();
+                        }}
+                    >
+                        {t('appSettings.viewKeyboardShortcuts')}
+                    </button>
+                </li>
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
@@ -250,11 +319,12 @@ export default function AppOptions(props: AppOptionsProps) {
                             width: '100%',
                         }}
                     >
-                        Change applied
+                        {t('common.changeApplied')}
                     </div>
                 ) : (
                     !isDefaults && (
-                        <div
+                        <button
+                            type='button'
                             className={styles.apply_defaults}
                             style={{
                                 background: 'var(--accent1)',
@@ -267,6 +337,8 @@ export default function AppOptions(props: AppOptionsProps) {
                                 setNumFormat(NumFormatTypes[0]);
                                 setBsColor('colors.default');
                                 useAppSettings.getState().resetLayoutHeights();
+                                setNavigationKeyboardShortcutsEnabled(true);
+                                setTradingKeyboardShortcutsEnabled(true);
 
                                 const defaultLanguage = getDefaultLanguage();
                                 i18n.changeLanguage(defaultLanguage);
@@ -282,8 +354,8 @@ export default function AppOptions(props: AppOptionsProps) {
                                 }
                             }}
                         >
-                            {t('common.applyDefaults')}
-                        </div>
+                            {tDefault('common.applyDefaults')}
+                        </button>
                     )
                 )}
             </div>

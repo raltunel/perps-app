@@ -158,7 +158,9 @@ export default defineConfig(({ mode }) => ({
                 ],
             },
             devOptions: {
-                enabled: mode === 'development',
+                enabled:
+                    mode === 'development' &&
+                    process.env.VITE_PWA_DEV === 'true',
             },
             manifest: {
                 name: appName,
