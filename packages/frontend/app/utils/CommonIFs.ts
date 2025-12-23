@@ -42,7 +42,7 @@ export type modalContentT =
     | 'limit_sell';
 
 export type OrderInputValue = {
-    value: number;
+    value: number | undefined;
     changeType: OrderInputChangeType;
 };
 

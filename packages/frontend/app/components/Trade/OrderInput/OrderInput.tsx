@@ -202,7 +202,7 @@ function OrderInput({
         setMarketOrderType,
     } = useTradeDataStore();
 
-    const orderInputPriceValueRef = useRef(orderInputPriceValue);
+    const orderInputPriceValueRef = useRef<number | undefined>(undefined);
     orderInputPriceValueRef.current = orderInputPriceValue.value;
 
     const isMobileRef = useRef(false);
@@ -306,11 +306,13 @@ function OrderInput({
     };
 
     const assignPrice = (price: string, changeType: OrderInputChangeType) => {
-        if (price === '') {
-            setOrderInputPriceValue({ value: 0, changeType });
-        } else {
+        // console.log('>>>>> assignPrice', price, changeType);
+        if (price && price.length > 0) {
             const parsed = parseFormattedNum(price);
+            // console.log('>>>>>> parsed', parsed);
             setOrderInputPriceValue({ value: parsed, changeType });
+        } else {
+            setOrderInputPriceValue({ value: undefined, changeType });
         }
     };
 
@@ -873,8 +875,8 @@ function OrderInput({
             assignPrice(event, 'inputChange');
         } else {
             // setPrice(event.target.value);
-            setIsMidModeActive(false);
             assignPrice(event.target.value, 'inputChange');
+            setIsMidModeActive(false);
         }
     };
 
@@ -890,7 +892,12 @@ function OrderInput({
     }, [marketOrderType]);
 
     useEffect(() => {
-        if (orderInputPriceValue.value > 0) {
+        if (orderInputPriceValue.value === undefined) {
+            setPrice('');
+        } else if (orderInputPriceValue.value === 0) {
+            console.log('>>>>>> 0');
+            setPrice('0');
+        } else {
             const resVal = usualResolution?.val || 1;
             const decimals = Math.floor(Math.log10(resVal)) * -1;
             const priceToSet = formatNumWithOnlyDecimals(
@@ -928,7 +935,7 @@ function OrderInput({
                 orderElem?.classList.remove('divPulseNeon');
             }, 800);
         }
-    }, [orderInputPriceValue, usualResolution]);
+    }, [orderInputPriceValue.value, usualResolution]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');
