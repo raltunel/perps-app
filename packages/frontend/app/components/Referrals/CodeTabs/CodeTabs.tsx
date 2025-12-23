@@ -191,6 +191,9 @@ export default function CodeTabs(props: PropsIF) {
             handleReferralURLParam.value &&
             handleReferralURLParam.value !== referralStore.cached
         ) {
+            // Reset validation state so the validation effect will re-run
+            setIsCachedValueValid(undefined);
+            setLastValidatedCode('');
             referralStore.cache(handleReferralURLParam.value);
         }
     }, [handleReferralURLParam.value]);
