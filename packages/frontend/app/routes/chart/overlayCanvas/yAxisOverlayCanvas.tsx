@@ -464,6 +464,13 @@ const YAxisOverlayCanvas: React.FC = () => {
                 return;
 
             if (
+                dragPriceRef.current < 0 &&
+                dragStartPriceRef.current !== undefined
+            ) {
+                dragPriceRef.current = dragStartPriceRef.current;
+            }
+
+            if (
                 mouseOutOfFrameRef.current &&
                 dragStartPriceRef.current !== undefined
             ) {
