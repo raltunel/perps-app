@@ -1,50 +1,3 @@
-import express from 'express';
-import { createServer as createViteServer } from 'vite';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
-import { readFile } from 'node:fs/promises';
-import os from 'node:os';
-
-const loadEnvLocal = async () => {
-    try {
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
-        const envPath = path.join(__dirname, '.env.local');
-        const content = await readFile(envPath, 'utf-8');
-        for (const rawLine of content.split(/\r?\n/)) {
-            const line = rawLine.trim();
-            if (!line || line.startsWith('#')) continue;
-            const idx = line.indexOf('=');
-            if (idx === -1) continue;
-            const key = line.slice(0, idx).trim();
-            let value = line.slice(idx + 1).trim();
-            if (
-                (value.startsWith('"') && value.endsWith('"')) ||
-                (value.startsWith("'") && value.endsWith("'"))
-            ) {
-                value = value.slice(1, -1);
-            }
-            if (key && process.env[key] === undefined) {
-                process.env[key] = value;
-            }
-        }
-    } catch {
-        // ignore
-    }
-};
-
-await loadEnvLocal();
-
-const PORT = Number.parseInt(process.env.PORT || '3000');
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const root = __dirname;
-
-const app = express();
-app.disable('x-powered-by');
-
-app.use(express.json({ limit: '1mb' }));
-
 const PLATFORM_TO_HUBSPOT = {
     'X/Twitter': 'x_twitter',
     Youtube: 'youtube',
@@ -164,16 +117,28 @@ const LANGUAGE_TO_CODE = {
     Yoruba: 'yo',
 };
 
-app.post('/api/hubspot', async (req, res) => {
+export const handler = async (event) => {
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method not allowed' }),
+            headers: { 'Content-Type': 'application/json' },
+        };
+    }
+
     try {
         const hubspotToken = process.env.HUBSPOT_PRIVATE_APP_TOKEN;
         if (!hubspotToken) {
-            return res
-                .status(500)
-                .json({ error: 'HubSpot configuration missing' });
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: 'HubSpot configuration missing',
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            };
         }
 
-        const body = req.body || {};
+        const body = event.body ? JSON.parse(event.body) : {};
 
         const properties = {
             email: body.email,
@@ -211,6 +176,7 @@ app.post('/api/hubspot', async (req, res) => {
         const socialChannels = Array.isArray(body.socialChannels)
             ? body.socialChannels
             : [];
+
         for (const channel of socialChannels) {
             const hubspotPrefix = PLATFORM_TO_HUBSPOT[channel.platform];
             if (hubspotPrefix && channel.link) {
@@ -269,91 +235,37 @@ app.post('/api/hubspot', async (req, res) => {
                 // ignore
             }
 
-            return res.status(hubspotResponse.status).json({
-                error: errorMessage,
-                code: errorCode,
-                details: errorText,
-            });
+            return {
+                statusCode: hubspotResponse.status,
+                body: JSON.stringify({
+                    error: errorMessage,
+                    code: errorCode,
+                    details: errorText,
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            };
         }
 
         const responseData = await hubspotResponse.json();
-        return res.status(200).json({
-            success: true,
-            message: 'Contact created successfully',
-            data: responseData,
-        });
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                success: true,
+                message: 'Contact created successfully',
+                data: responseData,
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        };
     } catch (error) {
-        return res.status(500).json({
-            error: 'Internal server error',
-            details: error instanceof Error ? error.message : 'Unknown error',
-        });
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Internal server error',
+                details:
+                    error instanceof Error ? error.message : 'Unknown error',
+            }),
+            headers: { 'Content-Type': 'application/json' },
+        };
     }
-});
-
-const getLanAddresses = () => {
-    const nets = os.networkInterfaces();
-    const results = new Set();
-    Object.values(nets).forEach((interfaces) => {
-        interfaces?.forEach((net) => {
-            if (net.family === 'IPv4' && !net.internal) {
-                results.add(net.address);
-            }
-        });
-    });
-    return [...results];
 };
-
-const originalWarn = console.warn;
-const ignoredSourceMapPattern = /Sourcemap for /;
-console.warn = (message, ...rest) => {
-    if (typeof message === 'string' && ignoredSourceMapPattern.test(message)) {
-        return;
-    }
-    originalWarn.call(console, message, ...rest);
-};
-
-console.log('Starting SPA development server');
-const viteDevServer = await createViteServer({
-    root,
-    server: { middlewareMode: true },
-    appType: 'spa',
-});
-app.use(viteDevServer.middlewares);
-const indexHtmlPath = path.join(root, 'index.html');
-
-app.use(async (req, res, next) => {
-    try {
-        const isIndexHtmlRequest = req.originalUrl === '/index.html';
-        const isAssetRequest =
-            req.method !== 'GET' ||
-            (req.originalUrl.includes('.') && !isIndexHtmlRequest);
-        if (isAssetRequest) {
-            return next();
-        }
-
-        let html = await readFile(indexHtmlPath, 'utf-8');
-        html = await viteDevServer.transformIndexHtml(req.originalUrl, html);
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
-    } catch (error) {
-        if (typeof error === 'object' && error instanceof Error) {
-            viteDevServer.ssrFixStacktrace(error);
-        }
-        next(error);
-    }
-});
-
-app.listen(PORT, () => {
-    console.log(`SPA dev server running at http://localhost:${PORT}`);
-    const lanAddresses = getLanAddresses();
-    if (lanAddresses.length > 0) {
-        lanAddresses.forEach((address) => {
-            console.log(
-                `LAN dev server available at http://${address}:${PORT}`,
-            );
-        });
-    } else {
-        console.log(
-            'LAN IP not detected automatically. Run `ipconfig getiflist` to find your interface.',
-        );
-    }
-});
