@@ -185,6 +185,16 @@ export default function CodeTabs(props: PropsIF) {
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
+    // URL param takes priority over cached localStorage value
+    useEffect(() => {
+        if (
+            handleReferralURLParam.value &&
+            handleReferralURLParam.value !== referralStore.cached
+        ) {
+            referralStore.cache(handleReferralURLParam.value);
+        }
+    }, [handleReferralURLParam.value]);
+
     // this holds an improperly formatted ref code to provide user feedback
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
