@@ -159,6 +159,8 @@ export default function App() {
             translatedPart = t('pageTitles.portfolio');
         } else if (pathname.startsWith('/v2/referrals')) {
             translatedPart = t('pageTitles.referrals');
+        } else if (pathname.startsWith('/v2/affiliates')) {
+            translatedPart = t('pageTitles.affiliates');
         } else if (pathname.startsWith('/v2/points')) {
             translatedPart = t('pageTitles.points');
         } else if (pathname.startsWith('/v2/leaderboard')) {
