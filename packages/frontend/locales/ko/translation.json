@@ -13,6 +13,7 @@
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
+        "changeApplied": "변경 사항 적용됨",
         "learnMore": "더 알아보기",
         "deposit": "입금",
         "transfer": "이체",
