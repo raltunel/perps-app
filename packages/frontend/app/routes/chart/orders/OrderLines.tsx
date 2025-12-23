@@ -52,13 +52,56 @@ export default function OrderLines({
         undefined | LabelLocationData
     >(undefined);
 
+    const arePricesEqual = (a?: number, b?: number) => {
+        if (a === undefined || b === undefined) return false;
+        if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+
+        const absA = Math.abs(a);
+        const absB = Math.abs(b);
+        const scale = Math.max(1, absA, absB);
+
+        // Tolerant comparison to avoid float representation issues.
+        // We only want to dedupe when the prices are effectively the same.
+        return Math.abs(a - b) <= scale * 1e-10;
+    };
+
+    const normalizePrice = (value?: number) => {
+        if (value === undefined || !Number.isFinite(value)) return undefined;
+
+        // Use tick size appropriate for price magnitude (matches chart display)
+        // High prices (BTC ~85000) display as integers; lower prices need finer precision
+        let tick: number;
+        if (value >= 10000) {
+            tick = 1;
+        } else if (value >= 100) {
+            tick = 0.1;
+        } else if (value >= 1) {
+            tick = 0.01;
+        } else {
+            tick = 0.0001;
+        }
+
+        return Math.round(value / tick) * tick;
+    };
+
     useEffect(() => {
         let matchFound = false;
+
+        const hidePreviewLine =
+            !!obPreviewLine &&
+            openLines.some((line) => {
+                if (line.type !== 'LIMIT') return false;
+                if (line.textValue?.type !== 'Limit') return false;
+
+                const normalizedOpen = normalizePrice(line.yPrice);
+                const normalizedPreview = normalizePrice(obPreviewLine.yPrice);
+                return arePricesEqual(normalizedOpen, normalizedPreview);
+            });
 
         const linesData = [
             ...openLines,
             ...positionLines,
-            ...(obPreviewLine ? [obPreviewLine] : []),
+            ...(obPreviewLine && !hidePreviewLine ? [obPreviewLine] : []),
         ];
 
         const updatedLines = linesData.map((line) => {
