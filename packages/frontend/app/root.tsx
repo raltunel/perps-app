@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect } from 'react';
 import './i18n'; // i18n MUST be imported before any components
 import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { init as initPlausible } from '@plausible-analytics/tracker';
 
 // Components
@@ -21,7 +21,10 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider, Network } from '@fogo/sessions-sdk-react';
 import { WsProvider } from './contexts/WsContext';
-import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
+import {
+    KeyboardShortcutsProvider,
+    useKeyboardShortcuts,
+} from './contexts/KeyboardShortcutsContext';
 
 // Config
 import {
@@ -35,6 +38,7 @@ import packageJson from '../package.json';
 import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import { useDebugStore } from './stores/DebugStore';
+import { useAppSettings } from './stores/AppSettingsStore';
 
 // Styles
 import './css/app.css';
@@ -44,7 +48,115 @@ import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
 import { FuulProvider } from './contexts/FuulContext';
+import KeyboardShortcutsModal from './components/KeyboardShortcutsModal/KeyboardShortcutsModal';
 import { useTranslation } from 'react-i18next';
+import {
+    getKeyboardShortcutById,
+    getKeyboardShortcutCategories,
+    matchesShortcutEvent,
+} from './utils/keyboardShortcuts';
+
+// Wrapper component that uses the keyboard shortcuts context
+function KeyboardShortcutsModalWrapper() {
+    const { isOpen, close, toggle } = useKeyboardShortcuts();
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+    const { navigationKeyboardShortcutsEnabled } = useAppSettings();
+
+    // Global keyboard shortcut listener for Shift+/ (?) to open keyboard shortcuts
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            const categories = getKeyboardShortcutCategories(t);
+            const shortcutsModalShortcut = getKeyboardShortcutById(
+                categories,
+                'shortcuts.open',
+            );
+            const navHomeShortcut = getKeyboardShortcutById(
+                categories,
+                'navigation.home',
+            );
+            const navTradeShortcut = getKeyboardShortcutById(
+                categories,
+                'navigation.trade',
+            );
+            const navPortfolioShortcut = getKeyboardShortcutById(
+                categories,
+                'navigation.portfolio',
+            );
+
+            const isShortcut =
+                !!shortcutsModalShortcut &&
+                matchesShortcutEvent(e, shortcutsModalShortcut.keys);
+
+            const isNavigationShortcut =
+                navigationKeyboardShortcutsEnabled &&
+                ((!!navHomeShortcut &&
+                    matchesShortcutEvent(e, navHomeShortcut.keys)) ||
+                    (!!navTradeShortcut &&
+                        matchesShortcutEvent(e, navTradeShortcut.keys)) ||
+                    (!!navPortfolioShortcut &&
+                        matchesShortcutEvent(e, navPortfolioShortcut.keys)));
+
+            if (!isShortcut && !isNavigationShortcut) return;
+
+            const target = e.target as HTMLElement | null;
+
+            const isOptedInField = !!target?.closest?.(
+                '[data-allow-keyboard-shortcuts="true"]',
+            );
+
+            if (!isOptedInField && target) {
+                if (target.tagName === 'TEXTAREA' || target.isContentEditable) {
+                    return;
+                }
+
+                if (target.tagName === 'INPUT') {
+                    const input = target as HTMLInputElement;
+                    const isNumericInput = input.inputMode === 'numeric';
+                    if (!isNumericInput) {
+                        return;
+                    }
+                }
+            }
+
+            if (isShortcut) {
+                e.preventDefault();
+                toggle();
+                return;
+            }
+
+            if (isOpen) return;
+
+            e.preventDefault();
+
+            if (
+                navTradeShortcut &&
+                matchesShortcutEvent(e, navTradeShortcut.keys)
+            ) {
+                navigate('/v2/trade');
+                return;
+            }
+            if (
+                navHomeShortcut &&
+                matchesShortcutEvent(e, navHomeShortcut.keys)
+            ) {
+                navigate('/');
+                return;
+            }
+            if (
+                navPortfolioShortcut &&
+                matchesShortcutEvent(e, navPortfolioShortcut.keys)
+            ) {
+                navigate('/v2/portfolio');
+            }
+        };
+
+        window.addEventListener('keydown', handleGlobalKeyDown);
+        return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+    }, [toggle, navigate, isOpen, t, navigationKeyboardShortcutsEnabled]);
+
+    return <KeyboardShortcutsModal isOpen={isOpen} onClose={close} />;
+}
 
 // Check if error is a chunk/module loading failure (typically happens offline)
 function isChunkLoadError(error: Error): boolean {
@@ -233,6 +345,7 @@ export default function App() {
 
     return (
         <FuulProvider>
+            {' '}
             <FogoSessionProvider
                 network={Network.Testnet}
                 domain='https://perps.ambient.finance'
@@ -281,7 +394,11 @@ export default function App() {
                                                                 <Outlet />
                                                             </Suspense>
                                                         </main>
-                                                        <MobileFooter />
+                                                        <MobileFooter
+                                                            onFeedbackClick={() => {
+                                                                return;
+                                                            }}
+                                                        />
                                                         <Notifications />
                                                         {restrictedSiteModal.isOpen && (
                                                             <Modal
@@ -302,6 +419,7 @@ export default function App() {
                                                         )}
                                                     </div>
                                                     <RuntimeDomManipulation />
+                                                    <KeyboardShortcutsModalWrapper />
                                                 </ErrorBoundary>
                                             </GlobalModalHost>
                                         </TutorialProvider>
