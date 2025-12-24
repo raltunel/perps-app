@@ -413,9 +413,13 @@
     },
     "referrals": {
         "title": "Referidos",
-        "description": "Refiere usuarios y gana recompensas. Los afiliados ganan más.",
-        "tradersReferred": "Traders referidos",
-        "rewardsEarned": "Recompensas obtenidas"
+        "description": "Refiere usuarios para ganar recompensas. Los afiliados obtienen mayores recompensas.",
+        "tradersReferred": "Comerciantes referidos",
+        "rewardsEarned": "Recompensas obtenidas",
+        "rewardHistory": "Historial de recompensas",
+        "enterCode": "Ingresar código",
+        "claim": "Reclamar",
+        "createCode": "Crear código"
     },
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",
@@ -601,6 +605,7 @@
         "more": "Más",
         "termsOfService": "Términos de Servicio",
         "privacyPolicy": "Política de Privacidad",
+        "affiliates": "Afiliados",
         "pageNotFound": "Página No Encontrada"
     },
     "docs": {
