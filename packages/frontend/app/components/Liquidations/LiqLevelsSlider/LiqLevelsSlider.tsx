@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import styles from './LiqLevelsSlider.module.css';
 import { useLiqChartStore, type LiqLevel } from '~/stores/LiqChartStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -11,6 +11,8 @@ interface LiqThreshold {
 interface LiqLevelsSliderProps {
     onThresholdsChange?: (thresholds: number[]) => void;
 }
+
+const STORAGE_KEY = 'liqSliderLevels';
 
 export const LiqLevelsSlider = ({
     onThresholdsChange,
@@ -28,8 +30,43 @@ export const LiqLevelsSlider = ({
     const { formatNum } = useNumFormatter();
 
     // 3 thresholds to create 4 sections
-    const [thresholds, setThresholds] =
-        useState<LiqThreshold[]>(defaultThresholds);
+    const [thresholds, setThresholds] = useState<LiqThreshold[]>(() => {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+
+            if (stored && maxLiqValue !== null && minLiqValue !== null) {
+                const parsed = JSON.parse(stored);
+
+                if (!Array.isArray(parsed) || parsed.length === 0)
+                    return defaultThresholds;
+
+                const thresholdWithStoredValues: LiqThreshold[] = parsed
+                    .slice(0, -1)
+                    .map((element: any, id: number) => {
+                        const numericValue =
+                            typeof element.maxRange === 'string'
+                                ? parseFloat(element.maxRange.replace(/,/g, ''))
+                                : element.maxRange;
+
+                        const ratio =
+                            ((numericValue - minLiqValue) /
+                                (maxLiqValue - minLiqValue)) *
+                            100;
+
+                        return {
+                            id,
+                            value: ratio,
+                        };
+                    });
+
+                return thresholdWithStoredValues;
+            }
+
+            return defaultThresholds;
+        } catch {
+            return defaultThresholds;
+        }
+    });
 
     useEffect(() => {
         const newLiqLevels = [...liqLevels];
@@ -184,6 +221,39 @@ export const LiqLevelsSlider = ({
             },
         ];
     };
+
+    useEffect(() => {
+        return () => {
+            const sorted = sortedThresholds.map((t) => t.value);
+            const localStorageLevels = [
+                {
+                    level: liqLevels[3].id,
+                    minRange: 'Min',
+                    maxRange: getValueForRatio(sorted[0]),
+                },
+                {
+                    level: liqLevels[2].id,
+                    minRange: getValueForRatio(sorted[0]),
+                    maxRange: getValueForRatio(sorted[1]),
+                },
+                {
+                    level: liqLevels[1].id,
+                    minRange: getValueForRatio(sorted[1]),
+                    maxRange: getValueForRatio(sorted[2]),
+                },
+                {
+                    level: liqLevels[0].id,
+                    minRange: getValueForRatio(sorted[2]),
+                    maxRange: 'Max',
+                },
+            ];
+
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(localStorageLevels),
+            );
+        };
+    }, [liqLevels]);
 
     return (
         <div className={styles.container}>
