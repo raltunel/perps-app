@@ -184,6 +184,23 @@ export function formatKeyboardShortcutKey(
     const normalized = normalizeToken(token);
     const mac = isMacPlatform();
 
+    if (normalized === 'mod') {
+        const fallback = mac ? 'Cmd' : 'Ctrl';
+        const resolvedToken = mac ? 'cmd' : 'ctrl';
+        const osSpecificKey = mac
+            ? `keyboardShortcuts.keyLabelsMac.${resolvedToken}`
+            : `keyboardShortcuts.keyLabelsWin.${resolvedToken}`;
+        const baseKey = `keyboardShortcuts.keyLabels.${resolvedToken}`;
+
+        const osValue = t(osSpecificKey, { defaultValue: '' });
+        if (typeof osValue === 'string' && osValue) return osValue;
+
+        const baseValue = t(baseKey, { defaultValue: '' });
+        if (typeof baseValue === 'string' && baseValue) return baseValue;
+
+        return fallback;
+    }
+
     const baseKey = `keyboardShortcuts.keyLabels.${normalized}`;
     const osKey = mac
         ? `keyboardShortcuts.keyLabelsMac.${normalized}`
