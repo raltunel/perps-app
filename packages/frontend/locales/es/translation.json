@@ -665,6 +665,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Iniciar orden limitada"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Cerrar posición al precio de mercado"
                     }
                 ]
             },

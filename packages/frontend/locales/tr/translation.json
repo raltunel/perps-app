@@ -665,6 +665,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Limit emrini başlat"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Pozisyonu piyasa fiyatından kapat"
                     }
                 ]
             },

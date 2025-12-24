@@ -662,6 +662,11 @@
                         "description": "Market-Order starten"
                     },
                     {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Market Close öffnen"
+                    },
+                    {
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Limit-Order starten"

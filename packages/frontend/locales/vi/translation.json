@@ -665,6 +665,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Bắt đầu lệnh giới hạn"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Đóng vị thế theo giá thị trường"
                     }
                 ]
             },

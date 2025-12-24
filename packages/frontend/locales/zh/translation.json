@@ -665,6 +665,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "开始限价单"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "以市价平仓"
                     }
                 ]
             },
