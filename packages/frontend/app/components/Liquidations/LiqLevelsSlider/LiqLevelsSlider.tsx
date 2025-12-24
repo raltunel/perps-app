@@ -48,8 +48,13 @@ export const LiqLevelsSlider = ({
                                 ? parseFloat(element.maxRange.replace(/,/g, ''))
                                 : element.maxRange;
 
+                        const limitedNumericValue = Math.min(
+                            Math.max(numericValue, minLiqValue),
+                            maxLiqValue,
+                        );
+
                         const ratio =
-                            ((numericValue - minLiqValue) /
+                            ((limitedNumericValue - minLiqValue) /
                                 (maxLiqValue - minLiqValue)) *
                             100;
 
