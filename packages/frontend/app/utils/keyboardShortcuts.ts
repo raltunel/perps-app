@@ -83,6 +83,10 @@ function eventMatchesMainKey(e: KeyboardEvent, token: string): boolean {
     if (t === 'esc' || t === 'escape') return e.key === 'Escape';
     if (t === 'enter' || t === 'return') return e.key === 'Enter';
 
+    if (t === ',' || t === 'comma') {
+        return e.code === 'Comma' || e.key === ',';
+    }
+
     if (t === 'slash' || t === '/') {
         return e.code === 'Slash' || e.key === '/';
     }
@@ -92,7 +96,16 @@ function eventMatchesMainKey(e: KeyboardEvent, token: string): boolean {
     }
 
     if (t.length === 1) {
-        return e.key.toLowerCase() === t;
+        if (e.key.toLowerCase() === t) return true;
+
+        // If the user has a key remapping, `e.code` refers to the physical key.
+        // Only fall back to `e.code` when a modifier is held (e.g. Option/Alt),
+        // because some layouts/platforms can produce non-letter `e.key` values.
+        // For unmodified letter shortcuts, prefer `e.key` to respect remaps.
+        const hasModifier = e.altKey || e.ctrlKey || e.metaKey;
+        if (!hasModifier) return false;
+
+        return e.code.toLowerCase() === `key${t}`.toLowerCase();
     }
 
     return e.key.toLowerCase() === t;
@@ -179,6 +192,23 @@ export function formatKeyboardShortcutKey(
 ): string {
     const normalized = normalizeToken(token);
     const mac = isMacPlatform();
+
+    if (normalized === 'mod') {
+        const fallback = mac ? 'Cmd' : 'Ctrl';
+        const resolvedToken = mac ? 'cmd' : 'ctrl';
+        const osSpecificKey = mac
+            ? `keyboardShortcuts.keyLabelsMac.${resolvedToken}`
+            : `keyboardShortcuts.keyLabelsWin.${resolvedToken}`;
+        const baseKey = `keyboardShortcuts.keyLabels.${resolvedToken}`;
+
+        const osValue = t(osSpecificKey, { defaultValue: '' });
+        if (typeof osValue === 'string' && osValue) return osValue;
+
+        const baseValue = t(baseKey, { defaultValue: '' });
+        if (typeof baseValue === 'string' && baseValue) return baseValue;
+
+        return fallback;
+    }
 
     const baseKey = `keyboardShortcuts.keyLabels.${normalized}`;
     const osKey = mac

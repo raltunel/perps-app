@@ -338,7 +338,8 @@
         "openLong": "롱 오픈",
         "openShort": "숏 오픈",
         "closeLong": "롱 종료",
-        "closeShort": "숏 종료"
+        "closeShort": "숏 종료",
+        "goToMarket": "{{coin}} 마켓으로 이동"
     },
     "time": {
         "second": "초",
@@ -520,13 +521,15 @@
     },
     "leverage": {
         "title": "레버리지 조정",
-        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요"
+        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요",
+        "adjustLeverage": "레버리지 조정, 현재 {{value}}배"
     },
     "share": {
         "prompt": "텍스트 편집",
         "xCTA": "𝕏에 공유",
         "copyLinkCTA": "링크 복사",
-        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요"
+        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요",
+        "sharePosition": "PnL {{pnl}} 포지션 공유"
     },
     "colors": {
         "default": "기본",
@@ -572,7 +575,28 @@
         "toggleTPSL": "TP/SL 전환",
         "editTPSL": "TP/SL 편집",
         "toggleConfigureAmount": "금액 설정 전환",
-        "toggleLimitPrice": "지정가 전환"
+        "toggleLimitPrice": "지정가 전환",
+        "setMaxAmount": "최대 금액 설정",
+        "rowsPerPage": "페이지당 행 수",
+        "closeModal": "모달 닫기",
+        "goToHome": "홈으로 이동",
+        "spotTradingOpensNewTab": "Ambient v1 현물 거래 (새 탭에서 열기)",
+        "moreOptions": "더 보기",
+        "notifications": "알림",
+        "transferAmount": "송금 금액",
+        "viewOnExplorerNewTab": "탐색기에서 보기 (새 탭에서 열기)",
+        "externalLinkOpensNewTab": "{{linkText}} (새 탭에서 열기)",
+        "opensInNewTab": "(새 탭에서 열기)",
+        "selectTokenCurrent": "토큰 선택, 현재: {{symbol}}",
+        "mobileTradeNavigation": "거래 내비게이션",
+        "takeProfitPrice": "익절 가격",
+        "expectedGain": "예상 수익",
+        "toggleGainCurrency": "수익 통화를 달러와 퍼센트 간 전환",
+        "stopLossPrice": "손절 가격",
+        "expectedLoss": "예상 손실",
+        "toggleLossCurrency": "손실 통화를 달러와 퍼센트 간 전환",
+        "setMidPrice": "중간 가격 설정",
+        "selectSizeDenomination": "수량 단위 선택"
     },
     "chart": {
         "liqPrice": "청산 가격"
@@ -633,7 +657,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "설정 열기"
                     },
                     {
@@ -665,6 +689,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "지정가 주문 시작"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "시장가로 포지션 청산"
                     }
                 ]
             },
