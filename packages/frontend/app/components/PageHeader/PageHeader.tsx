@@ -432,6 +432,7 @@ export default function PageHeader() {
                         style={{
                             position: 'relative',
                         }}
+                        className={styles.moreSection}
                         ref={moreDropdownRef}
                     >
                         <button
