@@ -13,6 +13,7 @@
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
+        "changeApplied": "변경 사항 적용됨",
         "learnMore": "더 알아보기",
         "deposit": "입금",
         "transfer": "이체",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "추천",
-        "description": "사용자를 추천하고 보상을 받을 수 있습니다. 제휴 파트너는 더 많은 보상 획득 가능!",
+        "description": "사용자를 추천하여 보상을 받으세요. 제휴 파트너는 더 높은 보상을 얻습니다.",
         "tradersReferred": "추천된 트레이더",
-        "rewardsEarned": "획득한 보상"
+        "rewardsEarned": "획득한 보상",
+        "rewardHistory": "보상 내역",
+        "enterCode": "코드 입력",
+        "claim": "요청하기",
+        "createCode": "코드 생성"
     },
     "deposit": {
         "prompt": "Fogo에서 {{token}} 입금하기",
@@ -573,14 +578,41 @@
         "liqPrice": "청산 가격"
     },
     "meta": {
-        "title": "홈 | Ambient",
+        "title": "Ambient Finance | Fogo 무기한 선물",
+        "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",
         "content": "앰비언트에서 페페츄얼 거래"
     },
+    "pageTitles": {
+        "portfolio": "포트폴리오",
+        "referrals": "추천",
+        "points": "포인트",
+        "leaderboard": "리더보드",
+        "newStrategy": "새 전략",
+        "editStrategy": "전략 편집",
+        "strategy": "전략",
+        "strategies": "전략 목록",
+        "vault": "볼트",
+        "vaults": "볼트 목록",
+        "subAccounts": "서브계정",
+        "positions": "포지션",
+        "openOrders": "미체결 주문",
+        "orderHistory": "주문 내역",
+        "tradeHistory": "거래 내역",
+        "twapFillHistory": "TWAP 체결 내역",
+        "twapHistory": "TWAP 내역",
+        "depositsAndWithdrawals": "입출금",
+        "fundingHistory": "펀딩 내역",
+        "more": "더보기",
+        "termsOfService": "이용약관",
+        "privacyPolicy": "개인정보처리방침",
+        "affiliates": "제휴인",
+        "pageNotFound": "페이지를 찾을 수 없습니다"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "이용약관",
+        "menuPrivacy": "개인정보처리방침",
+        "terms": "CROCODILE Labs 이용약관",
+        "privacy": "개인정보처리방침"
     },
     "keyboardShortcuts": {
         "menuLabel": "단축키",

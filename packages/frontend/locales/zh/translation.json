@@ -13,6 +13,7 @@
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
+        "changeApplied": "更改已应用",
         "learnMore": "了解更多",
         "deposit": "充值",
         "transfer": "转账",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "邀请",
-        "description": "邀请用户赚奖励。合作伙伴获得更多奖励。",
-        "tradersReferred": "已邀请交易者",
-        "rewardsEarned": "已赚取奖励"
+        "description": "邀请用户以获得奖励。合作伙伴可获得更高的奖励。",
+        "tradersReferred": "已邀请的交易员",
+        "rewardsEarned": "已获得的奖励",
+        "rewardHistory": "奖励记录",
+        "enterCode": "输入代码",
+        "claim": "领取",
+        "createCode": "创建代码"
     },
     "deposit": {
         "prompt": "从Fogo充值{{token}}",
@@ -573,14 +578,41 @@
         "liqPrice": "清算价格"
     },
     "meta": {
-        "title": "首页 | Ambient",
+        "title": "Ambient Finance | Fogo永续合约",
+        "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",
         "content": "在Ambient进行永续合约交易"
     },
+    "pageTitles": {
+        "portfolio": "投资组合",
+        "referrals": "推荐",
+        "points": "积分",
+        "leaderboard": "排行榜",
+        "newStrategy": "新建策略",
+        "editStrategy": "编辑策略",
+        "strategy": "策略",
+        "strategies": "策略列表",
+        "vault": "金库",
+        "vaults": "金库列表",
+        "subAccounts": "子账户",
+        "positions": "持仓",
+        "openOrders": "未成交订单",
+        "orderHistory": "订单历史",
+        "tradeHistory": "交易历史",
+        "twapFillHistory": "TWAP成交历史",
+        "twapHistory": "TWAP历史",
+        "depositsAndWithdrawals": "存取款",
+        "fundingHistory": "资金费率历史",
+        "more": "更多",
+        "termsOfService": "服务条款",
+        "privacyPolicy": "隐私政策",
+        "affiliates": "联盟人",
+        "pageNotFound": "页面未找到"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "服务条款",
+        "menuPrivacy": "隐私",
+        "terms": "CROCODILE Labs 服务条款",
+        "privacy": "隐私政策"
     },
     "keyboardShortcuts": {
         "menuLabel": "快捷键",

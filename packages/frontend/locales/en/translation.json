@@ -13,6 +13,7 @@
         "error": "Error",
         "success": "Success",
         "applyDefaults": "Apply Defaults",
+        "changeApplied": "Change applied",
         "learnMore": "Learn More",
         "deposit": "Deposit",
         "transfer": "Transfer",
@@ -41,7 +42,11 @@
         "announcements": "Announcements",
         "leverage": "Leverage",
         "comingSoon": "Coming Soon",
-        "clearFilter": "Clear filter"
+        "enter": "Enter",
+        "claim": "Claim",
+        "seeDocsForMore": "See the docs for more.",
+        "clearFilter": "Clear filter",
+        "activate": "Activate"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -414,7 +419,29 @@
         "title": "Referrals",
         "description": "Refer users to earn rewards. Affiliates earn higher rewards.",
         "tradersReferred": "Traders Referred",
-        "rewardsEarned": "Rewards Earned"
+        "rewardsEarned": "Rewards Earned",
+        "rewardHistory": "Reward History",
+        "enterCode": "Enter Code",
+        "createCode": "Create Code",
+        "usingAffiliateCode": "Using Affiliate Code",
+        "overwriteCurrentReferralCode": "Overwrite current referral code",
+        "enterReferralCode": "Enter a referral code",
+        "referralCodeNotValidPleaseConfirm": "The code <0>{{invalidCode}}</0> is not claimed in the referral program. Please confirm the code is correct.",
+        "yourCodeIs": "Your code is <0>{{affiliateCode}}</0> based on the first six characters of your wallet address. Please click 'Activate' to register this code in the referral system.",
+        "createAnAffiliateCode": "Create an affiliate code",
+        "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",
+        "codeAlreadyInUse": "Code Already In Use",
+        "connectYourWallet": {
+            "affiliate": "Connect your wallet to create an affiliate code",
+            "claim": "Connect your wallet to claim rewards",
+            "enterCode": "Connect your wallet to enter a referral code"
+        },
+        "usersWithTradingVolume": "This code may be customized or updated by users after reaching $1M in trading volume.",
+        "doNotSelfRefer": "The code <0>{{affiliateCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
+        "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",
+        "claimRewardsWithAmount": "Claim {{amount}} in rewards",
+        "selectATabToViewData": "Select a tab to view data",
+        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive a <1>{{userPercent}}</1> discount."
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
@@ -573,8 +600,35 @@
         "liqPrice": "Liq. Price"
     },
     "meta": {
-        "title": "Home | Ambient",
-        "content": "Trade Perps With Ambient"
+        "title": "Ambient Finance | Perpetual Futures on Fogo",
+        "description": "Trade perpetual futures on Fogo with Ambient Finance. Zero taker fees, up to 100x leverage, and lightning-fast execution.",
+        "content": "Trade Perps With Ambient on Fogo"
+    },
+    "pageTitles": {
+        "portfolio": "Portfolio",
+        "referrals": "Referrals",
+        "points": "Points",
+        "leaderboard": "Leaderboard",
+        "newStrategy": "New Strategy",
+        "editStrategy": "Edit Strategy",
+        "strategy": "Strategy",
+        "strategies": "Strategies",
+        "vault": "Vault",
+        "vaults": "Vaults",
+        "subAccounts": "Sub-Accounts",
+        "positions": "Positions",
+        "openOrders": "Open Orders",
+        "orderHistory": "Order History",
+        "tradeHistory": "Trade History",
+        "twapFillHistory": "TWAP Fill History",
+        "twapHistory": "TWAP History",
+        "depositsAndWithdrawals": "Deposits & Withdrawals",
+        "fundingHistory": "Funding History",
+        "more": "More",
+        "termsOfService": "Terms of Service",
+        "privacyPolicy": "Privacy Policy",
+        "affiliates": "Affiliates",
+        "pageNotFound": "Page Not Found"
     },
     "docs": {
         "menuTerms": "Terms of Service",

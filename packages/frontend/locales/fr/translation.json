@@ -13,6 +13,7 @@
         "error": "Erreur",
         "success": "Succès",
         "applyDefaults": "Appliquer les paramètres par défaut",
+        "changeApplied": "Modification appliquée",
         "learnMore": "En savoir plus",
         "deposit": "Déposer",
         "transfer": "Transférer",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "Parrainages",
-        "description": "Parrainez des utilisateurs et gagnez des récompenses. Les affiliés gagnent plus.",
+        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés obtiennent des récompenses plus élevées.",
         "tradersReferred": "Traders parrainés",
-        "rewardsEarned": "Récompenses gagnées"
+        "rewardsEarned": "Récompenses obtenues",
+        "rewardHistory": "Historique des récompenses",
+        "enterCode": "Saisir le code",
+        "claim": "Réclamer",
+        "createCode": "Créer un code"
     },
     "deposit": {
         "prompt": "Déposer {{token}} depuis Fogo",
@@ -573,14 +578,41 @@
         "liqPrice": "Prix de liq."
     },
     "meta": {
-        "title": "Accueil | Ambient",
+        "title": "Ambient Finance | Contrats perpétuels sur Fogo",
+        "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",
         "content": "Trader des Perps avec Ambient"
     },
+    "pageTitles": {
+        "portfolio": "Portefeuille",
+        "referrals": "Parrainages",
+        "points": "Points",
+        "leaderboard": "Classement",
+        "newStrategy": "Nouvelle Stratégie",
+        "editStrategy": "Modifier la Stratégie",
+        "strategy": "Stratégie",
+        "strategies": "Stratégies",
+        "vault": "Coffre",
+        "vaults": "Coffres",
+        "subAccounts": "Sous-comptes",
+        "positions": "Positions",
+        "openOrders": "Ordres Ouverts",
+        "orderHistory": "Historique des Ordres",
+        "tradeHistory": "Historique des Transactions",
+        "twapFillHistory": "Historique d'Exécution TWAP",
+        "twapHistory": "Historique TWAP",
+        "depositsAndWithdrawals": "Dépôts et Retraits",
+        "fundingHistory": "Historique de Financement",
+        "more": "Plus",
+        "termsOfService": "Conditions d'Utilisation",
+        "privacyPolicy": "Politique de Confidentialité",
+        "affiliates": "Affiliés",
+        "pageNotFound": "Page Non Trouvée"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "Conditions d'utilisation",
+        "menuPrivacy": "Confidentialité",
+        "terms": "Conditions d'utilisation de CROCODILE Labs",
+        "privacy": "Politique de confidentialité"
     },
     "keyboardShortcuts": {
         "menuLabel": "Raccourcis",
@@ -616,12 +648,12 @@
                 "shortcuts": [
                     {
                         "id": "trading.buy",
-                        "keys": ["a"],
+                        "keys": ["b"],
                         "description": "Passer en achat"
                     },
                     {
                         "id": "trading.sell",
-                        "keys": ["v"],
+                        "keys": ["s"],
                         "description": "Passer en vente"
                     },
                     {
@@ -666,7 +698,7 @@
                     },
                     {
                         "id": "portfolio.withdraw",
-                        "keys": ["r"],
+                        "keys": ["w"],
                         "description": "Ouvrir la fenêtre de retrait"
                     },
                     {
