@@ -46,6 +46,7 @@ export const createDataFeed = (
     let userFillsSubscription: { unsubscribe: () => void } | null = null;
 
     let userFills: UserFillIF[] = [];
+    let userFillsInterval: NodeJS.Timeout | null = null;
 
     const updateUserFills = (fills: UserFillIF[]) => {
         console.log('>>>>> updateUserFills', fills);
@@ -74,6 +75,10 @@ export const createDataFeed = (
             if (userFillsSubscription) {
                 userFillsSubscription.unsubscribe();
                 userFillsSubscription = null;
+            }
+            if (userFillsInterval) {
+                clearInterval(userFillsInterval);
+                userFillsInterval = null;
             }
         },
 
@@ -161,41 +166,38 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
-            console.log(
-                '>>>>>> getMarks',
-                symbolInfo,
-                from,
-                to,
-                onDataCallback,
-                resolution,
-            );
+            const chartTheme = getMarkColorData();
+            const floorMode = resolutionToSecondsMiliSeconds(resolution);
+
+            if (userFillsInterval) {
+                clearInterval(userFillsInterval);
+                userFillsInterval = null;
+                onDataCallback([]);
+                userFills = [];
+            }
+
             const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
             const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-            const chartTheme = getMarkColorData();
+            const processUserFills = () => {
+                userFills.sort((a, b) => b.time - a.time);
 
-            const fillMarks = (payload: any) => {
-                console.log('>>>>> fillMarks', payload);
-                const floorMode = resolutionToSecondsMiliSeconds(resolution);
-
-                payload.forEach((element: any, index: number) => {
-                    const isBuy = element.side === 'B';
-
+                userFills.forEach((fill) => {
+                    const isBuy = fill.side === 'B' || fill.side === 'buy';
                     const markerColor = isBuy
                         ? chartTheme.buy
                         : chartTheme.sell;
-
                     const markData = {
-                        id: element.oid,
+                        id: fill.oid,
                         time:
-                            (Math.floor(element.time / floorMode) * floorMode) /
+                            (Math.floor(fill.time / floorMode) * floorMode) /
                             1000,
                         color: {
                             border: markerColor,
                             background: markerColor,
                         } as any,
-                        text: element.dir + ' at ' + element.px,
-                        px: element.px,
+                        text: fill.dir + ' at ' + fill.px,
+                        px: fill.px,
                         label: isBuy ? 'B' : 'S',
                         labelFontColor: 'white',
                         minSize: 15,
@@ -204,98 +206,159 @@ export const createDataFeed = (
                     };
 
                     if (isBuy) {
-                        bSideOrderHistoryMarks.set(element.oid, markData);
+                        bSideOrderHistoryMarks.set(
+                            fill.oid.toString(),
+                            markData,
+                        );
                     } else {
-                        aSideOrderHistoryMarks.set(element.oid, markData);
+                        aSideOrderHistoryMarks.set(
+                            fill.oid.toString(),
+                            markData,
+                        );
                     }
+
+                    const markArray = [
+                        ...bSideOrderHistoryMarks.values(),
+                        ...aSideOrderHistoryMarks.values(),
+                    ];
+
+                    markArray.sort((a: any, b: any) => b.px - a.px);
+
+                    onDataCallback(markArray);
                 });
             };
 
-            let markRes: any;
-            try {
-                markRes = (await getMarkFillData(
-                    symbolInfo.name || '',
-                    currentUserAddress,
-                )) as any;
-            } catch (error) {
-                console.error('Error loading marks data:', error);
-                onDataCallback([]);
-                return;
-            }
+            userFillsInterval = setInterval(processUserFills, 3000);
+            setTimeout(processUserFills, 1000);
 
-            if (!markRes) {
-                onDataCallback([]);
-                return;
-            }
+            //-------------------------------------------------------------------------------------------------------------------------------------------------
 
-            const fillHistory = markRes.dataCache;
-            const userWallet = markRes.user;
+            // prev implemnetation which sends http requests to get the user fills after checking cache
 
-            if (fillHistory) {
-                fillHistory.sort((a: any, b: any) => b.time - a.time);
+            // const fillMarks = (payload: any) => {
+            //     console.log('>>>>> fillMarks', payload);
+            //     const floorMode = resolutionToSecondsMiliSeconds(resolution);
 
-                fillMarks(fillHistory);
-            }
-            const markArray = [
-                ...bSideOrderHistoryMarks.values(),
-                ...aSideOrderHistoryMarks.values(),
-            ];
+            //     payload.forEach((element: any, index: number) => {
+            //         const isBuy = element.side === 'B';
 
-            if (markArray.length > 0) {
-                markArray.sort((a: any, b: any) => b.px - a.px);
+            //         const markerColor = isBuy
+            //             ? chartTheme.buy
+            //             : chartTheme.sell;
 
-                onDataCallback(markArray);
-            }
+            //         const markData = {
+            //             id: element.oid,
+            //             time:
+            //                 (Math.floor(element.time / floorMode) * floorMode) /
+            //                 1000,
+            //             color: {
+            //                 border: markerColor,
+            //                 background: markerColor,
+            //             } as any,
+            //             text: element.dir + ' at ' + element.px,
+            //             px: element.px,
+            //             label: isBuy ? 'B' : 'S',
+            //             labelFontColor: 'white',
+            //             minSize: 15,
+            //             borderWidth: 0,
+            //             hoveredBorderWidth: 1,
+            //         };
 
-            if (!info) return console.log('SDK is not ready');
-            setTimeout(() => {
-                // Unsubscribe previous listener if it exists to avoid leaks
-                if (userFillsSubscription) {
-                    userFillsSubscription.unsubscribe();
-                }
+            //         if (isBuy) {
+            //             bSideOrderHistoryMarks.set(element.oid, markData);
+            //         } else {
+            //             aSideOrderHistoryMarks.set(element.oid, markData);
+            //         }
+            //     });
+            // };
 
-                userFillsSubscription = info.subscribe(
-                    {
-                        type: WsChannels.USER_FILLS,
-                        user: userWallet,
-                    },
-                    (payload: any) => {
-                        addToFetchedChannels(WsChannels.USER_FILLS);
-                        if (!payload || !payload.data) return;
-                        // ...
+            // let markRes: any;
+            // try {
+            //     markRes = (await getMarkFillData(
+            //         symbolInfo.name || '',
+            //         currentUserAddress,
+            //     )) as any;
+            // } catch (error) {
+            //     console.error('Error loading marks data:', error);
+            //     onDataCallback([]);
+            //     return;
+            // }
 
-                        const fills = payload.data.fills;
-                        if (!fills || fills.length === 0) return;
+            // if (!markRes) {
+            //     onDataCallback([]);
+            //     return;
+            // }
 
-                        const poolFills = fills.filter(
-                            (fill: any) => fill.coin === symbolInfo.name,
-                        );
+            // const fillHistory = markRes.dataCache;
+            // const userWallet = markRes.user;
 
-                        if (poolFills.length === 0) return;
+            // if (fillHistory) {
+            //     fillHistory.sort((a: any, b: any) => b.time - a.time);
 
-                        poolFills.sort((a: any, b: any) => b.time - a.time);
+            //     fillMarks(fillHistory);
+            // }
+            // const markArray = [
+            //     ...bSideOrderHistoryMarks.values(),
+            //     ...aSideOrderHistoryMarks.values(),
+            // ];
 
-                        fillMarks(poolFills);
+            // if (markArray.length > 0) {
+            //     markArray.sort((a: any, b: any) => b.px - a.px);
 
-                        updateMarkDataWithSubscription(
-                            symbolInfo.name || '',
-                            poolFills,
-                            userWallet,
-                        );
+            //     onDataCallback(markArray);
+            // }
 
-                        const markArray = [
-                            ...bSideOrderHistoryMarks.values(),
-                            ...aSideOrderHistoryMarks.values(),
-                        ];
+            // if (!info) return console.log('SDK is not ready');
+            // setTimeout(() => {
+            //     // Unsubscribe previous listener if it exists to avoid leaks
+            //     if (userFillsSubscription) {
+            //         userFillsSubscription.unsubscribe();
+            //     }
 
-                        if (markArray.length > 0) {
-                            markArray.sort((a: any, b: any) => b.px - a.px);
+            //     userFillsSubscription = info.subscribe(
+            //         {
+            //             type: WsChannels.USER_FILLS,
+            //             user: userWallet,
+            //         },
+            //         (payload: any) => {
+            //             addToFetchedChannels(WsChannels.USER_FILLS);
+            //             if (!payload || !payload.data) return;
+            //             // ...
 
-                            onDataCallback(markArray);
-                        }
-                    },
-                );
-            }, 500);
+            //             const fills = payload.data.fills;
+            //             if (!fills || fills.length === 0) return;
+
+            //             const poolFills = fills.filter(
+            //                 (fill: any) => fill.coin === symbolInfo.name,
+            //             );
+
+            //             if (poolFills.length === 0) return;
+
+            //             poolFills.sort((a: any, b: any) => b.time - a.time);
+
+            //             fillMarks(poolFills);
+
+            //             updateMarkDataWithSubscription(
+            //                 symbolInfo.name || '',
+            //                 poolFills,
+            //                 userWallet,
+            //             );
+
+            //             const markArray = [
+            //                 ...bSideOrderHistoryMarks.values(),
+            //                 ...aSideOrderHistoryMarks.values(),
+            //             ];
+
+            //             if (markArray.length > 0) {
+            //                 markArray.sort((a: any, b: any) => b.px - a.px);
+
+            //                 onDataCallback(markArray);
+            //             }
+            //         },
+            //     );
+            // }, 500);
+
+            //-------------------------------------------------------------------------------------------------------------------------------------------------
         },
 
         subscribeBars: (
