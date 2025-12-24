@@ -294,7 +294,7 @@ function PortfolioDeposit(props: propsIF) {
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label={t('aria.depositInput')}
-                    autoFocus
+                    dataModalInitialFocus
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (
                             e.key === 'Enter' &&

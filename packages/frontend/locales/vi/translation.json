@@ -338,7 +338,8 @@
         "openLong": "Mở Long",
         "openShort": "Mở Short",
         "closeLong": "Đóng Long",
-        "closeShort": "Đóng Short"
+        "closeShort": "Đóng Short",
+        "goToMarket": "Đi đến thị trường {{coin}}"
     },
     "time": {
         "second": "giây",
@@ -520,13 +521,15 @@
     },
     "leverage": {
         "title": "Điều chỉnh đòn bẩy",
-        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu"
+        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu",
+        "adjustLeverage": "Điều chỉnh đòn bẩy, hiện tại {{value}}x"
     },
     "share": {
         "prompt": "Tùy chỉnh văn bản của bạn",
         "xCTA": "Chia sẻ lên 𝕏",
         "copyLinkCTA": "Sao chép liên kết",
-        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay"
+        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
+        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}"
     },
     "colors": {
         "default": "Mặc định",
@@ -572,7 +575,19 @@
         "toggleTPSL": "Chuyển Chốt lời/Dừng lỗ",
         "editTPSL": "Chỉnh sửa Chốt lời/Dừng lỗ",
         "toggleConfigureAmount": "Chuyển nhập số tiền",
-        "toggleLimitPrice": "Chuyển nhập giá giới hạn"
+        "toggleLimitPrice": "Chuyển nhập giá giới hạn",
+        "setMaxAmount": "Đặt số tiền tối đa",
+        "rowsPerPage": "Số hàng mỗi trang",
+        "closeModal": "Đóng cửa sổ",
+        "goToHome": "Đi đến trang chủ",
+        "spotTradingOpensNewTab": "Giao dịch spot trên Ambient v1 (mở trong tab mới)",
+        "moreOptions": "Tùy chọn khác",
+        "notifications": "Thông báo",
+        "transferAmount": "Số tiền chuyển",
+        "viewOnExplorerNewTab": "Xem trên trình duyệt (mở trong tab mới)",
+        "externalLinkOpensNewTab": "{{linkText}} (mở trong tab mới)",
+        "opensInNewTab": "(mở trong tab mới)",
+        "selectTokenCurrent": "Chọn token, hiện tại: {{symbol}}"
     },
     "chart": {
         "liqPrice": "Giá thanh lý"

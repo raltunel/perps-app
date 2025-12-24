@@ -338,7 +338,8 @@
         "openLong": "Long新規",
         "openShort": "Short新規",
         "closeLong": "Long決済",
-        "closeShort": "Short決済"
+        "closeShort": "Short決済",
+        "goToMarket": "{{coin}}マーケットへ移動"
     },
     "time": {
         "second": "秒",
@@ -520,13 +521,15 @@
     },
     "leverage": {
         "title": "レバレッジを調整",
-        "closePositionPrompt": "レバレッジを下げるにはポジション終了"
+        "closePositionPrompt": "レバレッジを下げるにはポジション終了",
+        "adjustLeverage": "レバレッジを調整、現在{{value}}倍"
     },
     "share": {
         "prompt": "テキストをカスタマイズ",
         "xCTA": "𝕏で共有",
         "copyLinkCTA": "リンクをコピー",
-        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう"
+        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう",
+        "sharePosition": "PnL {{pnl}}のポジションを共有"
     },
     "colors": {
         "default": "デフォルト",
@@ -572,7 +575,19 @@
         "toggleTPSL": "TP/SLを切り替え",
         "editTPSL": "TP/SLを編集",
         "toggleConfigureAmount": "金額設定を切り替え",
-        "toggleLimitPrice": "指値価格を切り替え"
+        "toggleLimitPrice": "指値価格を切り替え",
+        "setMaxAmount": "最大金額を設定",
+        "rowsPerPage": "ページあたりの行数",
+        "closeModal": "モーダルを閉じる",
+        "goToHome": "ホームへ移動",
+        "spotTradingOpensNewTab": "Ambient v1でのスポット取引（新しいタブで開く）",
+        "moreOptions": "その他のオプション",
+        "notifications": "通知",
+        "transferAmount": "送金額",
+        "viewOnExplorerNewTab": "エクスプローラーで表示（新しいタブで開く）",
+        "externalLinkOpensNewTab": "{{linkText}}（新しいタブで開く）",
+        "opensInNewTab": "（新しいタブで開く）",
+        "selectTokenCurrent": "トークンを選択、現在: {{symbol}}"
     },
     "chart": {
         "liqPrice": "清算価格"

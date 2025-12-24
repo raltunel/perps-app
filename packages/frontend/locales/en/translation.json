@@ -342,7 +342,8 @@
         "openLong": "Open Long",
         "openShort": "Open Short",
         "closeLong": "Close Long",
-        "closeShort": "Close Short"
+        "closeShort": "Close Short",
+        "goToMarket": "Go to {{coin}} market"
     },
     "time": {
         "second": "second",
@@ -542,13 +543,15 @@
     },
     "leverage": {
         "title": "Adjust Leverage",
-        "closePositionPrompt": "Close position to reduce minimum leverage"
+        "closePositionPrompt": "Close position to reduce minimum leverage",
+        "adjustLeverage": "Adjust leverage, currently {{value}}x"
     },
     "share": {
         "prompt": "Customize your text",
         "xCTA": "Share on 𝕏",
         "copyLinkCTA": "Copy Link",
-        "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now"
+        "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now",
+        "sharePosition": "Share position with PnL {{pnl}}"
     },
     "colors": {
         "default": "Default",
@@ -594,7 +597,19 @@
         "toggleTPSL": "Toggle Take Profit / Stop Loss",
         "editTPSL": "Edit Take Profit / Stop Loss",
         "toggleConfigureAmount": "Toggle Configure Amount",
-        "toggleLimitPrice": "Toggle Limit Price"
+        "toggleLimitPrice": "Toggle Limit Price",
+        "setMaxAmount": "Set maximum amount",
+        "rowsPerPage": "Rows per page",
+        "closeModal": "Close modal",
+        "goToHome": "Go to home",
+        "spotTradingOpensNewTab": "Spot trading on Ambient v1 (opens in new tab)",
+        "moreOptions": "More options",
+        "notifications": "Notifications",
+        "transferAmount": "Transfer amount",
+        "viewOnExplorerNewTab": "View on explorer (opens in new tab)",
+        "externalLinkOpensNewTab": "{{linkText}} (opens in new tab)",
+        "opensInNewTab": "(opens in new tab)",
+        "selectTokenCurrent": "Select token, current: {{symbol}}"
     },
     "chart": {
         "liqPrice": "Liq. Price"

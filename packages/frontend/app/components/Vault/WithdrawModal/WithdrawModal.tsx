@@ -96,6 +96,7 @@ export default function WithdrawModal({
                     value={amount}
                     onChange={handleInputChange}
                     aria-label={t('aria.withdrawInput')}
+                    data-modal-initial-focus
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder='Enter amount'

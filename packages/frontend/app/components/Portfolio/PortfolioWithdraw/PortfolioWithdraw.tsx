@@ -340,7 +340,7 @@ function PortfolioWithdraw({
                             setMaxModeActive(false);
                         }
                     }}
-                    autoFocus
+                    dataModalInitialFocus
                     aria-label={t('aria.withdrawInput')}
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === 'Enter' && !isButtonDisabled) {
