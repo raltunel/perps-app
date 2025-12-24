@@ -37,10 +37,12 @@ interface FooterMenuItem {
 }
 
 interface MobileFooterProps {
-    onFeedbackClick: () => void;
+    onFeedbackClick?: () => void;
 }
 
-const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
+const MobileFooter: React.FC<MobileFooterProps> = ({
+    onFeedbackClick = () => {},
+}) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 

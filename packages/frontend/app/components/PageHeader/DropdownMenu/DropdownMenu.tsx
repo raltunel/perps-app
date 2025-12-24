@@ -3,6 +3,7 @@ import {
     FaCommentAlt,
     FaUserSecret,
     FaFileAlt,
+    FaKeyboard,
 } from 'react-icons/fa';
 import { RiTwitterXFill } from 'react-icons/ri';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
@@ -14,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { animate, motion, useMotionValue, type PanInfo } from 'framer-motion';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { useEffect, useRef } from 'react';
+import { useKeyboardShortcuts } from '~/contexts/KeyboardShortcutsContext';
 
 interface DropdownMenuProps {
     setIsDropdownMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,7 +27,7 @@ const SIDEBAR_WIDTH = 320;
 const SNAP = {
     type: 'tween' as const,
     duration: 0.06,
-    ease: 'linear',
+    ease: [0, 0, 1, 1] as const,
 };
 
 const DropdownMenu = ({
@@ -35,6 +37,11 @@ const DropdownMenu = ({
     const sessionState = useSession();
     const navigate = useNavigate();
     const location = useLocation();
+
+    /**
+     * Drawer position
+     */
+    const x = useMotionValue(SIDEBAR_WIDTH);
 
     const isMobile = useMediaQuery('(max-width: 768px)');
     const initialPathRef = useRef(location.pathname);
@@ -54,11 +61,6 @@ const DropdownMenu = ({
             onComplete: () => setIsDropdownMenuOpen(false),
         });
     }, [location.pathname]);
-
-    /**
-     * Drawer position
-     */
-    const x = useMotionValue(SIDEBAR_WIDTH);
 
     /**
      * Open immediately on mount
@@ -109,6 +111,13 @@ const DropdownMenu = ({
         closeMenu();
     };
 
+    const { open: openKeyboardShortcuts } = useKeyboardShortcuts();
+
+    const handleKeyboardShortcutsClick = () => {
+        openKeyboardShortcuts();
+        closeMenu();
+    };
+
     const menuItems = [
         {
             name: '𝕏 / Twitter',
@@ -124,6 +133,11 @@ const DropdownMenu = ({
             name: t('feedback.menuLabel'),
             icon: <FaCommentAlt />,
             onClick: handleFeedbackClick,
+        },
+        {
+            name: t('keyboardShortcuts.menuLabel'),
+            icon: <FaKeyboard />,
+            onClick: handleKeyboardShortcutsClick,
         },
         {
             name: t('docs.menuPrivacy'),
@@ -202,7 +216,7 @@ const DropdownMenu = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.05, ease: 'linear' }}
+            transition={{ duration: 0.05, ease: [0, 0, 1, 1] }}
         >
             <motion.div
                 className={styles.container}

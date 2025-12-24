@@ -26,7 +26,7 @@ const MemoizedPerformancePanel = memo(PerformancePanel);
 
 export function meta() {
     return [
-        { title: 'Portfolio | Ambient' },
+        { title: 'Portfolio | Ambient Finance' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }

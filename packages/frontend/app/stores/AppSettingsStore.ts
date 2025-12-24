@@ -50,6 +50,11 @@ type AppSettingsStore = {
 
     portfolioPanelHeight: number | null;
     setPortfolioPanelHeight: (h: number | null) => void;
+    navigationKeyboardShortcutsEnabled: boolean;
+    setNavigationKeyboardShortcutsEnabled: (enabled: boolean) => void;
+
+    tradingKeyboardShortcutsEnabled: boolean;
+    setTradingKeyboardShortcutsEnabled: (enabled: boolean) => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
@@ -84,6 +89,13 @@ export const useAppSettings = create<AppSettingsStore>()(
 
             portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
             setPortfolioPanelHeight: (h) => set({ portfolioPanelHeight: h }),
+            navigationKeyboardShortcutsEnabled: true,
+            setNavigationKeyboardShortcutsEnabled: (enabled) =>
+                set({ navigationKeyboardShortcutsEnabled: enabled }),
+
+            tradingKeyboardShortcutsEnabled: true,
+            setTradingKeyboardShortcutsEnabled: (enabled) =>
+                set({ tradingKeyboardShortcutsEnabled: enabled }),
         }),
 
         {
@@ -109,6 +121,8 @@ export const useAppSettings = create<AppSettingsStore>()(
                     return {
                         ...state,
                         portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
+                        navigationKeyboardShortcutsEnabled: true,
+                        tradingKeyboardShortcutsEnabled: true,
                     };
                 }
 
@@ -122,6 +136,10 @@ export const useAppSettings = create<AppSettingsStore>()(
                 chartTopHeight: state.chartTopHeight,
                 isWalletCollapsed: state.isWalletCollapsed,
                 portfolioPanelHeight: state.portfolioPanelHeight,
+                navigationKeyboardShortcutsEnabled:
+                    state.navigationKeyboardShortcutsEnabled,
+                tradingKeyboardShortcutsEnabled:
+                    state.tradingKeyboardShortcutsEnabled,
             }),
         },
     ),

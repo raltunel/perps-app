@@ -23,10 +23,10 @@ import {
 import { processWSCandleMessage } from './processChartData';
 import {
     convertResolutionToIntervalParam,
-    mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
+import { useChartStore } from '~/stores/TradingviewChartStore';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
@@ -331,6 +331,7 @@ export const createDataFeed = (
                         ) {
                             const tick = processWSCandleMessage(candleData);
                             onTick(tick);
+                            useChartStore.getState().setLastCandle(tick);
                             updateCandleCache(
                                 symbolInfo.ticker,
                                 resolution,

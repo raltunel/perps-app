@@ -185,6 +185,14 @@ const router = createBrowserRouter([
                 },
             },
             {
+                path: 'v2/affiliates',
+                lazy: async () => {
+                    const { default: Component } =
+                        await import('./routes/affiliates/affiliates');
+                    return { Component };
+                },
+            },
+            {
                 path: 'v2/more',
                 lazy: async () => {
                     const { default: Component } =
