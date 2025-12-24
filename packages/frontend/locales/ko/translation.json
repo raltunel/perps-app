@@ -633,7 +633,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "설정 열기"
                     },
                     {
