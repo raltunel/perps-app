@@ -48,6 +48,8 @@ type AppSettingsStore = {
     isWalletCollapsed: boolean;
     setIsWalletCollapsed: (collapsed: boolean) => void;
 
+    portfolioPanelHeight: number | null;
+    setPortfolioPanelHeight: (h: number | null) => void;
     navigationKeyboardShortcutsEnabled: boolean;
     setNavigationKeyboardShortcutsEnabled: (enabled: boolean) => void;
 
@@ -58,6 +60,7 @@ type AppSettingsStore = {
 const LS_KEY = 'VISUAL_SETTINGS';
 const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
 const DEFAULT_WALLET_COLLAPSED = false;
+const DEFAULT_PORTFOLIO_PANEL_HEIGHT: number | null = null;
 
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
@@ -84,6 +87,8 @@ export const useAppSettings = create<AppSettingsStore>()(
             setIsWalletCollapsed: (collapsed) =>
                 set({ isWalletCollapsed: collapsed }),
 
+            portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
+            setPortfolioPanelHeight: (h) => set({ portfolioPanelHeight: h }),
             navigationKeyboardShortcutsEnabled: true,
             setNavigationKeyboardShortcutsEnabled: (enabled) =>
                 set({ navigationKeyboardShortcutsEnabled: enabled }),
@@ -115,6 +120,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 if (version < 5) {
                     return {
                         ...state,
+                        portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
                         navigationKeyboardShortcutsEnabled: true,
                         tradingKeyboardShortcutsEnabled: true,
                     };
@@ -129,6 +135,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 // orderBookMode: state.orderBookMode,
                 chartTopHeight: state.chartTopHeight,
                 isWalletCollapsed: state.isWalletCollapsed,
+                portfolioPanelHeight: state.portfolioPanelHeight,
                 navigationKeyboardShortcutsEnabled:
                     state.navigationKeyboardShortcutsEnabled,
                 tradingKeyboardShortcutsEnabled:
