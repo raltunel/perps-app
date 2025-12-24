@@ -338,7 +338,8 @@
         "openLong": "Ouvrir Long",
         "openShort": "Ouvrir Short",
         "closeLong": "Fermer Long",
-        "closeShort": "Fermer Short"
+        "closeShort": "Fermer Short",
+        "goToMarket": "Aller au marché {{coin}}"
     },
     "time": {
         "second": "seconde",
@@ -520,13 +521,15 @@
     },
     "leverage": {
         "title": "Ajuster l'effet de levier",
-        "closePositionPrompt": "Clôturez la position pour réduire le levier"
+        "closePositionPrompt": "Clôturez la position pour réduire le levier",
+        "adjustLeverage": "Ajuster l'effet de levier, actuellement {{value}}x"
     },
     "share": {
         "prompt": "Personnalisez votre texte",
         "xCTA": "Partager sur 𝕏",
         "copyLinkCTA": "Copier le lien",
-        "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant"
+        "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant",
+        "sharePosition": "Partager la position avec PnL {{pnl}}"
     },
     "colors": {
         "default": "Par défaut",
@@ -572,7 +575,28 @@
         "toggleTPSL": "Activer/désactiver Take Profit / Stop Loss",
         "editTPSL": "Modifier Take Profit / Stop Loss",
         "toggleConfigureAmount": "Activer/désactiver la configuration du montant",
-        "toggleLimitPrice": "Activer/désactiver le prix limite"
+        "toggleLimitPrice": "Activer/désactiver le prix limite",
+        "setMaxAmount": "Définir le montant maximum",
+        "rowsPerPage": "Lignes par page",
+        "closeModal": "Fermer la fenêtre",
+        "goToHome": "Aller à l'accueil",
+        "spotTradingOpensNewTab": "Trading spot sur Ambient v1 (ouvre dans un nouvel onglet)",
+        "moreOptions": "Plus d'options",
+        "notifications": "Notifications",
+        "transferAmount": "Montant du transfert",
+        "viewOnExplorerNewTab": "Voir sur l'explorateur (ouvre dans un nouvel onglet)",
+        "externalLinkOpensNewTab": "{{linkText}} (ouvre dans un nouvel onglet)",
+        "opensInNewTab": "(ouvre dans un nouvel onglet)",
+        "selectTokenCurrent": "Sélectionner le jeton, actuel : {{symbol}}",
+        "mobileTradeNavigation": "Navigation de trading",
+        "takeProfitPrice": "Prix de prise de profit",
+        "expectedGain": "Gain attendu",
+        "toggleGainCurrency": "Basculer la devise de gain entre dollars et pourcentage",
+        "stopLossPrice": "Prix de stop loss",
+        "expectedLoss": "Perte attendue",
+        "toggleLossCurrency": "Basculer la devise de perte entre dollars et pourcentage",
+        "setMidPrice": "Définir le prix médian",
+        "selectSizeDenomination": "Sélectionner la dénomination de taille"
     },
     "chart": {
         "liqPrice": "Prix de liq."

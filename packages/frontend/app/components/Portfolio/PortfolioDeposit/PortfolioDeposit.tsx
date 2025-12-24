@@ -294,7 +294,7 @@ function PortfolioDeposit(props: propsIF) {
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label={t('aria.depositInput')}
-                    autoFocus
+                    dataModalInitialFocus
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (
                             e.key === 'Enter' &&
@@ -308,7 +308,11 @@ function PortfolioDeposit(props: propsIF) {
                         `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
                     )}
                 />
-                <button onClick={handleMaxClick} disabled={isProcessing}>
+                <button
+                    onClick={handleMaxClick}
+                    disabled={isProcessing}
+                    aria-label={t('aria.setMaxAmount')}
+                >
                     {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}

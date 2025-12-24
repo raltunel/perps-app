@@ -338,7 +338,8 @@
         "openLong": "Long Aç",
         "openShort": "Short Aç",
         "closeLong": "Long Kapat",
-        "closeShort": "Short Kapat"
+        "closeShort": "Short Kapat",
+        "goToMarket": "{{coin}} piyasasına git"
     },
     "time": {
         "second": "saniye",
@@ -520,13 +521,15 @@
     },
     "leverage": {
         "title": "Kaldıraç ayarla",
-        "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat"
+        "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat",
+        "adjustLeverage": "Kaldıraç ayarla, şu an {{value}}x"
     },
     "share": {
         "prompt": "Metninizi özelleştirin",
         "xCTA": "𝕏'te paylaş",
         "copyLinkCTA": "Bağlantıyı kopyala",
-        "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap"
+        "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap",
+        "sharePosition": "PnL {{pnl}} pozisyonunu paylaş"
     },
     "colors": {
         "default": "Varsayılan",
@@ -572,7 +575,28 @@
         "toggleTPSL": "Kâr Al / Zarar Durdur'u değiştir",
         "editTPSL": "Kâr Al / Zarar Durdur'u düzenle",
         "toggleConfigureAmount": "Tutarı yapılandırmayı değiştir",
-        "toggleLimitPrice": "Limit fiyatı değiştir"
+        "toggleLimitPrice": "Limit fiyatı değiştir",
+        "setMaxAmount": "Maksimum tutarı ayarla",
+        "rowsPerPage": "Sayfa başına satır",
+        "closeModal": "Pencereyi kapat",
+        "goToHome": "Ana sayfaya git",
+        "spotTradingOpensNewTab": "Ambient v1'de spot işlem (yeni sekmede açılır)",
+        "moreOptions": "Daha fazla seçenek",
+        "notifications": "Bildirimler",
+        "transferAmount": "Transfer tutarı",
+        "viewOnExplorerNewTab": "Gezginde görüntüle (yeni sekmede açılır)",
+        "externalLinkOpensNewTab": "{{linkText}} (yeni sekmede açılır)",
+        "opensInNewTab": "(yeni sekmede açılır)",
+        "selectTokenCurrent": "Token seç, mevcut: {{symbol}}",
+        "mobileTradeNavigation": "İşlem navigasyonu",
+        "takeProfitPrice": "Kâr al fiyatı",
+        "expectedGain": "Beklenen kazanç",
+        "toggleGainCurrency": "Kazanç para birimini dolar ve yüzde arasında değiştir",
+        "stopLossPrice": "Zarar durdur fiyatı",
+        "expectedLoss": "Beklenen kayıp",
+        "toggleLossCurrency": "Kayıp para birimini dolar ve yüzde arasında değiştir",
+        "setMidPrice": "Orta fiyatı ayarla",
+        "selectSizeDenomination": "Boyut birimini seç"
     },
     "chart": {
         "liqPrice": "Lik. fiyatı"

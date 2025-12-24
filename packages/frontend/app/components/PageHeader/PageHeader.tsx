@@ -457,7 +457,7 @@ export default function PageHeader() {
                 <button
                     onClick={handleLogoClick}
                     className={styles.logo}
-                    aria-label='Go to home'
+                    aria-label={t('aria.goToHome')}
                 >
                     <img
                         src='/images/favicon.svg'
@@ -509,12 +509,14 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsMoreDropdownOpen(!isMoreDropdownOpen)
                             }
+                            aria-expanded={isMoreDropdownOpen}
+                            aria-haspopup='menu'
                         >
                             More
                             {isMoreDropdownOpen ? (
-                                <LuChevronUp size={15} />
+                                <LuChevronUp size={15} aria-hidden='true' />
                             ) : (
-                                <LuChevronDown size={15} />
+                                <LuChevronDown size={15} aria-hidden='true' />
                             )}
                         </button>
                         {isMoreDropdownOpen && (
@@ -529,6 +531,7 @@ export default function PageHeader() {
                             target='_blank'
                             rel='noopener noreferrer'
                             className={styles.ambientmm}
+                            aria-label={t('aria.spotTradingOpensNewTab')}
                         >
                             Spot
                         </a>

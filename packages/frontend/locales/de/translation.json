@@ -338,7 +338,8 @@
         "openLong": "Long eröffnen",
         "openShort": "Short eröffnen",
         "closeLong": "Long schließen",
-        "closeShort": "Short schließen"
+        "closeShort": "Short schließen",
+        "goToMarket": "Zum {{coin}}-Markt gehen"
     },
     "time": {
         "second": "Sekunde",
@@ -520,13 +521,15 @@
     },
     "leverage": {
         "title": "Hebel anpassen",
-        "closePositionPrompt": "Position schließen zur Hebel-Reduzierung"
+        "closePositionPrompt": "Position schließen zur Hebel-Reduzierung",
+        "adjustLeverage": "Hebel anpassen, aktuell {{value}}x"
     },
     "share": {
         "prompt": "Bearbeiten Sie Ihren Text",
         "xCTA": "Auf 𝕏 teilen",
         "copyLinkCTA": "Link kopieren",
-        "textPlaceholder": "Handeln Sie jetzt {{coin}}-Perps auf {{twitter}} im {{fogo}} Testnet"
+        "textPlaceholder": "Handeln Sie jetzt {{coin}}-Perps auf {{twitter}} im {{fogo}} Testnet",
+        "sharePosition": "Position mit PnL {{pnl}} teilen"
     },
     "colors": {
         "default": "Standard",
@@ -572,7 +575,28 @@
         "toggleTPSL": "Take Profit / Stop Loss umschalten",
         "editTPSL": "Take Profit / Stop Loss bearbeiten",
         "toggleConfigureAmount": "Betragskonfiguration umschalten",
-        "toggleLimitPrice": "Limitpreis umschalten"
+        "toggleLimitPrice": "Limitpreis umschalten",
+        "setMaxAmount": "Maximalbetrag setzen",
+        "rowsPerPage": "Zeilen pro Seite",
+        "closeModal": "Modal schließen",
+        "goToHome": "Zur Startseite",
+        "spotTradingOpensNewTab": "Spot-Handel auf Ambient v1 (öffnet in neuem Tab)",
+        "moreOptions": "Weitere Optionen",
+        "notifications": "Benachrichtigungen",
+        "transferAmount": "Überweisungsbetrag",
+        "viewOnExplorerNewTab": "Im Explorer anzeigen (öffnet in neuem Tab)",
+        "externalLinkOpensNewTab": "{{linkText}} (öffnet in neuem Tab)",
+        "opensInNewTab": "(öffnet in neuem Tab)",
+        "selectTokenCurrent": "Token auswählen, aktuell: {{symbol}}",
+        "mobileTradeNavigation": "Handelsnavigation",
+        "takeProfitPrice": "Take-Profit-Preis",
+        "expectedGain": "Erwarteter Gewinn",
+        "toggleGainCurrency": "Gewinnwährung zwischen Dollar und Prozent umschalten",
+        "stopLossPrice": "Stop-Loss-Preis",
+        "expectedLoss": "Erwarteter Verlust",
+        "toggleLossCurrency": "Verlustwährung zwischen Dollar und Prozent umschalten",
+        "setMidPrice": "Mittelpreis setzen",
+        "selectSizeDenomination": "Größeneinheit auswählen"
     },
     "chart": {
         "liqPrice": "Liquidationspreis"
