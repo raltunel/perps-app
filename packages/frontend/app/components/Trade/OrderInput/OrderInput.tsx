@@ -653,6 +653,10 @@ function OrderInput({
         500,
     );
 
+    const isDepositRequired = useMemo(() => {
+        return !isReduceOnlyEnabled && normalizedEquity < MIN_POSITION_USD_SIZE;
+    }, [isReduceOnlyEnabled, normalizedEquity]);
+
     useEffect(() => {
         if (!isMobileRef.current) {
             setNotionalQtyNum(0);
@@ -2205,6 +2209,7 @@ function OrderInput({
 
     const isDisabled =
         userExceededOI ||
+        isDepositRequired ||
         isMarginInsufficientDebounced ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
