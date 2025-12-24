@@ -83,6 +83,10 @@ function eventMatchesMainKey(e: KeyboardEvent, token: string): boolean {
     if (t === 'esc' || t === 'escape') return e.key === 'Escape';
     if (t === 'enter' || t === 'return') return e.key === 'Enter';
 
+    if (t === ',' || t === 'comma') {
+        return e.code === 'Comma' || e.key === ',';
+    }
+
     if (t === 'slash' || t === '/') {
         return e.code === 'Slash' || e.key === '/';
     }
