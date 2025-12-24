@@ -137,6 +137,8 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
+    const isPortfolioPage = location.pathname.includes('portfolio');
+    const noPaddingPages = isHomePage || isPortfolioPage;
     const restrictedSiteModal = useModal('closed');
 
     useEffect(() => {
@@ -191,7 +193,7 @@ export default function App() {
                                                     <PageHeader />
                                                 </div>
                                                 <main
-                                                    className={`content ${isHomePage ? 'home-page' : ''}`}
+                                                    className={`content ${noPaddingPages ? 'home-page' : ''}`}
                                                 >
                                                     <Suspense
                                                         fallback={

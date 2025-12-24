@@ -364,7 +364,8 @@
         "chart": "Chart",
         "book": "Orderbuch",
         "recent": "Kürzlich",
-        "positions": "Positionen"
+        "positions": "Positionen",
+        "portfolio": "Portfolio"
     },
     "auth": {
         "login": "Anmelden",

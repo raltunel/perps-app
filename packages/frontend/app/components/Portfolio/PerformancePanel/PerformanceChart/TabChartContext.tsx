@@ -26,7 +26,8 @@ export interface TabChartContext {
     isMobile?: boolean;
 }
 
-const MOBILE_CHART_HEIGHT = 220;
+// Increased mobile chart height to show full content including labels
+const MOBILE_CHART_HEIGHT = 280;
 const MOBILE_CHART_WIDTH_PADDING = 32;
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
@@ -213,9 +214,9 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             ref={containerRef}
             style={{
                 width: '100%',
-                height: isMobile ? `${MOBILE_CHART_HEIGHT}px` : '100%',
-                overflow: 'hidden',
-                maxHeight: isMobile ? `${MOBILE_CHART_HEIGHT}px` : undefined,
+                height: isMobile ? 'auto' : '100%',
+                minHeight: isMobile ? `${MOBILE_CHART_HEIGHT}px` : undefined,
+                overflow: 'visible',
             }}
         >
             {isChartReady && chartWidth && chartHeight && (

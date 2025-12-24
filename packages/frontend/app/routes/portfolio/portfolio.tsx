@@ -1,4 +1,5 @@
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import { useModal } from '~/hooks/useModal';
@@ -10,7 +11,12 @@ import { usePortfolioModals } from './usePortfolioModals';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { IoArrowUp, IoArrowDown } from 'react-icons/io5';
+import {
+    IoArrowUp,
+    IoArrowDown,
+    IoChevronForward,
+    IoChevronBack,
+} from 'react-icons/io5';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
@@ -95,10 +101,11 @@ function Portfolio() {
     }, [maxTop]);
 
     const { portfolio, formatCurrency, userData } = usePortfolioManager();
-    const [mobileView, setMobileView] = useState<'performance' | 'table'>(
-        'performance',
-    );
     const { formatNum } = useNumFormatter();
+    const location = useLocation();
+
+    // Check if we're on the transactions sub-route (mobile only)
+    const isTransactionsView = location.pathname.includes('/transactions');
 
     const {
         openDepositModal,
@@ -256,7 +263,28 @@ function Portfolio() {
                     }}
                 />
                 <WebDataConsumer />
-                <header>Portfolio</header>
+
+                {/* Header - changes on mobile transactions view */}
+                {isTransactionsView ? (
+                    <header className={styles.mobileTransactionsHeader}>
+                        <Link to='/v2/portfolio' className={styles.backLink}>
+                            <IoChevronBack />
+                            <span className={styles.breadcrumb}>
+                                <span className={styles.breadcrumbParent}>
+                                    Portfolio
+                                </span>
+                                <span className={styles.breadcrumbSeparator}>
+                                    &gt;
+                                </span>
+                                <span className={styles.breadcrumbCurrent}>
+                                    Transactions
+                                </span>
+                            </span>
+                        </Link>
+                    </header>
+                ) : (
+                    <header>Portfolio</header>
+                )}
 
                 <div className={styles.column}>
                     {/* Mobile Hero Section */}
@@ -316,22 +344,6 @@ function Portfolio() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Mobile Toggle - Luxury Segmented Control */}
-                    <div className={styles.mobileToggle}>
-                        <button
-                            className={`${styles.toggleButton} ${mobileView === 'performance' ? styles.active : ''}`}
-                            onClick={() => setMobileView('performance')}
-                        >
-                            Performance
-                        </button>
-                        <button
-                            className={`${styles.toggleButton} ${mobileView === 'table' ? styles.active : ''}`}
-                            onClick={() => setMobileView('table')}
-                        >
-                            Positions
-                        </button>
                     </div>
 
                     <section
@@ -399,46 +411,86 @@ function Portfolio() {
                             </section>
                         </div>
 
-                        {/* Mobile: Toggle between views */}
+                        {/* Mobile: Conditional content based on route */}
                         <div className={styles.mobileViewContainer}>
-                            {mobileView === 'performance' ? (
+                            {isTransactionsView ? (
+                                /* Transactions View - All stacked tables */
                                 <section
-                                    style={{
-                                        height: '100%',
-                                        overflow: 'visible',
-                                    }}
+                                    className={styles.mobileTransactionsContent}
                                 >
-                                    {isLayoutReady && (
-                                        <MemoizedPerformancePanel
-                                            userData={userData}
-                                            panelHeight={panelHeight}
-                                            isMobile={true}
-                                        />
-                                    )}
+                                    <PortfolioTables
+                                        layout='stacked'
+                                        visibleSections={[
+                                            'common.positions',
+                                            'common.openOrders',
+                                            'common.balances',
+                                            'common.tradeHistory',
+                                            'common.orderHistory',
+                                            'common.depositsAndWithdrawals',
+                                        ]}
+                                        stackedTableHeight={250}
+                                    />
                                 </section>
                             ) : (
-                                <section className={styles.table}>
-                                    <PortfolioTables />
-                                </section>
-                            )}
+                                /* Default Portfolio View */
+                                <>
+                                    <section
+                                        style={{
+                                            height: '100%',
+                                            overflow: 'visible',
+                                        }}
+                                    >
+                                        {isLayoutReady && (
+                                            <MemoizedPerformancePanel
+                                                userData={userData}
+                                                panelHeight={panelHeight}
+                                                isMobile={true}
+                                            />
+                                        )}
+                                    </section>
+                                    {/* Mobile Stats */}
+                                    {mobileStatsSection}
+                                    {/* Mobile Action Buttons */}
+                                    <div className={styles.mobileActions}>
+                                        <button
+                                            className={`${styles.mobileActionBtn} ${styles.primary}`}
+                                            onClick={openDepositModal}
+                                        >
+                                            Deposit
+                                        </button>
+                                        <button
+                                            className={`${styles.mobileActionBtn} ${styles.secondary}`}
+                                            onClick={openWithdrawModal}
+                                        >
+                                            Withdraw
+                                        </button>
+                                    </div>
 
-                            {/* Mobile Stats - Inside container */}
-                            {mobileStatsSection}
-                            {/* Mobile Action Buttons - Inside container */}
-                            <div className={styles.mobileActions}>
-                                <button
-                                    className={`${styles.mobileActionBtn} ${styles.primary}`}
-                                    onClick={openDepositModal}
-                                >
-                                    Deposit
-                                </button>
-                                <button
-                                    className={`${styles.mobileActionBtn} ${styles.secondary}`}
-                                    onClick={openWithdrawModal}
-                                >
-                                    Withdraw
-                                </button>
-                            </div>
+                                    {/* Stacked Tables - right under performance */}
+                                    <section
+                                        className={styles.mobileStackedTables}
+                                    >
+                                        <PortfolioTables
+                                            layout='stacked'
+                                            visibleSections={[
+                                                'common.positions',
+                                                'common.openOrders',
+                                                'common.balances',
+                                            ]}
+                                            stackedTableHeight={180}
+                                        />
+                                    </section>
+
+                                    {/* View All History - right under tables */}
+                                    <Link
+                                        to='/v2/portfolio/transactions'
+                                        className={styles.viewAllHistoryLink}
+                                    >
+                                        <span>View All History</span>
+                                        <IoChevronForward />
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </section>
                 </div>
