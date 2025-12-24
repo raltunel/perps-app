@@ -587,7 +587,16 @@
         "viewOnExplorerNewTab": "Xem trên trình duyệt (mở trong tab mới)",
         "externalLinkOpensNewTab": "{{linkText}} (mở trong tab mới)",
         "opensInNewTab": "(mở trong tab mới)",
-        "selectTokenCurrent": "Chọn token, hiện tại: {{symbol}}"
+        "selectTokenCurrent": "Chọn token, hiện tại: {{symbol}}",
+        "mobileTradeNavigation": "Điều hướng giao dịch",
+        "takeProfitPrice": "Giá chốt lời",
+        "expectedGain": "Lợi nhuận dự kiến",
+        "toggleGainCurrency": "Chuyển đổi đơn vị lợi nhuận giữa đô la và phần trăm",
+        "stopLossPrice": "Giá dừng lỗ",
+        "expectedLoss": "Thua lỗ dự kiến",
+        "toggleLossCurrency": "Chuyển đổi đơn vị thua lỗ giữa đô la và phần trăm",
+        "setMidPrice": "Đặt giá trung bình",
+        "selectSizeDenomination": "Chọn đơn vị kích thước"
     },
     "chart": {
         "liqPrice": "Giá thanh lý"

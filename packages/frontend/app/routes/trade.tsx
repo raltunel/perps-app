@@ -630,13 +630,21 @@ export default function Trade() {
 
     const MobileTabNavigation = useMemo(() => {
         return (
-            <div className={`${styles.mobileTabNav} `} id='mobileTradeTabs'>
-                <div className={styles.mobileTabBtns}>
+            <nav
+                className={`${styles.mobileTabNav} `}
+                id='mobileTradeTabs'
+                aria-label={t('aria.mobileTradeNavigation', 'Trade navigation')}
+            >
+                <div className={styles.mobileTabBtns} role='tablist'>
                     {tabList.map(({ key, label }) => {
                         if (key !== 'positions') {
                             return (
                                 <button
                                     key={key}
+                                    id={`mobile-${key}-tab`}
+                                    role='tab'
+                                    aria-selected={activeTab === key}
+                                    aria-controls={`mobile-${key}-panel`}
                                     className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
                                     onClick={handleTabClick(key)}
                                 >
@@ -653,6 +661,10 @@ export default function Trade() {
                                 className={styles.posTabWrap}
                             >
                                 <button
+                                    id='mobile-positions-tab'
+                                    role='tab'
+                                    aria-selected={activeTab === 'positions'}
+                                    aria-controls='mobile-positions-panel'
                                     aria-haspopup='listbox'
                                     aria-expanded={positionsMenuOpen}
                                     className={`${styles.mobileTabBtn} ${activeTab === 'positions' ? styles.active : ''} ${styles.posTabBtn}`}
@@ -668,6 +680,7 @@ export default function Trade() {
                                         width='14'
                                         height='14'
                                         viewBox='0 0 24 24'
+                                        aria-hidden='true'
                                     >
                                         <path
                                             d='M7 10l5 5 5-5'
@@ -710,9 +723,10 @@ export default function Trade() {
                         );
                     })}
                 </div>
-            </div>
+            </nav>
         );
     }, [
+        t,
         activeTab,
         handleTabClick,
         tabList,
@@ -961,6 +975,9 @@ export default function Trade() {
                     </div>
                     {MobileTabNavigation}
                     <div
+                        id='mobile-order-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-order-tab'
                         className={`${styles.mobileSection} ${isFogoPresale ? styles.mobileSectionMin : styles.mobileSectionMax} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
                         style={{
                             display: activeTab === 'order' ? 'block' : 'none',
@@ -977,6 +994,9 @@ export default function Trade() {
                         )}
                     </div>
                     <div
+                        id='mobile-chart-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-chart-tab'
                         className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
                         style={{
                             display: activeTab === 'chart' ? 'block' : 'none',
@@ -988,6 +1008,9 @@ export default function Trade() {
                         )}
                     </div>
                     <div
+                        id='mobile-book-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-book-tab'
                         className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
                         style={{
                             display: activeTab === 'book' ? 'block' : 'none',
@@ -996,6 +1019,9 @@ export default function Trade() {
                         {activeTab === 'book' && mobileOrderBookView}
                     </div>
                     <div
+                        id='mobile-recent-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-recent-tab'
                         className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
                         style={{
                             display: activeTab === 'recent' ? 'block' : 'none',
@@ -1004,6 +1030,9 @@ export default function Trade() {
                         {activeTab === 'recent' && mobileRecentTradesView}
                     </div>
                     <div
+                        id='mobile-positions-panel'
+                        role='tabpanel'
+                        aria-labelledby='mobile-positions-tab'
                         className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
                         style={{
                             display:
@@ -1365,9 +1394,25 @@ export default function Trade() {
                             }}
                         >
                             {isWalletCollapsed ? (
-                                <div className={styles.walletCollapsedHeader}>
-                                    <span>Account Overview</span>
-                                </div>
+                                <button
+                                    className={styles.walletCollapsedHeader}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        expandWalletToDefault();
+                                    }}
+                                    aria-label={t(
+                                        'portfolio.expandWallet',
+                                        'Expand wallet',
+                                    )}
+                                    aria-expanded={false}
+                                >
+                                    <span>
+                                        {t(
+                                            'portfolio.accountOverview',
+                                            'Account Overview',
+                                        )}
+                                    </span>
+                                </button>
                             ) : (
                                 <DepositDropdown
                                     marginBucket={marginBucket}

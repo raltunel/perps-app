@@ -308,7 +308,11 @@ function PortfolioDeposit(props: propsIF) {
                         `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
                     )}
                 />
-                <button onClick={handleMaxClick} disabled={isProcessing}>
+                <button
+                    onClick={handleMaxClick}
+                    disabled={isProcessing}
+                    aria-label={t('aria.setMaxAmount')}
+                >
                     {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}

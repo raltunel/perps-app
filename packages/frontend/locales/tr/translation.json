@@ -587,7 +587,16 @@
         "viewOnExplorerNewTab": "Gezginde görüntüle (yeni sekmede açılır)",
         "externalLinkOpensNewTab": "{{linkText}} (yeni sekmede açılır)",
         "opensInNewTab": "(yeni sekmede açılır)",
-        "selectTokenCurrent": "Token seç, mevcut: {{symbol}}"
+        "selectTokenCurrent": "Token seç, mevcut: {{symbol}}",
+        "mobileTradeNavigation": "İşlem navigasyonu",
+        "takeProfitPrice": "Kâr al fiyatı",
+        "expectedGain": "Beklenen kazanç",
+        "toggleGainCurrency": "Kazanç para birimini dolar ve yüzde arasında değiştir",
+        "stopLossPrice": "Zarar durdur fiyatı",
+        "expectedLoss": "Beklenen kayıp",
+        "toggleLossCurrency": "Kayıp para birimini dolar ve yüzde arasında değiştir",
+        "setMidPrice": "Orta fiyatı ayarla",
+        "selectSizeDenomination": "Boyut birimini seç"
     },
     "chart": {
         "liqPrice": "Lik. fiyatı"

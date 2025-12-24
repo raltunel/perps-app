@@ -587,7 +587,16 @@
         "viewOnExplorerNewTab": "エクスプローラーで表示（新しいタブで開く）",
         "externalLinkOpensNewTab": "{{linkText}}（新しいタブで開く）",
         "opensInNewTab": "（新しいタブで開く）",
-        "selectTokenCurrent": "トークンを選択、現在: {{symbol}}"
+        "selectTokenCurrent": "トークンを選択、現在: {{symbol}}",
+        "mobileTradeNavigation": "取引ナビゲーション",
+        "takeProfitPrice": "利確価格",
+        "expectedGain": "予想利益",
+        "toggleGainCurrency": "利益通貨をドルとパーセントで切り替え",
+        "stopLossPrice": "損切り価格",
+        "expectedLoss": "予想損失",
+        "toggleLossCurrency": "損失通貨をドルとパーセントで切り替え",
+        "setMidPrice": "中間価格を設定",
+        "selectSizeDenomination": "サイズ単位を選択"
     },
     "chart": {
         "liqPrice": "清算価格"

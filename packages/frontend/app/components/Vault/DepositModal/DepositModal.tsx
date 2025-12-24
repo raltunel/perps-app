@@ -303,7 +303,11 @@ export default function DepositModal({
                     step='any'
                     className={isBelowMinimum ? styles.inputBelowMin : ''}
                 />
-                <button onClick={handleMaxClick} className={styles.maxButton}>
+                <button
+                    onClick={handleMaxClick}
+                    className={styles.maxButton}
+                    aria-label={t('aria.setMaxAmount')}
+                >
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}

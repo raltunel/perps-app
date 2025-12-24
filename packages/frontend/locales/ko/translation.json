@@ -587,7 +587,16 @@
         "viewOnExplorerNewTab": "탐색기에서 보기 (새 탭에서 열기)",
         "externalLinkOpensNewTab": "{{linkText}} (새 탭에서 열기)",
         "opensInNewTab": "(새 탭에서 열기)",
-        "selectTokenCurrent": "토큰 선택, 현재: {{symbol}}"
+        "selectTokenCurrent": "토큰 선택, 현재: {{symbol}}",
+        "mobileTradeNavigation": "거래 내비게이션",
+        "takeProfitPrice": "익절 가격",
+        "expectedGain": "예상 수익",
+        "toggleGainCurrency": "수익 통화를 달러와 퍼센트 간 전환",
+        "stopLossPrice": "손절 가격",
+        "expectedLoss": "예상 손실",
+        "toggleLossCurrency": "손실 통화를 달러와 퍼센트 간 전환",
+        "setMidPrice": "중간 가격 설정",
+        "selectSizeDenomination": "수량 단위 선택"
     },
     "chart": {
         "liqPrice": "청산 가격"

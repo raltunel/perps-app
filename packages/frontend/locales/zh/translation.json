@@ -587,7 +587,16 @@
         "viewOnExplorerNewTab": "在浏览器中查看（在新标签页打开）",
         "externalLinkOpensNewTab": "{{linkText}}（在新标签页打开）",
         "opensInNewTab": "（在新标签页打开）",
-        "selectTokenCurrent": "选择代币，当前: {{symbol}}"
+        "selectTokenCurrent": "选择代币，当前: {{symbol}}",
+        "mobileTradeNavigation": "交易导航",
+        "takeProfitPrice": "止盈价格",
+        "expectedGain": "预期收益",
+        "toggleGainCurrency": "在美元和百分比之间切换收益货币",
+        "stopLossPrice": "止损价格",
+        "expectedLoss": "预期亏损",
+        "toggleLossCurrency": "在美元和百分比之间切换亏损货币",
+        "setMidPrice": "设置中间价",
+        "selectSizeDenomination": "选择数量单位"
     },
     "chart": {
         "liqPrice": "清算价格"

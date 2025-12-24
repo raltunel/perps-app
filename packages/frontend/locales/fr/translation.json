@@ -587,7 +587,16 @@
         "viewOnExplorerNewTab": "Voir sur l'explorateur (ouvre dans un nouvel onglet)",
         "externalLinkOpensNewTab": "{{linkText}} (ouvre dans un nouvel onglet)",
         "opensInNewTab": "(ouvre dans un nouvel onglet)",
-        "selectTokenCurrent": "Sélectionner le jeton, actuel : {{symbol}}"
+        "selectTokenCurrent": "Sélectionner le jeton, actuel : {{symbol}}",
+        "mobileTradeNavigation": "Navigation de trading",
+        "takeProfitPrice": "Prix de prise de profit",
+        "expectedGain": "Gain attendu",
+        "toggleGainCurrency": "Basculer la devise de gain entre dollars et pourcentage",
+        "stopLossPrice": "Prix de stop loss",
+        "expectedLoss": "Perte attendue",
+        "toggleLossCurrency": "Basculer la devise de perte entre dollars et pourcentage",
+        "setMidPrice": "Définir le prix médian",
+        "selectSizeDenomination": "Sélectionner la dénomination de taille"
     },
     "chart": {
         "liqPrice": "Prix de liq."

@@ -355,6 +355,8 @@ function PortfolioWithdraw({
                     onClick={handleMaxClick}
                     disabled={isProcessing}
                     className={maxModeActive ? styles.active : ''}
+                    aria-label={t('aria.setMaxAmount')}
+                    aria-pressed={maxModeActive}
                 >
                     {t('common.max')}
                 </button>
