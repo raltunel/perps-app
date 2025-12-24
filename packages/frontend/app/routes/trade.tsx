@@ -195,7 +195,7 @@ export default function Trade() {
     const switchTab = useCallback(
         (tab: TabType) => {
             if (activeTab === tab) return;
-            Refs.current = {
+            visibilityRefs.current = {
                 order: tab === 'order',
                 chart: tab === 'chart',
                 book: tab === 'book',
