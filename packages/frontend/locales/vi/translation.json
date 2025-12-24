@@ -13,6 +13,7 @@
         "error": "Lỗi",
         "success": "Thành công",
         "applyDefaults": "Áp dụng mặc định",
+        "changeApplied": "Đã áp dụng thay đổi",
         "learnMore": "Tìm hiểu thêm",
         "deposit": "Nạp tiền",
         "transfer": "Chuyển tiền",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
-        "tradersReferred": "Nhà giao dịch đã giới thiệu",
-        "rewardsEarned": "Phần thưởng nhận được"
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "tradersReferred": "Người giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng đã nhận",
+        "rewardHistory": "Lịch sử phần thưởng",
+        "enterCode": "Nhập mã",
+        "claim": "Nhận",
+        "createCode": "Tạo mã"
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
@@ -600,7 +605,8 @@
         "more": "Thêm",
         "termsOfService": "Điều khoản dịch vụ",
         "privacyPolicy": "Chính sách bảo mật",
-        "pageNotFound": "Không tìm thấy trang"
+        "affiliates": "Liên kết",
+        "pageNotFound": "Không Tìm Thấy Trang"
     },
     "docs": {
         "menuTerms": "Điều khoản dịch vụ",

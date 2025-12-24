@@ -13,6 +13,7 @@
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
+        "changeApplied": "변경 사항 적용됨",
         "learnMore": "더 알아보기",
         "deposit": "입금",
         "transfer": "이체",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "추천",
-        "description": "사용자를 추천하고 보상을 받을 수 있습니다. 제휴 파트너는 더 많은 보상 획득 가능!",
+        "description": "사용자를 추천하여 보상을 받으세요. 제휴 파트너는 더 높은 보상을 얻습니다.",
         "tradersReferred": "추천된 트레이더",
-        "rewardsEarned": "획득한 보상"
+        "rewardsEarned": "획득한 보상",
+        "rewardHistory": "보상 내역",
+        "enterCode": "코드 입력",
+        "claim": "요청하기",
+        "createCode": "코드 생성"
     },
     "deposit": {
         "prompt": "Fogo에서 {{token}} 입금하기",
@@ -600,6 +605,7 @@
         "more": "더보기",
         "termsOfService": "이용약관",
         "privacyPolicy": "개인정보처리방침",
+        "affiliates": "제휴인",
         "pageNotFound": "페이지를 찾을 수 없습니다"
     },
     "docs": {

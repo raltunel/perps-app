@@ -27,6 +27,7 @@ VITE_CONTEXT = "branch-deploy"
   publish = "build"
   autoLaunch = true
 
+# Handle client-side routing
 [[redirects]]
   from = "/blocked.html"
   to = "/blocked.html"
@@ -49,6 +50,11 @@ VITE_CONTEXT = "branch-deploy"
   conditions = {Country = [
     "AF", "BY", "MM", "CF", "CU", "CD", "ET", "IR", "IQ", "LB", "LY", "ML", "NI", "KP", "RU", "SO", "SS", "SD", "VE", "YE", "ZW"
   ]}
+
+ [[redirects]]
+   from = "/api/hubspot"
+   to = "/.netlify/functions/hubspot"
+   status = 200
 
 # Set immutable caching for static files FIRST (more specific rules should come first)
 # These files have fingerprinted filenames so they can be cached forever

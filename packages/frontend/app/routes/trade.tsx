@@ -44,6 +44,7 @@ import {
     getKeyboardShortcutCategories,
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
+import { ObTradeDataSyncProvider } from '~/contexts/ObTradeDataSyncContext';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -75,7 +76,6 @@ export default function Trade() {
 
     // mobile Positions tab dropdown
     const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
-    // --- HYDRATION GATE (add after your other useState hooks) ---
     const [settingsHydrated, setSettingsHydrated] = useState(() => {
         const p = (useAppSettings as any).persist;
         return p?.hasHydrated?.() ?? false;
@@ -165,6 +165,10 @@ export default function Trade() {
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const useSymbolInfoMobile = useMediaQuery('(max-width: 480px)');
+
+    // after your hydrated state
+    const [layoutMeasured, setLayoutMeasured] = useState(false);
+    const [panelReady, setPanelReady] = useState(false);
 
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
@@ -827,7 +831,6 @@ export default function Trade() {
             if (limitShortcut && matchesShortcutEvent(e, limitShortcut.keys)) {
                 e.preventDefault();
                 setMarketOrderType('limit');
-                setTimeout(() => focusById('trade-module-price-input'), 0);
                 return;
             }
 
@@ -912,67 +915,74 @@ export default function Trade() {
                 transition={{ duration: 0.18 }}
                 className={styles.mobileOuterContainer}
             >
-                <TradeRouteHandler />
-                <WebDataConsumer />
-                <div className={styles.symbolInfoContainer}>
-                    {useSymbolInfoMobile ? (
-                        <MemoizedSymbolInfoMobile />
-                    ) : (
-                        <MemoizedSymbolInfo />
-                    )}
-                </div>
-                {MobileTabNavigation}
-                <div
-                    className={`${styles.mobileSection} ${isFogoPresale ? styles.mobileSectionMin : styles.mobileSectionMax} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'order' ? 'block' : 'none',
-                    }}
-                >
-                    {(activeTab === 'order' ||
-                        visibilityRefs.current.order) && (
-                        <OrderInput
-                            marginBucket={marginBucket}
-                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
-                        />
-                    )}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'chart' ? 'block' : 'none',
-                    }}
-                >
-                    {(activeTab === 'chart' ||
-                        visibilityRefs.current.chart) && (
-                        <MemoizedTradingViewWrapper />
-                    )}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
-                    style={{ display: activeTab === 'book' ? 'block' : 'none' }}
-                >
-                    {activeTab === 'book' && mobileOrderBookView}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'recent' ? 'block' : 'none',
-                    }}
-                >
-                    {activeTab === 'recent' && mobileRecentTradesView}
-                </div>
-                <div
-                    className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
-                    style={{
-                        display: activeTab === 'positions' ? 'block' : 'none',
-                    }}
-                >
-                    {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
-                    {(activeTab === 'positions' ||
-                        visibilityRefs.current.positions) && (
-                        <MemoizedTradeTable mobileExternalSwitcher />
-                    )}
-                </div>
+                <ObTradeDataSyncProvider>
+                    <TradeRouteHandler />
+                    <WebDataConsumer />
+                    <div className={styles.symbolInfoContainer}>
+                        {useSymbolInfoMobile ? (
+                            <MemoizedSymbolInfoMobile />
+                        ) : (
+                            <MemoizedSymbolInfo />
+                        )}
+                    </div>
+                    {MobileTabNavigation}
+                    <div
+                        className={`${styles.mobileSection} ${isFogoPresale ? styles.mobileSectionMin : styles.mobileSectionMax} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'order' ? 'block' : 'none',
+                        }}
+                    >
+                        {(activeTab === 'order' ||
+                            visibilityRefs.current.order) && (
+                            <OrderInput
+                                marginBucket={marginBucket}
+                                isAnyPortfolioModalOpen={
+                                    isAnyPortfolioModalOpen
+                                }
+                            />
+                        )}
+                    </div>
+                    <div
+                        className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'chart' ? 'block' : 'none',
+                        }}
+                    >
+                        {(activeTab === 'chart' ||
+                            visibilityRefs.current.chart) && (
+                            <MemoizedTradingViewWrapper />
+                        )}
+                    </div>
+                    <div
+                        className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'book' ? 'block' : 'none',
+                        }}
+                    >
+                        {activeTab === 'book' && mobileOrderBookView}
+                    </div>
+                    <div
+                        className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
+                        style={{
+                            display: activeTab === 'recent' ? 'block' : 'none',
+                        }}
+                    >
+                        {activeTab === 'recent' && mobileRecentTradesView}
+                    </div>
+                    <div
+                        className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
+                        style={{
+                            display:
+                                activeTab === 'positions' ? 'block' : 'none',
+                        }}
+                    >
+                        {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
+                        {(activeTab === 'positions' ||
+                            visibilityRefs.current.positions) && (
+                            <MemoizedTradeTable mobileExternalSwitcher />
+                        )}
+                    </div>
+                </ObTradeDataSyncProvider>
             </motion.div>
         );
     }

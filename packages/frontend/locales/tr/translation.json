@@ -13,6 +13,7 @@
         "error": "Hata",
         "success": "Başarılı",
         "applyDefaults": "Varsayılanları uygula",
+        "changeApplied": "Değişiklik uygulandı",
         "learnMore": "Daha fazla bilgi",
         "deposit": "Yatır",
         "transfer": "Transfer",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "Referanslar",
-        "description": "Kullanıcıları davet et, ödül kazanın. İş Ortakları daha fazla kazanır.",
-        "tradersReferred": "Referans Edilen Traderlar",
-        "rewardsEarned": "Kazanılan Ödüller"
+        "description": "Kullanıcıları davet ederek ödüller kazanın. İş ortakları daha yüksek ödüller kazanır.",
+        "tradersReferred": "Yönlendirilen traderlar",
+        "rewardsEarned": "Kazanılan ödüller",
+        "rewardHistory": "Ödül geçmişi",
+        "enterCode": "Kodu girin",
+        "claim": "Talep et",
+        "createCode": "Kod oluştur"
     },
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır",
@@ -600,6 +605,7 @@
         "more": "Daha Fazla",
         "termsOfService": "Hizmet Şartları",
         "privacyPolicy": "Gizlilik Politikası",
+        "affiliates": "Ortaklar",
         "pageNotFound": "Sayfa Bulunamadı"
     },
     "docs": {

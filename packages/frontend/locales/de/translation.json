@@ -13,6 +13,7 @@
         "error": "Fehler",
         "success": "Erfolg",
         "applyDefaults": "Standardwerte anwenden",
+        "changeApplied": "Änderung angewendet",
         "learnMore": "Mehr erfahren",
         "deposit": "Einzahlung",
         "transfer": "Überweisen",
@@ -412,9 +413,13 @@
     },
     "referrals": {
         "title": "Empfehlungen",
-        "description": "Werben Sie Nutzer und verdienen Sie Belohnungen. Partner erhalten höhere Prämien.",
+        "description": "Empfehle Nutzer, um Belohnungen zu verdienen. Partner erhalten höhere Belohnungen.",
         "tradersReferred": "Empfohlene Trader",
-        "rewardsEarned": "Erhaltene Belohnungen"
+        "rewardsEarned": "Verdiente Belohnungen",
+        "rewardHistory": "Belohnungsverlauf",
+        "enterCode": "Code eingeben",
+        "claim": "Einlösen",
+        "createCode": "Code erstellen"
     },
     "deposit": {
         "prompt": "{{token}} von Fogo einzahlen",
@@ -600,6 +605,7 @@
         "more": "Mehr",
         "termsOfService": "Nutzungsbedingungen",
         "privacyPolicy": "Datenschutzrichtlinie",
+        "affiliates": "Affiliates",
         "pageNotFound": "Seite nicht gefunden"
     },
     "docs": {
