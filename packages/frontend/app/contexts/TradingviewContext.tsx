@@ -95,7 +95,7 @@ export const TradingViewProvider: React.FC<{
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
-    const { symbol, addToFetchedChannels } = useTradeDataStore();
+    const { symbol, addToFetchedChannels, userFills } = useTradeDataStore();
 
     const previousSymbolRef = useRef<string | null>(null);
 
@@ -648,6 +648,12 @@ export const TradingViewProvider: React.FC<{
             showBuysSellsOnChart && chart.chart().refreshMarks();
         }
     }, [showBuysSellsOnChart]);
+
+    useEffect(() => {
+        if (dataFeedRef.current && userFills) {
+            dataFeedRef.current.updateUserFills(userFills);
+        }
+    }, [userFills]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady }}>

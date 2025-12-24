@@ -27,12 +27,14 @@ import {
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
+import type { UserFillIF } from '~/utils/UserDataIFs';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
     destroy: () => void;
+    updateUserFills: (fills: UserFillIF[]) => void;
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -42,6 +44,13 @@ export const createDataFeed = (
     let currentUserAddress = '';
     // Keep track of user fills subscription separately since it's not tied to a listenerGuid
     let userFillsSubscription: { unsubscribe: () => void } | null = null;
+
+    let userFills: UserFillIF[] = [];
+
+    const updateUserFills = (fills: UserFillIF[]) => {
+        console.log('>>>>> updateUserFills', fills);
+        userFills = fills;
+    };
 
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
@@ -152,12 +161,21 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
+            console.log(
+                '>>>>>> getMarks',
+                symbolInfo,
+                from,
+                to,
+                onDataCallback,
+                resolution,
+            );
             const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
             const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
             const chartTheme = getMarkColorData();
 
             const fillMarks = (payload: any) => {
+                console.log('>>>>> fillMarks', payload);
                 const floorMode = resolutionToSecondsMiliSeconds(resolution);
 
                 payload.forEach((element: any, index: number) => {
@@ -378,6 +396,7 @@ export const createDataFeed = (
         },
 
         updateUserAddress,
+        updateUserFills,
     } as CustomDataFeedType;
 
     return datafeed as CustomDataFeedType;
