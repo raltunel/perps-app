@@ -633,7 +633,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "Ouvrir les paramètres"
                     },
                     {
@@ -665,6 +665,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Démarrer un ordre limite"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Clôturer la position au prix du marché"
                     }
                 ]
             },

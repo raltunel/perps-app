@@ -655,7 +655,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "Open settings"
                     },
                     {
@@ -687,6 +687,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Start limit order"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Close position at market price"
                     }
                 ]
             },

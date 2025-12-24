@@ -256,19 +256,20 @@ export default function PageHeader() {
             const target = e.target as HTMLElement | null;
             if (shouldIgnoreDueToTyping(target)) return;
 
+            const categories = getKeyboardShortcutCategories(t);
+            const settingsShortcut = getKeyboardShortcutById(
+                categories,
+                'settings.open',
+            );
+
             if (
-                e.altKey &&
-                !e.shiftKey &&
-                !e.ctrlKey &&
-                !e.metaKey &&
-                e.code === 'Comma'
+                settingsShortcut &&
+                matchesShortcutEvent(e, settingsShortcut.keys)
             ) {
                 e.preventDefault();
                 openAppSettingsModalRef.current();
                 return;
             }
-
-            const categories = getKeyboardShortcutCategories(t);
             const connectWalletShortcut = getKeyboardShortcutById(
                 categories,
                 'wallet.connect',

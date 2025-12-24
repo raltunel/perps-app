@@ -633,7 +633,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "Einstellungen öffnen"
                     },
                     {
@@ -660,6 +660,11 @@
                         "id": "trading.market",
                         "keys": ["m"],
                         "description": "Market-Order starten"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Market Close öffnen"
                     },
                     {
                         "id": "trading.limit",

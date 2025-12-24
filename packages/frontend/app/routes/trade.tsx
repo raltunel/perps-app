@@ -14,6 +14,7 @@ import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDrop
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
+import MarketCloseModal from '~/components/Trade/MarketCloseModal/MarketCloseModal';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
@@ -45,6 +46,7 @@ import {
     matchesShortcutEvent,
 } from '~/utils/keyboardShortcuts';
 import { ObTradeDataSyncProvider } from '~/contexts/ObTradeDataSyncContext';
+import { useModal } from '~/hooks/useModal';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -59,6 +61,7 @@ export default function Trade() {
         import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER === 'fogoPresale';
     const {
         symbol,
+        positions,
         selectedTradeTab,
         setSelectedTradeTab,
         setTradeDirection,
@@ -143,6 +146,20 @@ export default function Trade() {
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
+
+    const marketCloseModalCtrl = useModal('closed');
+
+    const currentMarketPosition = useMemo(() => {
+        const currentSymbol = symbol?.toLowerCase?.() ?? '';
+        if (!currentSymbol) return null;
+        return (
+            positions.find(
+                (p) =>
+                    p?.coin?.toLowerCase?.() === currentSymbol &&
+                    Math.abs(p.szi) > 0,
+            ) ?? null
+        );
+    }, [positions, symbol]);
 
     const setHeightLocalOnly = (h: number) => {
         setChartTopHeightLocal(h);
@@ -780,8 +797,6 @@ export default function Trade() {
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
-            if (e.altKey || e.ctrlKey || e.metaKey) return;
-
             const target = e.target as HTMLElement | null;
             if (shouldIgnoreDueToTyping(target)) return;
 
@@ -802,6 +817,10 @@ export default function Trade() {
                 categories,
                 'trading.limit',
             );
+            const marketCloseShortcut = getKeyboardShortcutById(
+                categories,
+                'trading.marketClose',
+            );
 
             const isRelevantShortcut =
                 (!!buyShortcut && matchesShortcutEvent(e, buyShortcut.keys)) ||
@@ -810,7 +829,9 @@ export default function Trade() {
                 (!!marketShortcut &&
                     matchesShortcutEvent(e, marketShortcut.keys)) ||
                 (!!limitShortcut &&
-                    matchesShortcutEvent(e, limitShortcut.keys));
+                    matchesShortcutEvent(e, limitShortcut.keys)) ||
+                (!!marketCloseShortcut &&
+                    matchesShortcutEvent(e, marketCloseShortcut.keys));
 
             if (!isRelevantShortcut) return;
 
@@ -841,6 +862,17 @@ export default function Trade() {
                 e.preventDefault();
                 setMarketOrderType('market');
                 setTimeout(() => focusById('trade-module-size-input'), 0);
+                return;
+            }
+
+            if (
+                marketCloseShortcut &&
+                matchesShortcutEvent(e, marketCloseShortcut.keys)
+            ) {
+                if (!currentMarketPosition) return;
+                e.preventDefault();
+                marketCloseModalCtrl.open();
+                return;
             }
         };
 
@@ -853,6 +885,8 @@ export default function Trade() {
         setMarketOrderType,
         setTradeDirection,
         t,
+        currentMarketPosition,
+        marketCloseModalCtrl,
     ]);
 
     const isTableCollapsed = () => {
@@ -990,6 +1024,12 @@ export default function Trade() {
         <>
             <TradeRouteHandler />
             <WebDataConsumer />
+            {marketCloseModalCtrl.isOpen && currentMarketPosition && (
+                <MarketCloseModal
+                    close={marketCloseModalCtrl.close}
+                    position={currentMarketPosition}
+                />
+            )}
             {symbol && (
                 <motion.div
                     key='trade-hydrated'
