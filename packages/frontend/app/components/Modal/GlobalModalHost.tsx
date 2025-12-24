@@ -95,11 +95,10 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     return;
                 }
 
-                const closeButton =
-                    modalContainerRef.current?.querySelector<HTMLButtonElement>(
-                        '[data-modal-close]',
-                    );
-                closeButton?.focus();
+                // Focus the modal container itself (not the close button) to avoid
+                // showing a focus ring when opened via keyboard shortcut.
+                // The container is focusable via tabindex="-1" for accessibility.
+                modalContainerRef.current?.focus();
             }, 0);
         } else {
             // Restore focus when modal closes
@@ -205,6 +204,7 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     role='dialog'
                     aria-modal='true'
                     aria-labelledby='global-modal-title'
+                    tabIndex={-1}
                     onKeyDown={handleFocusTrap}
                     onPointerDown={(e) => {
                         e.stopPropagation();
