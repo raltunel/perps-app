@@ -35,6 +35,7 @@ export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
     destroy: () => void;
     updateUserFills: (fills: UserFillIF[]) => void;
+    currentFills: () => UserFillIF[];
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -47,15 +48,69 @@ export const createDataFeed = (
 
     let userFills: UserFillIF[] = [];
     let userFillsInterval: NodeJS.Timeout | null = null;
+    let lastResolution: ResolutionString | undefined = undefined;
+    let onMarksCallback: ((marks: Mark[]) => void) | undefined = undefined;
 
     const updateUserFills = (fills: UserFillIF[]) => {
-        console.log('>>>>> updateUserFills', fills);
         userFills = fills;
+
+        processUserFills(userFills, lastResolution, onMarksCallback);
     };
 
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
     };
+
+    const processUserFills = (
+        userFills: UserFillIF[],
+        resolution?: ResolutionString,
+        ocb?: (marks: Mark[]) => void,
+    ) => {
+        const chartTheme = getMarkColorData();
+        const floorMode = resolutionToSecondsMiliSeconds(resolution || '');
+
+        const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
+        const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
+
+        userFills.sort((a, b) => b.time - a.time);
+
+        userFills.forEach((fill) => {
+            const isBuy = fill.side === 'B' || fill.side === 'buy';
+            const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
+            const markData = {
+                id: fill.oid,
+                time: (Math.floor(fill.time / floorMode) * floorMode) / 1000,
+                color: {
+                    border: markerColor,
+                    background: markerColor,
+                } as any,
+                text: fill.dir + ' at ' + fill.px,
+                px: fill.px,
+                label: isBuy ? 'B' : 'S',
+                labelFontColor: 'white',
+                minSize: 15,
+                borderWidth: 0,
+                hoveredBorderWidth: 1,
+            };
+
+            if (isBuy) {
+                bSideOrderHistoryMarks.set(fill.oid.toString(), markData);
+            } else {
+                aSideOrderHistoryMarks.set(fill.oid.toString(), markData);
+            }
+        });
+        const markArray = [
+            ...bSideOrderHistoryMarks.values(),
+            ...aSideOrderHistoryMarks.values(),
+        ];
+
+        markArray.sort((a: any, b: any) => b.px - a.px);
+
+        if (ocb) {
+            ocb(markArray);
+        }
+    };
+
     const datafeed: IDatafeedChartApi & {
         updateUserAddress: (address: string) => void;
         destroy: () => void;
@@ -166,70 +221,22 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
-            const chartTheme = getMarkColorData();
-            const floorMode = resolutionToSecondsMiliSeconds(resolution);
+            console.log('>>>>> getMarks method');
 
-            if (userFillsInterval) {
-                clearInterval(userFillsInterval);
-                userFillsInterval = null;
-                onDataCallback([]);
-                userFills = [];
-            }
+            onMarksCallback = onDataCallback;
+            lastResolution = resolution;
 
-            const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
-            const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
+            // if (userFillsInterval) {
+            //     clearInterval(userFillsInterval);
+            //     userFillsInterval = null;
+            //     onDataCallback([]);
+            //     userFills = [];
+            // }
 
-            const processUserFills = () => {
-                userFills.sort((a, b) => b.time - a.time);
+            //-----------------------------------------------------------------------
 
-                userFills.forEach((fill) => {
-                    const isBuy = fill.side === 'B' || fill.side === 'buy';
-                    const markerColor = isBuy
-                        ? chartTheme.buy
-                        : chartTheme.sell;
-                    const markData = {
-                        id: fill.oid,
-                        time:
-                            (Math.floor(fill.time / floorMode) * floorMode) /
-                            1000,
-                        color: {
-                            border: markerColor,
-                            background: markerColor,
-                        } as any,
-                        text: fill.dir + ' at ' + fill.px,
-                        px: fill.px,
-                        label: isBuy ? 'B' : 'S',
-                        labelFontColor: 'white',
-                        minSize: 15,
-                        borderWidth: 0,
-                        hoveredBorderWidth: 1,
-                    };
-
-                    if (isBuy) {
-                        bSideOrderHistoryMarks.set(
-                            fill.oid.toString(),
-                            markData,
-                        );
-                    } else {
-                        aSideOrderHistoryMarks.set(
-                            fill.oid.toString(),
-                            markData,
-                        );
-                    }
-
-                    const markArray = [
-                        ...bSideOrderHistoryMarks.values(),
-                        ...aSideOrderHistoryMarks.values(),
-                    ];
-
-                    markArray.sort((a: any, b: any) => b.px - a.px);
-
-                    onDataCallback(markArray);
-                });
-            };
-
-            userFillsInterval = setInterval(processUserFills, 3000);
-            setTimeout(processUserFills, 1000);
+            // userFillsInterval = setInterval(processUserFills, 3000);
+            // setTimeout(processUserFills, 1000);
 
             //-------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -456,6 +463,10 @@ export const createDataFeed = (
                     `No active subscription found for listenerGuid: ${listenerGuid}`,
                 );
             }
+        },
+
+        currentFills: () => {
+            return userFills;
         },
 
         updateUserAddress,
