@@ -372,7 +372,7 @@ export const TradingViewProvider: React.FC<{
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '1h') as ResolutionString,
+            interval: (chartState?.interval || '60') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
@@ -575,6 +575,7 @@ export const TradingViewProvider: React.FC<{
             );
 
             if (intervalMinutes <= lastSleepDurationInMinutes) {
+                console.log('>>>>>> Resetting chart');
                 chart?.resetCache();
                 chart?.chart().resetData();
                 chart?.chart().restoreChart();

@@ -67,10 +67,13 @@ export const createDataFeed = (
         ocb?: (marks: Mark[]) => void,
     ) => {
         const chartTheme = getMarkColorData();
+        if (!chartTheme) return;
         const floorMode = resolutionToSecondsMiliSeconds(resolution || '');
 
         const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
         const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
+
+        console.log('>>>>> resolution', resolution);
 
         userFills.sort((a, b) => b.time - a.time);
 
