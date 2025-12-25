@@ -665,101 +665,48 @@
         "title": "Keyboard Shortcuts",
         "hintPress": "Press",
         "hintToClose": "to close",
+        "applyDefaults": "Apply Defaults",
+        "editShortcut": "Edit shortcut",
+        "pressKeys": "Press keys...",
         "aria": {
             "close": "Close keyboard shortcuts"
         },
-        "categories": [
-            {
-                "title": "General",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "Display shortcuts"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "Open settings"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "Close modal / cancel"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "General",
+            "trading": "Trading",
+            "navigation": "Navigation"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Display shortcuts"
             },
-            {
-                "title": "Trading",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "Switch to buy"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "Switch to sell"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "Start market order"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "Start limit order"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "Close position at market price"
-                    }
-                ]
+            "settings": {
+                "open": "Open settings"
             },
-            {
-                "title": "Navigation",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "Go to trade page"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "Go to home page"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "Go to portfolio page"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Open wallet connector"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Open deposit modal"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "Open withdraw modal"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "View latest transaction in block explorer"
-                    }
-                ]
+            "modal": {
+                "close": "Close modal / cancel"
+            },
+            "trading": {
+                "buy": "Switch to buy",
+                "sell": "Switch to sell",
+                "market": "Start market order",
+                "limit": "Start limit order",
+                "marketClose": "Close position at market price"
+            },
+            "navigation": {
+                "trade": "Go to trade page",
+                "home": "Go to home page",
+                "portfolio": "Go to portfolio page"
+            },
+            "wallet": {
+                "connect": "Open wallet connector"
+            },
+            "portfolio": {
+                "deposit": "Open deposit modal",
+                "withdraw": "Open withdraw modal",
+                "latestTx": "View latest transaction in block explorer"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",
