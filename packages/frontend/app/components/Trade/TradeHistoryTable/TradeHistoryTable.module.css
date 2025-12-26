@@ -6,6 +6,21 @@
     display: grid;
     grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
     align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.rowContainer.highlighted {
+    background-color: var(--accent1-transparent, rgba(115, 115, 255, 0.2));
+    animation: highlightPulse 2s ease-out;
+}
+
+@keyframes highlightPulse {
+    0% {
+        background-color: var(--accent1, #7373ff);
+    }
+    100% {
+        background-color: var(--accent1-transparent, rgba(115, 115, 255, 0.2));
+    }
 }
 
 .headerContainer {
