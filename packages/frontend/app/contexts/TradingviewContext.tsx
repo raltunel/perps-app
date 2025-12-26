@@ -573,7 +573,6 @@ export const TradingViewProvider: React.FC<{
             );
 
             if (intervalMinutes <= lastSleepDurationInMinutes) {
-                console.log('>>>>>> Resetting chart');
                 chart?.resetCache();
                 chart?.chart().resetData();
                 chart?.chart().restoreChart();
