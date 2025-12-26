@@ -643,101 +643,48 @@
         "title": "키보드 단축키",
         "hintPress": "",
         "hintToClose": "로 닫기",
+        "applyDefaults": "기본값 적용",
+        "editShortcut": "단축키 편집",
+        "pressKeys": "키를 누르세요...",
         "aria": {
             "close": "키보드 단축키 닫기"
         },
-        "categories": [
-            {
-                "title": "일반",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "단축키 보기"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "설정 열기"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "모달 닫기 / 취소"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "일반",
+            "trading": "거래",
+            "navigation": "내비게이션"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "단축키 보기"
             },
-            {
-                "title": "거래",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "매수로 전환"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "매도로 전환"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "시장가 주문 시작"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "지정가 주문 시작"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "시장가로 포지션 청산"
-                    }
-                ]
+            "settings": {
+                "open": "설정 열기"
             },
-            {
-                "title": "내비게이션",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "거래 페이지로 이동"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "홈으로 이동"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "포트폴리오로 이동"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "지갑 연결 열기"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "입금 모달 열기"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "출금 모달 열기"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "최신 트랜잭션을 탐색기에서 보기"
-                    }
-                ]
+            "modal": {
+                "close": "모달 닫기 / 취소"
+            },
+            "trading": {
+                "buy": "매수로 전환",
+                "sell": "매도로 전환",
+                "market": "시장가 주문 시작",
+                "limit": "지정가 주문 시작",
+                "marketClose": "시장가로 포지션 청산"
+            },
+            "navigation": {
+                "trade": "거래 페이지로 이동",
+                "home": "홈으로 이동",
+                "portfolio": "포트폴리오로 이동"
+            },
+            "wallet": {
+                "connect": "지갑 연결 열기"
+            },
+            "portfolio": {
+                "deposit": "입금 모달 열기",
+                "withdraw": "출금 모달 열기",
+                "latestTx": "최신 트랜잭션을 탐색기에서 보기"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",

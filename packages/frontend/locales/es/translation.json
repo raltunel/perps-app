@@ -643,101 +643,48 @@
         "title": "Atajos de teclado",
         "hintPress": "Pulsa",
         "hintToClose": "para cerrar",
+        "applyDefaults": "Aplicar valores predeterminados",
+        "editShortcut": "Editar atajo",
+        "pressKeys": "Pulsa las teclas...",
         "aria": {
             "close": "Cerrar atajos de teclado"
         },
-        "categories": [
-            {
-                "title": "General",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "Mostrar atajos"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "Abrir configuración"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "Cerrar modal / cancelar"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "General",
+            "trading": "Trading",
+            "navigation": "Navegación"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Mostrar atajos"
             },
-            {
-                "title": "Trading",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "Cambiar a compra"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "Cambiar a venta"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "Iniciar orden de mercado"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "Iniciar orden limitada"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "Cerrar posición al precio de mercado"
-                    }
-                ]
+            "settings": {
+                "open": "Abrir configuración"
             },
-            {
-                "title": "Navegación",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "Ir a la página de trading"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "Ir a la página de inicio"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "Ir a la página de portfolio"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Abrir conector de billetera"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Abrir modal de depósito"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "Abrir modal de retiro"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "Ver la última transacción en el explorador"
-                    }
-                ]
+            "modal": {
+                "close": "Cerrar modal / cancelar"
+            },
+            "trading": {
+                "buy": "Cambiar a compra",
+                "sell": "Cambiar a venta",
+                "market": "Iniciar orden de mercado",
+                "limit": "Iniciar orden limitada",
+                "marketClose": "Cerrar posición al precio de mercado"
+            },
+            "navigation": {
+                "trade": "Ir a la página de trading",
+                "home": "Ir a la página de inicio",
+                "portfolio": "Ir a la página de portfolio"
+            },
+            "wallet": {
+                "connect": "Abrir conector de billetera"
+            },
+            "portfolio": {
+                "deposit": "Abrir modal de depósito",
+                "withdraw": "Abrir modal de retiro",
+                "latestTx": "Ver la última transacción en el explorador"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",
