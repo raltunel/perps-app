@@ -95,7 +95,7 @@ export const TradingViewProvider: React.FC<{
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
-    const { symbol, addToFetchedChannels } = useTradeDataStore();
+    const { symbol, addToFetchedChannels, userFills } = useTradeDataStore();
 
     const previousSymbolRef = useRef<string | null>(null);
 
@@ -370,7 +370,7 @@ export const TradingViewProvider: React.FC<{
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '1h') as ResolutionString,
+            interval: (chartState?.interval || '60') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
@@ -626,12 +626,19 @@ export const TradingViewProvider: React.FC<{
     }, [symbol, chart]);
 
     useEffect(() => {
-        if (dataFeedRef.current && userAddress && chart) {
+        if (!dataFeedRef.current || !chart) return;
+
+        if (!userAddress) {
             chart.chart().clearMarks();
-            dataFeedRef.current.updateUserAddress(userAddress);
-            getMarkFillData(symbol, userAddress);
-            chart.chart().refreshMarks();
+            dataFeedRef.current.updateUserAddress('');
+            dataFeedRef.current.updateUserFills([]);
+            return;
         }
+
+        chart.chart().clearMarks();
+        dataFeedRef.current.updateUserAddress(userAddress);
+        getMarkFillData(symbol, userAddress);
+        chart.chart().refreshMarks();
     }, [userAddress, chart, symbol]);
 
     useEffect(() => {
@@ -648,6 +655,12 @@ export const TradingViewProvider: React.FC<{
             showBuysSellsOnChart && chart.chart().refreshMarks();
         }
     }, [showBuysSellsOnChart]);
+
+    useEffect(() => {
+        if (dataFeedRef.current && userFills) {
+            dataFeedRef.current.updateUserFills(userFills);
+        }
+    }, [userFills]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady }}>
