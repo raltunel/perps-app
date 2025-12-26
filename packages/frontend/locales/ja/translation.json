@@ -13,6 +13,7 @@
         "error": "エラー",
         "success": "成功",
         "applyDefaults": "デフォルトを適用",
+        "changeApplied": "変更が適用されました",
         "learnMore": "詳細はこちら",
         "deposit": "入金",
         "transfer": "送金",
@@ -337,7 +338,8 @@
         "openLong": "Long新規",
         "openShort": "Short新規",
         "closeLong": "Long決済",
-        "closeShort": "Short決済"
+        "closeShort": "Short決済",
+        "goToMarket": "{{coin}}マーケットへ移動"
     },
     "time": {
         "second": "秒",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "紹介",
-        "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多く報酬を得られます。",
+        "description": "ユーザーを紹介して報酬を獲得しましょう。アフィリエイトはより多くの報酬を得られます。",
         "tradersReferred": "紹介されたトレーダー",
-        "rewardsEarned": "獲得報酬"
+        "rewardsEarned": "獲得した報酬",
+        "rewardHistory": "報酬履歴",
+        "enterCode": "コードを入力",
+        "claim": "請求する",
+        "createCode": "コードを作成"
     },
     "deposit": {
         "prompt": "Fogoから{{token}}を入金",
@@ -515,13 +521,15 @@
     },
     "leverage": {
         "title": "レバレッジを調整",
-        "closePositionPrompt": "レバレッジを下げるにはポジション終了"
+        "closePositionPrompt": "レバレッジを下げるにはポジション終了",
+        "adjustLeverage": "レバレッジを調整、現在{{value}}倍"
     },
     "share": {
         "prompt": "テキストをカスタマイズ",
         "xCTA": "𝕏で共有",
         "copyLinkCTA": "リンクをコピー",
-        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう"
+        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう",
+        "sharePosition": "PnL {{pnl}}のポジションを共有"
     },
     "colors": {
         "default": "デフォルト",
@@ -567,7 +575,28 @@
         "toggleTPSL": "TP/SLを切り替え",
         "editTPSL": "TP/SLを編集",
         "toggleConfigureAmount": "金額設定を切り替え",
-        "toggleLimitPrice": "指値価格を切り替え"
+        "toggleLimitPrice": "指値価格を切り替え",
+        "setMaxAmount": "最大金額を設定",
+        "rowsPerPage": "ページあたりの行数",
+        "closeModal": "モーダルを閉じる",
+        "goToHome": "ホームへ移動",
+        "spotTradingOpensNewTab": "Ambient v1でのスポット取引（新しいタブで開く）",
+        "moreOptions": "その他のオプション",
+        "notifications": "通知",
+        "transferAmount": "送金額",
+        "viewOnExplorerNewTab": "エクスプローラーで表示（新しいタブで開く）",
+        "externalLinkOpensNewTab": "{{linkText}}（新しいタブで開く）",
+        "opensInNewTab": "（新しいタブで開く）",
+        "selectTokenCurrent": "トークンを選択、現在: {{symbol}}",
+        "mobileTradeNavigation": "取引ナビゲーション",
+        "takeProfitPrice": "利確価格",
+        "expectedGain": "予想利益",
+        "toggleGainCurrency": "利益通貨をドルとパーセントで切り替え",
+        "stopLossPrice": "損切り価格",
+        "expectedLoss": "予想損失",
+        "toggleLossCurrency": "損失通貨をドルとパーセントで切り替え",
+        "setMidPrice": "中間価格を設定",
+        "selectSizeDenomination": "サイズ単位を選択"
     },
     "chart": {
         "liqPrice": "清算価格"
@@ -600,6 +629,7 @@
         "more": "その他",
         "termsOfService": "利用規約",
         "privacyPolicy": "プライバシーポリシー",
+        "affiliates": "アフィリエイト",
         "pageNotFound": "ページが見つかりません"
     },
     "docs": {
@@ -627,7 +657,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "設定を開く"
                     },
                     {
@@ -659,6 +689,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "指値注文を開始"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "成行でポジションをクローズ"
                     }
                 ]
             },

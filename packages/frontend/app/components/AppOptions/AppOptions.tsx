@@ -53,11 +53,14 @@ export default function AppOptions(props: AppOptionsProps) {
     } = useAppSettings();
     const { i18n, t } = useTranslation();
 
+    // Get translation function for the user's default language (for Apply Defaults button)
+    const defaultLanguage = getDefaultLanguage();
+    const tDefault = i18n.getFixedT(defaultLanguage);
+
     const [showChangeApplied, setShowChangeApplied] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Check if current settings are defaults
-    const defaultLanguage = getDefaultLanguage();
     const isDefaults =
         activeOptions['skipOpenOrderConfirm'] === false &&
         activeOptions['enableTxNotifications'] === true &&
@@ -316,7 +319,7 @@ export default function AppOptions(props: AppOptionsProps) {
                             width: '100%',
                         }}
                     >
-                        Change applied
+                        {t('common.changeApplied')}
                     </div>
                 ) : (
                     !isDefaults && (
@@ -351,7 +354,7 @@ export default function AppOptions(props: AppOptionsProps) {
                                 }
                             }}
                         >
-                            {t('common.applyDefaults')}
+                            {tDefault('common.applyDefaults')}
                         </button>
                     )
                 )}

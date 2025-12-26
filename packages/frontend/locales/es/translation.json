@@ -13,6 +13,7 @@
         "error": "Error",
         "success": "Éxito",
         "applyDefaults": "Aplicar predeterminados",
+        "changeApplied": "Cambio aplicado",
         "learnMore": "Más información",
         "deposit": "Depositar",
         "transfer": "Transferir",
@@ -337,7 +338,8 @@
         "openLong": "Abrir Long",
         "openShort": "Abrir Short",
         "closeLong": "Cerrar Long",
-        "closeShort": "Cerrar Short"
+        "closeShort": "Cerrar Short",
+        "goToMarket": "Ir al mercado de {{coin}}"
     },
     "time": {
         "second": "segundo",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "Referidos",
-        "description": "Refiere usuarios y gana recompensas. Los afiliados ganan más.",
-        "tradersReferred": "Traders referidos",
-        "rewardsEarned": "Recompensas obtenidas"
+        "description": "Refiere usuarios para ganar recompensas. Los afiliados obtienen mayores recompensas.",
+        "tradersReferred": "Comerciantes referidos",
+        "rewardsEarned": "Recompensas obtenidas",
+        "rewardHistory": "Historial de recompensas",
+        "enterCode": "Ingresar código",
+        "claim": "Reclamar",
+        "createCode": "Crear código"
     },
     "deposit": {
         "prompt": "Deposita {{token}} desde Fogo",
@@ -515,13 +521,15 @@
     },
     "leverage": {
         "title": "Ajustar apalancamiento",
-        "closePositionPrompt": "Reduce apalancamiento cerrando"
+        "closePositionPrompt": "Reduce apalancamiento cerrando",
+        "adjustLeverage": "Ajustar apalancamiento, actualmente {{value}}x"
     },
     "share": {
         "prompt": "Personaliza tu texto",
         "xCTA": "Compartir en 𝕏",
         "copyLinkCTA": "Copiar enlace",
-        "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora"
+        "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora",
+        "sharePosition": "Compartir posición con PnL {{pnl}}"
     },
     "colors": {
         "default": "Predeterminado",
@@ -567,7 +575,28 @@
         "toggleTPSL": "Alternar Take Profit / Stop Loss",
         "editTPSL": "Editar Take Profit / Stop Loss",
         "toggleConfigureAmount": "Alternar configuración de cantidad",
-        "toggleLimitPrice": "Alternar precio límite"
+        "toggleLimitPrice": "Alternar precio límite",
+        "setMaxAmount": "Establecer cantidad máxima",
+        "rowsPerPage": "Filas por página",
+        "closeModal": "Cerrar modal",
+        "goToHome": "Ir al inicio",
+        "spotTradingOpensNewTab": "Trading spot en Ambient v1 (abre en nueva pestaña)",
+        "moreOptions": "Más opciones",
+        "notifications": "Notificaciones",
+        "transferAmount": "Monto de transferencia",
+        "viewOnExplorerNewTab": "Ver en explorador (abre en nueva pestaña)",
+        "externalLinkOpensNewTab": "{{linkText}} (abre en nueva pestaña)",
+        "opensInNewTab": "(abre en nueva pestaña)",
+        "selectTokenCurrent": "Seleccionar token, actual: {{symbol}}",
+        "mobileTradeNavigation": "Navegación de trading",
+        "takeProfitPrice": "Precio de toma de ganancias",
+        "expectedGain": "Ganancia esperada",
+        "toggleGainCurrency": "Alternar moneda de ganancia entre dólares y porcentaje",
+        "stopLossPrice": "Precio de stop loss",
+        "expectedLoss": "Pérdida esperada",
+        "toggleLossCurrency": "Alternar moneda de pérdida entre dólares y porcentaje",
+        "setMidPrice": "Establecer precio medio",
+        "selectSizeDenomination": "Seleccionar denominación de tamaño"
     },
     "chart": {
         "liqPrice": "Precio liq."
@@ -600,10 +629,11 @@
         "more": "Más",
         "termsOfService": "Términos de Servicio",
         "privacyPolicy": "Política de Privacidad",
+        "affiliates": "Afiliados",
         "pageNotFound": "Página No Encontrada"
     },
     "docs": {
-        "menuTerms": "Términos de Servicio",
+        "menuTerms": "Términos",
         "menuPrivacy": "Privacidad",
         "terms": "Términos de Servicio de CROCODILE Labs",
         "privacy": "Política de Privacidad"
@@ -627,7 +657,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "Abrir configuración"
                     },
                     {
@@ -659,6 +689,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Iniciar orden limitada"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Cerrar posición al precio de mercado"
                     }
                 ]
             },
