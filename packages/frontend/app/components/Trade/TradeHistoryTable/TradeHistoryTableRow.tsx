@@ -4,7 +4,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type AnimationEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface TradeHistoryTableRowProps {
@@ -24,12 +24,16 @@ export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
                 behavior: 'smooth',
                 block: 'center',
             });
-            const timeoutId = setTimeout(() => {
-                setHighlightedTradeOid(null);
-            }, 3000);
-            return () => clearTimeout(timeoutId);
         }
     }, [isHighlighted, setHighlightedTradeOid]);
+
+    const handleHighlightAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.animationName !== 'highlightPulse') return;
+        if (isHighlighted) {
+            setHighlightedTradeOid(null);
+        }
+    };
 
     const { formatNum } = useNumFormatter();
 
@@ -62,6 +66,7 @@ export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
         <div
             ref={rowRef}
             className={`${styles.rowContainer} ${isHighlighted ? styles.highlighted : ''}`}
+            onAnimationEnd={handleHighlightAnimationEnd}
         >
             <div className={`${styles.cell} ${styles.timeCell}`}>
                 {formatTimestamp(trade.time)}
