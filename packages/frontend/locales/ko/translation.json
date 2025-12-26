@@ -13,6 +13,7 @@
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
+        "changeApplied": "변경 사항 적용됨",
         "learnMore": "더 알아보기",
         "deposit": "입금",
         "transfer": "이체",
@@ -337,7 +338,8 @@
         "openLong": "롱 오픈",
         "openShort": "숏 오픈",
         "closeLong": "롱 종료",
-        "closeShort": "숏 종료"
+        "closeShort": "숏 종료",
+        "goToMarket": "{{coin}} 마켓으로 이동"
     },
     "time": {
         "second": "초",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "추천",
-        "description": "사용자를 추천하고 보상을 받을 수 있습니다. 제휴 파트너는 더 많은 보상 획득 가능!",
+        "description": "사용자를 추천하여 보상을 받으세요. 제휴 파트너는 더 높은 보상을 얻습니다.",
         "tradersReferred": "추천된 트레이더",
-        "rewardsEarned": "획득한 보상"
+        "rewardsEarned": "획득한 보상",
+        "rewardHistory": "보상 내역",
+        "enterCode": "코드 입력",
+        "claim": "요청하기",
+        "createCode": "코드 생성"
     },
     "deposit": {
         "prompt": "Fogo에서 {{token}} 입금하기",
@@ -515,13 +521,15 @@
     },
     "leverage": {
         "title": "레버리지 조정",
-        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요"
+        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요",
+        "adjustLeverage": "레버리지 조정, 현재 {{value}}배"
     },
     "share": {
         "prompt": "텍스트 편집",
         "xCTA": "𝕏에 공유",
         "copyLinkCTA": "링크 복사",
-        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요"
+        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요",
+        "sharePosition": "PnL {{pnl}} 포지션 공유"
     },
     "colors": {
         "default": "기본",
@@ -567,7 +575,28 @@
         "toggleTPSL": "TP/SL 전환",
         "editTPSL": "TP/SL 편집",
         "toggleConfigureAmount": "금액 설정 전환",
-        "toggleLimitPrice": "지정가 전환"
+        "toggleLimitPrice": "지정가 전환",
+        "setMaxAmount": "최대 금액 설정",
+        "rowsPerPage": "페이지당 행 수",
+        "closeModal": "모달 닫기",
+        "goToHome": "홈으로 이동",
+        "spotTradingOpensNewTab": "Ambient v1 현물 거래 (새 탭에서 열기)",
+        "moreOptions": "더 보기",
+        "notifications": "알림",
+        "transferAmount": "송금 금액",
+        "viewOnExplorerNewTab": "탐색기에서 보기 (새 탭에서 열기)",
+        "externalLinkOpensNewTab": "{{linkText}} (새 탭에서 열기)",
+        "opensInNewTab": "(새 탭에서 열기)",
+        "selectTokenCurrent": "토큰 선택, 현재: {{symbol}}",
+        "mobileTradeNavigation": "거래 내비게이션",
+        "takeProfitPrice": "익절 가격",
+        "expectedGain": "예상 수익",
+        "toggleGainCurrency": "수익 통화를 달러와 퍼센트 간 전환",
+        "stopLossPrice": "손절 가격",
+        "expectedLoss": "예상 손실",
+        "toggleLossCurrency": "손실 통화를 달러와 퍼센트 간 전환",
+        "setMidPrice": "중간 가격 설정",
+        "selectSizeDenomination": "수량 단위 선택"
     },
     "chart": {
         "liqPrice": "청산 가격"
@@ -600,6 +629,7 @@
         "more": "더보기",
         "termsOfService": "이용약관",
         "privacyPolicy": "개인정보처리방침",
+        "affiliates": "제휴인",
         "pageNotFound": "페이지를 찾을 수 없습니다"
     },
     "docs": {
@@ -627,7 +657,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "설정 열기"
                     },
                     {
@@ -659,6 +689,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "지정가 주문 시작"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "시장가로 포지션 청산"
                     }
                 ]
             },

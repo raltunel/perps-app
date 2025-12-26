@@ -13,6 +13,7 @@
         "error": "Lỗi",
         "success": "Thành công",
         "applyDefaults": "Áp dụng mặc định",
+        "changeApplied": "Đã áp dụng thay đổi",
         "learnMore": "Tìm hiểu thêm",
         "deposit": "Nạp tiền",
         "transfer": "Chuyển tiền",
@@ -337,7 +338,8 @@
         "openLong": "Mở Long",
         "openShort": "Mở Short",
         "closeLong": "Đóng Long",
-        "closeShort": "Đóng Short"
+        "closeShort": "Đóng Short",
+        "goToMarket": "Đi đến thị trường {{coin}}"
     },
     "time": {
         "second": "giây",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
-        "tradersReferred": "Nhà giao dịch đã giới thiệu",
-        "rewardsEarned": "Phần thưởng nhận được"
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "tradersReferred": "Người giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng đã nhận",
+        "rewardHistory": "Lịch sử phần thưởng",
+        "enterCode": "Nhập mã",
+        "claim": "Nhận",
+        "createCode": "Tạo mã"
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
@@ -515,13 +521,15 @@
     },
     "leverage": {
         "title": "Điều chỉnh đòn bẩy",
-        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu"
+        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu",
+        "adjustLeverage": "Điều chỉnh đòn bẩy, hiện tại {{value}}x"
     },
     "share": {
         "prompt": "Tùy chỉnh văn bản của bạn",
         "xCTA": "Chia sẻ lên 𝕏",
         "copyLinkCTA": "Sao chép liên kết",
-        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay"
+        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
+        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}"
     },
     "colors": {
         "default": "Mặc định",
@@ -567,7 +575,28 @@
         "toggleTPSL": "Chuyển Chốt lời/Dừng lỗ",
         "editTPSL": "Chỉnh sửa Chốt lời/Dừng lỗ",
         "toggleConfigureAmount": "Chuyển nhập số tiền",
-        "toggleLimitPrice": "Chuyển nhập giá giới hạn"
+        "toggleLimitPrice": "Chuyển nhập giá giới hạn",
+        "setMaxAmount": "Đặt số tiền tối đa",
+        "rowsPerPage": "Số hàng mỗi trang",
+        "closeModal": "Đóng cửa sổ",
+        "goToHome": "Đi đến trang chủ",
+        "spotTradingOpensNewTab": "Giao dịch spot trên Ambient v1 (mở trong tab mới)",
+        "moreOptions": "Tùy chọn khác",
+        "notifications": "Thông báo",
+        "transferAmount": "Số tiền chuyển",
+        "viewOnExplorerNewTab": "Xem trên trình duyệt (mở trong tab mới)",
+        "externalLinkOpensNewTab": "{{linkText}} (mở trong tab mới)",
+        "opensInNewTab": "(mở trong tab mới)",
+        "selectTokenCurrent": "Chọn token, hiện tại: {{symbol}}",
+        "mobileTradeNavigation": "Điều hướng giao dịch",
+        "takeProfitPrice": "Giá chốt lời",
+        "expectedGain": "Lợi nhuận dự kiến",
+        "toggleGainCurrency": "Chuyển đổi đơn vị lợi nhuận giữa đô la và phần trăm",
+        "stopLossPrice": "Giá dừng lỗ",
+        "expectedLoss": "Thua lỗ dự kiến",
+        "toggleLossCurrency": "Chuyển đổi đơn vị thua lỗ giữa đô la và phần trăm",
+        "setMidPrice": "Đặt giá trung bình",
+        "selectSizeDenomination": "Chọn đơn vị kích thước"
     },
     "chart": {
         "liqPrice": "Giá thanh lý"
@@ -600,7 +629,8 @@
         "more": "Thêm",
         "termsOfService": "Điều khoản dịch vụ",
         "privacyPolicy": "Chính sách bảo mật",
-        "pageNotFound": "Không tìm thấy trang"
+        "affiliates": "Liên kết",
+        "pageNotFound": "Không Tìm Thấy Trang"
     },
     "docs": {
         "menuTerms": "Điều khoản dịch vụ",
@@ -627,7 +657,7 @@
                     },
                     {
                         "id": "settings.open",
-                        "keys": ["alt", ","],
+                        "keys": ["mod", ","],
                         "description": "Mở cài đặt"
                     },
                     {
@@ -659,6 +689,11 @@
                         "id": "trading.limit",
                         "keys": ["l"],
                         "description": "Bắt đầu lệnh giới hạn"
+                    },
+                    {
+                        "id": "trading.marketClose",
+                        "keys": ["alt", "m"],
+                        "description": "Đóng vị thế theo giá thị trường"
                     }
                 ]
             },
