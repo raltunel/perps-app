@@ -626,12 +626,19 @@ export const TradingViewProvider: React.FC<{
     }, [symbol, chart]);
 
     useEffect(() => {
-        if (dataFeedRef.current && userAddress && chart) {
+        if (!dataFeedRef.current || !chart) return;
+
+        if (!userAddress) {
             chart.chart().clearMarks();
-            dataFeedRef.current.updateUserAddress(userAddress);
-            getMarkFillData(symbol, userAddress);
-            chart.chart().refreshMarks();
+            dataFeedRef.current.updateUserAddress('');
+            dataFeedRef.current.updateUserFills([]);
+            return;
         }
+
+        chart.chart().clearMarks();
+        dataFeedRef.current.updateUserAddress(userAddress);
+        getMarkFillData(symbol, userAddress);
+        chart.chart().refreshMarks();
     }, [userAddress, chart, symbol]);
 
     useEffect(() => {
