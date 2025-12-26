@@ -643,101 +643,48 @@
         "title": "キーボードショートカット",
         "hintPress": "",
         "hintToClose": "で閉じる",
+        "applyDefaults": "デフォルトに戻す",
+        "editShortcut": "ショートカットを編集",
+        "pressKeys": "キーを押してください...",
         "aria": {
             "close": "キーボードショートカットを閉じる"
         },
-        "categories": [
-            {
-                "title": "一般",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "ショートカットを表示"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "設定を開く"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "モーダルを閉じる / キャンセル"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "一般",
+            "trading": "取引",
+            "navigation": "ナビゲーション"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "ショートカットを表示"
             },
-            {
-                "title": "取引",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "買いに切り替え"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "売りに切り替え"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "成行注文を開始"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "指値注文を開始"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "成行でポジションをクローズ"
-                    }
-                ]
+            "settings": {
+                "open": "設定を開く"
             },
-            {
-                "title": "ナビゲーション",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "取引ページへ移動"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "ホームへ移動"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "ポートフォリオへ移動"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "ウォレット接続を開く"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "入金モーダルを開く"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "出金モーダルを開く"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "最新のトランザクションをエクスプローラーで表示"
-                    }
-                ]
+            "modal": {
+                "close": "モーダルを閉じる / キャンセル"
+            },
+            "trading": {
+                "buy": "買いに切り替え",
+                "sell": "売りに切り替え",
+                "market": "成行注文を開始",
+                "limit": "指値注文を開始",
+                "marketClose": "成行でポジションをクローズ"
+            },
+            "navigation": {
+                "trade": "取引ページへ移動",
+                "home": "ホームへ移動",
+                "portfolio": "ポートフォリオへ移動"
+            },
+            "wallet": {
+                "connect": "ウォレット接続を開く"
+            },
+            "portfolio": {
+                "deposit": "入金モーダルを開く",
+                "withdraw": "出金モーダルを開く",
+                "latestTx": "最新のトランザクションをエクスプローラーで表示"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",

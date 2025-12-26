@@ -643,101 +643,48 @@
         "title": "Phím tắt bàn phím",
         "hintPress": "Nhấn",
         "hintToClose": "để đóng",
+        "applyDefaults": "Áp dụng mặc định",
+        "editShortcut": "Chỉnh sửa phím tắt",
+        "pressKeys": "Nhấn phím...",
         "aria": {
             "close": "Đóng phím tắt bàn phím"
         },
-        "categories": [
-            {
-                "title": "Chung",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "Hiển thị phím tắt"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "Mở cài đặt"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "Đóng hộp thoại / hủy"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "Chung",
+            "trading": "Giao dịch",
+            "navigation": "Điều hướng"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Hiển thị phím tắt"
             },
-            {
-                "title": "Giao dịch",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "Chuyển sang mua"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "Chuyển sang bán"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "Bắt đầu lệnh thị trường"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "Bắt đầu lệnh giới hạn"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "Đóng vị thế theo giá thị trường"
-                    }
-                ]
+            "settings": {
+                "open": "Mở cài đặt"
             },
-            {
-                "title": "Điều hướng",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "Đi tới trang giao dịch"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "Đi tới trang chủ"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "Đi tới trang danh mục"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Mở kết nối ví"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Mở nạp tiền"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "Mở rút tiền"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "Xem giao dịch mới nhất trên trình khám phá"
-                    }
-                ]
+            "modal": {
+                "close": "Đóng hộp thoại / hủy"
+            },
+            "trading": {
+                "buy": "Chuyển sang mua",
+                "sell": "Chuyển sang bán",
+                "market": "Bắt đầu lệnh thị trường",
+                "limit": "Bắt đầu lệnh giới hạn",
+                "marketClose": "Đóng vị thế theo giá thị trường"
+            },
+            "navigation": {
+                "trade": "Đi tới trang giao dịch",
+                "home": "Đi tới trang chủ",
+                "portfolio": "Đi tới trang danh mục"
+            },
+            "wallet": {
+                "connect": "Mở kết nối ví"
+            },
+            "portfolio": {
+                "deposit": "Mở nạp tiền",
+                "withdraw": "Mở rút tiền",
+                "latestTx": "Xem giao dịch mới nhất trên trình khám phá"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",
