@@ -95,6 +95,8 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
         userOrders,
     } = useTradeDataStore();
 
+    const { balance } = useUnifiedMarginData();
+
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const { isDebugWalletActive } = useDebugStore();
     const { assignDefaultAddress } = useApp();
@@ -248,16 +250,24 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
     // Get item count for a section
     const getItemCount = (sectionKey: string): number | null => {
         switch (sectionKey) {
+            case 'common.balances':
+                return balance ? 1 : 0;
+
             case 'common.positions':
                 return positions?.length ?? null;
+
             case 'common.openOrders':
                 return userOrders?.length ?? null;
+
             case 'common.tradeHistory':
                 return userFills?.length ?? null;
+
             case 'common.fundingHistory':
                 return userFundings?.length ?? null;
+
             case 'common.orderHistory':
                 return orderHistory?.length ?? null;
+
             default:
                 return null;
         }
@@ -300,7 +310,10 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
                         <div key={sectionKey} className={styles.stackedSection}>
                             <div className={styles.stackedSectionHeader}>
                                 <h3 className={styles.stackedSectionTitle}>
-                                    {sectionInfo.title} ({countText})
+                                    {sectionInfo.title}
+                                    {countText !== null
+                                        ? ` (${countText})`
+                                        : ''}
                                     {/* ({' '}
                                     <p
                                         className={
