@@ -35,7 +35,6 @@ export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
     destroy: () => void;
     updateUserFills: (fills: UserFillIF[]) => void;
-    currentFills: () => UserFillIF[];
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -224,8 +223,6 @@ export const createDataFeed = (
             onDataCallback: (marks: Mark[]) => void,
             resolution: ResolutionString,
         ) => {
-            console.log('>>>>> getMarks method');
-
             onMarksCallback = onDataCallback;
             lastResolution = resolution;
 
@@ -467,10 +464,6 @@ export const createDataFeed = (
                     `No active subscription found for listenerGuid: ${listenerGuid}`,
                 );
             }
-        },
-
-        currentFills: () => {
-            return userFills;
         },
 
         updateUserAddress,
