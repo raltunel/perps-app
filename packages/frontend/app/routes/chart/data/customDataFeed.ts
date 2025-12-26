@@ -23,7 +23,6 @@ import {
 import { processWSCandleMessage } from './processChartData';
 import {
     convertResolutionToIntervalParam,
-    resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
 import { useChartStore } from '~/stores/TradingviewChartStore';
@@ -60,6 +59,11 @@ export const createDataFeed = (
         currentUserAddress = newAddress;
     };
 
+    const normalizeEpochSeconds = (time: number): number => {
+        if (!Number.isFinite(time)) return 0;
+        return time > 1e11 ? Math.floor(time / 1000) : Math.floor(time);
+    };
+
     const processUserFills = (
         userFills: UserFillIF[],
         resolution?: ResolutionString,
@@ -67,12 +71,9 @@ export const createDataFeed = (
     ) => {
         const chartTheme = getMarkColorData();
         if (!chartTheme) return;
-        const floorMode = resolutionToSecondsMiliSeconds(resolution || '');
 
         const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
         const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
-
-        console.log('>>>>> resolution', resolution);
 
         userFills.sort((a, b) => b.time - a.time);
 
@@ -81,7 +82,7 @@ export const createDataFeed = (
             const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
             const markData = {
                 id: fill.oid,
-                time: (Math.floor(fill.time / floorMode) * floorMode) / 1000,
+                time: normalizeEpochSeconds(fill.time),
                 color: {
                     border: markerColor,
                     background: markerColor,
