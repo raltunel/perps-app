@@ -632,14 +632,6 @@ export const TradingViewProvider: React.FC<{
             dataFeedRef.current.updateUserAddress(userAddress);
             getMarkFillData(symbol, userAddress);
             chart.chart().refreshMarks();
-            // setTimeout(() => {
-            //     console.log('>>>>>> Refreshing marks');
-
-            //     setTimeout(() => {
-            //         console.log('>>>>>> Refreshing marks22222222');
-            //         chart.chart().refreshMarks();
-            //     }, 1200);
-            // }, 1200);
         }
     }, [userAddress, chart, symbol]);
 
