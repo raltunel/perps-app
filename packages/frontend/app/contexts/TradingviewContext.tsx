@@ -103,8 +103,6 @@ export const TradingViewProvider: React.FC<{
 
     const { userAddress } = useUserDataStore();
 
-    const shouldRefreshMarksRef = useRef(true);
-
     const { showBuysSellsOnChart } = useAppOptions();
 
     const [chartInterval, setChartInterval] = useState<string | undefined>(
@@ -631,17 +629,17 @@ export const TradingViewProvider: React.FC<{
     useEffect(() => {
         if (dataFeedRef.current && userAddress && chart) {
             chart.chart().clearMarks();
-            chart.chart().refreshMarks();
             dataFeedRef.current.updateUserAddress(userAddress);
             getMarkFillData(symbol, userAddress);
-            setTimeout(() => {
-                console.log('>>>>>> Refreshing marks');
+            chart.chart().refreshMarks();
+            // setTimeout(() => {
+            //     console.log('>>>>>> Refreshing marks');
 
-                setTimeout(() => {
-                    console.log('>>>>>> Refreshing marks22222222');
-                    chart.chart().refreshMarks();
-                }, 1200);
-            }, 1200);
+            //     setTimeout(() => {
+            //         console.log('>>>>>> Refreshing marks22222222');
+            //         chart.chart().refreshMarks();
+            //     }, 1200);
+            // }, 1200);
         }
     }, [userAddress, chart, symbol]);
 
