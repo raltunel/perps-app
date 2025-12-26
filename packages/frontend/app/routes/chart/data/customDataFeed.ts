@@ -181,6 +181,7 @@ export const createDataFeed = (
 
             const processUserFills = () => {
                 userFills.sort((a, b) => b.time - a.time);
+                let markArray: Mark[] = [];
 
                 userFills.forEach((fill) => {
                     const isBuy = fill.side === 'B' || fill.side === 'buy';
@@ -217,15 +218,14 @@ export const createDataFeed = (
                         );
                     }
 
-                    const markArray = [
+                    markArray = [
                         ...bSideOrderHistoryMarks.values(),
                         ...aSideOrderHistoryMarks.values(),
                     ];
 
                     markArray.sort((a: any, b: any) => b.px - a.px);
-
-                    onDataCallback(markArray);
                 });
+                onDataCallback(markArray);
             };
 
             userFillsInterval = setInterval(processUserFills, 3000);

@@ -370,7 +370,7 @@ export const TradingViewProvider: React.FC<{
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '1h') as ResolutionString,
+            interval: (chartState?.interval || '60') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
@@ -382,7 +382,7 @@ export const TradingViewProvider: React.FC<{
                     : []),
             ],
             favorites: {
-                intervals: ['5', '1h', 'D'] as ResolutionString[],
+                intervals: ['5', '60', 'D'] as ResolutionString[],
             },
             locale: mapI18nToTvLocale(i18n.language) as LanguageCode,
             theme: 'dark',
