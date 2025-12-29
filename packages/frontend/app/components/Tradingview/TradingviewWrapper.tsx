@@ -84,7 +84,7 @@ const TradingViewWrapper: React.FC = () => {
                     setChartLoadingStatus={setChartLoadingStatus}
                 >
                     <TradingViewChart />
-                    <OverlayCanvas />
+                    {/* <OverlayCanvas /> */}
                     <YaxisOverlayCanvas />
                     <OrderLinesOverlayCanvas />
                     <LimitOrderPlacementCanvas />
