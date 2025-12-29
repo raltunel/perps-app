@@ -480,13 +480,12 @@
 
 .mobileStatLabel {
     font-size: var(--font-size-s);
-    text-transform: uppercase;
     color: var(--text2);
     margin-bottom: var(--margin-xs);
 }
 
 .mobileStatValue {
-    font-size: var(--font-size-m);
+    font-size: var(--font-size-s);
     color: var(--text1);
 }
 
@@ -1096,7 +1095,7 @@
     }
 
     .mobileStatValue {
-        font-size: var(--font-size-m);
+        font-size: var(--font-size-s);
     }
 
     .toggleButton {
