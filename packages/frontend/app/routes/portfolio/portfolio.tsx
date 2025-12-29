@@ -421,12 +421,8 @@ function Portfolio() {
                                     <PortfolioTables
                                         layout='stacked'
                                         visibleSections={[
-                                            'common.positions',
-                                            'common.openOrders',
-                                            'common.balances',
                                             'common.tradeHistory',
                                             'common.orderHistory',
-                                            'common.depositsAndWithdrawals',
                                         ]}
                                         stackedTableHeight={250}
                                     />

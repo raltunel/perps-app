@@ -64,7 +64,7 @@
     width: 100%;
 
     /* Key fixes for mobile browsers */
-    max-height: 85dvh; /* Dynamic viewport height - adapts to browser UI */
+    /* max-height: 85dvh;  */
 
     /* This is important: extend the background color all the way to the bottom */
     padding-bottom: env(safe-area-inset-bottom, 16px);
