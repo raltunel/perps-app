@@ -644,101 +644,48 @@
         "title": "Klavye Kısayolları",
         "hintPress": "",
         "hintToClose": "ile kapat",
+        "applyDefaults": "Varsayılanları Uygula",
+        "editShortcut": "Kısayolu düzenle",
+        "pressKeys": "Tuşlara basın...",
         "aria": {
             "close": "Klavye kısayollarını kapat"
         },
-        "categories": [
-            {
-                "title": "Genel",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "Kısayolları göster"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "Ayarları aç"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "Pencereyi kapat / iptal"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "Genel",
+            "trading": "Trading",
+            "navigation": "Gezinme"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Kısayolları göster"
             },
-            {
-                "title": "Trading",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "Alışa geç"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "Satışa geç"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "Piyasa emrini başlat"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "Limit emrini başlat"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "Pozisyonu piyasa fiyatından kapat"
-                    }
-                ]
+            "settings": {
+                "open": "Ayarları aç"
             },
-            {
-                "title": "Gezinme",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "Trading sayfasına git"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "Ana sayfaya git"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "Portföy sayfasına git"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Cüzdan bağlayıcıyı aç"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Yatırma penceresini aç"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "Çekme penceresini aç"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "En son işlemi blok gezgininde görüntüle"
-                    }
-                ]
+            "modal": {
+                "close": "Pencereyi kapat / iptal"
+            },
+            "trading": {
+                "buy": "Alışa geç",
+                "sell": "Satışa geç",
+                "market": "Piyasa emrini başlat",
+                "limit": "Limit emrini başlat",
+                "marketClose": "Pozisyonu piyasa fiyatından kapat"
+            },
+            "navigation": {
+                "trade": "Trading sayfasına git",
+                "home": "Ana sayfaya git",
+                "portfolio": "Portföy sayfasına git"
+            },
+            "wallet": {
+                "connect": "Cüzdan bağlayıcıyı aç"
+            },
+            "portfolio": {
+                "deposit": "Yatırma penceresini aç",
+                "withdraw": "Çekme penceresini aç",
+                "latestTx": "En son işlemi blok gezgininde görüntüle"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",

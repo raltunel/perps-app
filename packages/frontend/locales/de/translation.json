@@ -644,101 +644,48 @@
         "title": "Tastenkürzel",
         "hintPress": "Drücke",
         "hintToClose": "zum Schließen",
+        "applyDefaults": "Standardwerte anwenden",
+        "editShortcut": "Tastenkürzel bearbeiten",
+        "pressKeys": "Tasten drücken...",
         "aria": {
             "close": "Tastenkürzel schließen"
         },
-        "categories": [
-            {
-                "title": "Allgemein",
-                "shortcuts": [
-                    {
-                        "id": "shortcuts.open",
-                        "keys": ["shift", "?"],
-                        "description": "Tastenkürzel anzeigen"
-                    },
-                    {
-                        "id": "settings.open",
-                        "keys": ["mod", ","],
-                        "description": "Einstellungen öffnen"
-                    },
-                    {
-                        "id": "modal.close",
-                        "keys": ["esc"],
-                        "description": "Modal schließen / abbrechen"
-                    }
-                ]
+        "categoryTitles": {
+            "general": "Allgemein",
+            "trading": "Handel",
+            "navigation": "Navigation"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Tastenkürzel anzeigen"
             },
-            {
-                "title": "Handel",
-                "shortcuts": [
-                    {
-                        "id": "trading.buy",
-                        "keys": ["b"],
-                        "description": "Zu Kaufen wechseln"
-                    },
-                    {
-                        "id": "trading.sell",
-                        "keys": ["s"],
-                        "description": "Zu Verkaufen wechseln"
-                    },
-                    {
-                        "id": "trading.market",
-                        "keys": ["m"],
-                        "description": "Market-Order starten"
-                    },
-                    {
-                        "id": "trading.marketClose",
-                        "keys": ["alt", "m"],
-                        "description": "Market Close öffnen"
-                    },
-                    {
-                        "id": "trading.limit",
-                        "keys": ["l"],
-                        "description": "Limit-Order starten"
-                    }
-                ]
+            "settings": {
+                "open": "Einstellungen öffnen"
             },
-            {
-                "title": "Navigation",
-                "shortcuts": [
-                    {
-                        "id": "navigation.trade",
-                        "keys": ["t"],
-                        "description": "Zur Handelsseite"
-                    },
-                    {
-                        "id": "navigation.home",
-                        "keys": ["h"],
-                        "description": "Zur Startseite"
-                    },
-                    {
-                        "id": "navigation.portfolio",
-                        "keys": ["p"],
-                        "description": "Zur Portfolio-Seite"
-                    },
-                    {
-                        "id": "wallet.connect",
-                        "keys": ["c"],
-                        "description": "Wallet-Connector öffnen"
-                    },
-                    {
-                        "id": "portfolio.deposit",
-                        "keys": ["d"],
-                        "description": "Einzahlungsmodal öffnen"
-                    },
-                    {
-                        "id": "portfolio.withdraw",
-                        "keys": ["w"],
-                        "description": "Auszahlungsmodal öffnen"
-                    },
-                    {
-                        "id": "portfolio.latestTx",
-                        "keys": ["e"],
-                        "description": "Letzte Transaktion im Block-Explorer ansehen"
-                    }
-                ]
+            "modal": {
+                "close": "Modal schließen / abbrechen"
+            },
+            "trading": {
+                "buy": "Zu Kaufen wechseln",
+                "sell": "Zu Verkaufen wechseln",
+                "market": "Market-Order starten",
+                "limit": "Limit-Order starten",
+                "marketClose": "Market Close öffnen"
+            },
+            "navigation": {
+                "trade": "Zur Handelsseite",
+                "home": "Zur Startseite",
+                "portfolio": "Zur Portfolio-Seite"
+            },
+            "wallet": {
+                "connect": "Wallet-Connector öffnen"
+            },
+            "portfolio": {
+                "deposit": "Einzahlungsmodal öffnen",
+                "withdraw": "Auszahlungsmodal öffnen",
+                "latestTx": "Letzte Transaktion im Block-Explorer ansehen"
             }
-        ],
+        },
         "keyLabels": {
             "esc": "Esc",
             "escape": "Esc",
