@@ -112,7 +112,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [chart, scaleDataRef.current]);
+    }, [chart, JSON.stringify(scaleDataRef?.current?.yScale.domain())]);
 
     useEffect(() => {
         if (!chart || !isChartReady) return;

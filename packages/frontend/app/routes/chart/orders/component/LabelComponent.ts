@@ -15,6 +15,7 @@ import {
     getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
+    scaleDataRef,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
 import {
@@ -602,6 +603,9 @@ const LabelComponent = ({
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
+            const price = scaleDataRef.current?.yScale.invert(offsetY);
+            console.log('>>>>> handleDragStart price', price);
+
             const isLabel = findLimitLabelAtPosition(
                 offsetX,
                 offsetY,
@@ -643,6 +647,7 @@ const LabelComponent = ({
             const { isOutsideArea, frozenPrice } = dragStateRef.current;
 
             if (isOutsideArea && frozenPrice !== undefined) {
+                console.log('>>>>> frozenPrice', frozenPrice);
                 dragStateRef.current.tempSelectedLine = dragStateRef.current
                     .tempSelectedLine
                     ? {
@@ -659,12 +664,19 @@ const LabelComponent = ({
                 return;
             }
 
-            const { offsetY: clientY } = getXandYLocationForChartDrag(
-                event,
-                canvas.getBoundingClientRect(),
-            );
+            // const { offsetY: clientY } = getXandYLocationForChartDrag(
+            //     event,
+            //     canvas.getBoundingClientRect(),
+            // );
 
-            let advancedValue = scaleData?.yScale.invert(clientY);
+            const rect = canvas.getBoundingClientRect();
+            const clientY = (event.sourceEvent.clientY - rect?.top) * dpr;
+            // const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
+
+            console.log('>>>>> handleDragging clientY', clientY);
+
+            let advancedValue = scaleDataRef.current?.yScale.invert(clientY);
+            console.log('>>>>> handleDragging advancedValue', advancedValue);
 
             if (chart) {
                 const paneIndex = getMainSeriesPaneIndex(chart);
