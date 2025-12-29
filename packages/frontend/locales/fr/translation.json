@@ -13,6 +13,7 @@
         "error": "Erreur",
         "success": "Succès",
         "applyDefaults": "Appliquer les paramètres par défaut",
+        "changeApplied": "Modification appliquée",
         "learnMore": "En savoir plus",
         "deposit": "Déposer",
         "transfer": "Transférer",
@@ -337,7 +338,8 @@
         "openLong": "Ouvrir Long",
         "openShort": "Ouvrir Short",
         "closeLong": "Fermer Long",
-        "closeShort": "Fermer Short"
+        "closeShort": "Fermer Short",
+        "goToMarket": "Aller au marché {{coin}}"
     },
     "time": {
         "second": "seconde",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "Parrainages",
-        "description": "Parrainez des utilisateurs et gagnez des récompenses. Les affiliés gagnent plus.",
+        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés obtiennent des récompenses plus élevées.",
         "tradersReferred": "Traders parrainés",
-        "rewardsEarned": "Récompenses gagnées"
+        "rewardsEarned": "Récompenses obtenues",
+        "rewardHistory": "Historique des récompenses",
+        "enterCode": "Saisir le code",
+        "claim": "Réclamer",
+        "createCode": "Créer un code"
     },
     "deposit": {
         "prompt": "Déposer {{token}} depuis Fogo",
@@ -440,6 +446,9 @@
         "skipOpenOrderConfirm": "Omettre la confirmation de l'ordre ouvert",
         "enableTxNotifications": "Activer les notifications de transaction",
         "enableBackgroundFillNotif": "Activer les notifications d'exécution en arrière-plan",
+        "navigationKeyboardShortcuts": "Activer les raccourcis clavier de navigation",
+        "tradingKeyboardShortcuts": "Activer les raccourcis clavier de trading",
+        "viewKeyboardShortcuts": "Voir les raccourcis clavier",
         "numberFormat": "Format de nombre",
         "color": "Couleur",
         "language": "Langue"
@@ -512,13 +521,15 @@
     },
     "leverage": {
         "title": "Ajuster l'effet de levier",
-        "closePositionPrompt": "Clôturez la position pour réduire le levier"
+        "closePositionPrompt": "Clôturez la position pour réduire le levier",
+        "adjustLeverage": "Ajuster l'effet de levier, actuellement {{value}}x"
     },
     "share": {
         "prompt": "Personnalisez votre texte",
         "xCTA": "Partager sur 𝕏",
         "copyLinkCTA": "Copier le lien",
-        "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant"
+        "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant",
+        "sharePosition": "Partager la position avec PnL {{pnl}}"
     },
     "colors": {
         "default": "Par défaut",
@@ -564,19 +575,149 @@
         "toggleTPSL": "Activer/désactiver Take Profit / Stop Loss",
         "editTPSL": "Modifier Take Profit / Stop Loss",
         "toggleConfigureAmount": "Activer/désactiver la configuration du montant",
-        "toggleLimitPrice": "Activer/désactiver le prix limite"
+        "toggleLimitPrice": "Activer/désactiver le prix limite",
+        "setMaxAmount": "Définir le montant maximum",
+        "rowsPerPage": "Lignes par page",
+        "closeModal": "Fermer la fenêtre",
+        "goToHome": "Aller à l'accueil",
+        "spotTradingOpensNewTab": "Trading spot sur Ambient v1 (ouvre dans un nouvel onglet)",
+        "moreOptions": "Plus d'options",
+        "notifications": "Notifications",
+        "transferAmount": "Montant du transfert",
+        "viewOnExplorerNewTab": "Voir sur l'explorateur (ouvre dans un nouvel onglet)",
+        "externalLinkOpensNewTab": "{{linkText}} (ouvre dans un nouvel onglet)",
+        "opensInNewTab": "(ouvre dans un nouvel onglet)",
+        "selectTokenCurrent": "Sélectionner le jeton, actuel : {{symbol}}",
+        "mobileTradeNavigation": "Navigation de trading",
+        "takeProfitPrice": "Prix de prise de profit",
+        "expectedGain": "Gain attendu",
+        "toggleGainCurrency": "Basculer la devise de gain entre dollars et pourcentage",
+        "stopLossPrice": "Prix de stop loss",
+        "expectedLoss": "Perte attendue",
+        "toggleLossCurrency": "Basculer la devise de perte entre dollars et pourcentage",
+        "setMidPrice": "Définir le prix médian",
+        "selectSizeDenomination": "Sélectionner la dénomination de taille"
     },
     "chart": {
         "liqPrice": "Prix de liq."
     },
     "meta": {
-        "title": "Accueil | Ambient",
+        "title": "Ambient Finance | Contrats perpétuels sur Fogo",
+        "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",
         "content": "Trader des Perps avec Ambient"
     },
+    "pageTitles": {
+        "portfolio": "Portefeuille",
+        "referrals": "Parrainages",
+        "points": "Points",
+        "leaderboard": "Classement",
+        "newStrategy": "Nouvelle Stratégie",
+        "editStrategy": "Modifier la Stratégie",
+        "strategy": "Stratégie",
+        "strategies": "Stratégies",
+        "vault": "Coffre",
+        "vaults": "Coffres",
+        "subAccounts": "Sous-comptes",
+        "positions": "Positions",
+        "openOrders": "Ordres Ouverts",
+        "orderHistory": "Historique des Ordres",
+        "tradeHistory": "Historique des Transactions",
+        "twapFillHistory": "Historique d'Exécution TWAP",
+        "twapHistory": "Historique TWAP",
+        "depositsAndWithdrawals": "Dépôts et Retraits",
+        "fundingHistory": "Historique de Financement",
+        "more": "Plus",
+        "termsOfService": "Conditions d'Utilisation",
+        "privacyPolicy": "Politique de Confidentialité",
+        "affiliates": "Affiliés",
+        "pageNotFound": "Page Non Trouvée"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "Conditions",
+        "menuPrivacy": "Confidentialité",
+        "terms": "Conditions d'utilisation de CROCODILE Labs",
+        "privacy": "Politique de confidentialité"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Raccourcis",
+        "title": "Raccourcis clavier",
+        "hintPress": "Appuyez sur",
+        "hintToClose": "pour fermer",
+        "applyDefaults": "Appliquer les valeurs par défaut",
+        "editShortcut": "Modifier le raccourci",
+        "pressKeys": "Appuyez sur les touches...",
+        "aria": {
+            "close": "Fermer les raccourcis clavier"
+        },
+        "categoryTitles": {
+            "general": "Général",
+            "trading": "Trading",
+            "navigation": "Navigation"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Afficher les raccourcis"
+            },
+            "settings": {
+                "open": "Ouvrir les paramètres"
+            },
+            "modal": {
+                "close": "Fermer la fenêtre / annuler"
+            },
+            "trading": {
+                "buy": "Passer en achat",
+                "sell": "Passer en vente",
+                "market": "Démarrer un ordre au marché",
+                "limit": "Démarrer un ordre limite",
+                "marketClose": "Clôturer la position au prix du marché"
+            },
+            "navigation": {
+                "trade": "Aller à la page trading",
+                "home": "Aller à l'accueil",
+                "portfolio": "Aller au portfolio"
+            },
+            "wallet": {
+                "connect": "Ouvrir le connecteur de wallet"
+            },
+            "portfolio": {
+                "deposit": "Ouvrir la fenêtre de dépôt",
+                "withdraw": "Ouvrir la fenêtre de retrait",
+                "latestTx": "Voir la dernière transaction dans l'explorateur"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }
