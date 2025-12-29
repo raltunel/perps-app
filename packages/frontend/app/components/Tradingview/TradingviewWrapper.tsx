@@ -4,6 +4,7 @@ import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
+import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
 import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
 import LimitOrderPlacementCanvas from '~/routes/chart/overlayCanvas/LimitOrderPlacementCanvas';
 import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
@@ -83,6 +84,8 @@ const TradingViewWrapper: React.FC = () => {
                     setChartLoadingStatus={setChartLoadingStatus}
                 >
                     <TradingViewChart />
+                    <OverlayCanvas />
+                    <YaxisOverlayCanvas />
                     <OrderLinesOverlayCanvas />
                     <LimitOrderPlacementCanvas />
                 </TradingViewProvider>

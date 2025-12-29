@@ -13,6 +13,7 @@
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
+        "changeApplied": "변경 사항 적용됨",
         "learnMore": "더 알아보기",
         "deposit": "입금",
         "transfer": "이체",
@@ -337,7 +338,8 @@
         "openLong": "롱 오픈",
         "openShort": "숏 오픈",
         "closeLong": "롱 종료",
-        "closeShort": "숏 종료"
+        "closeShort": "숏 종료",
+        "goToMarket": "{{coin}} 마켓으로 이동"
     },
     "time": {
         "second": "초",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "추천",
-        "description": "사용자를 추천하고 보상을 받을 수 있습니다. 제휴 파트너는 더 많은 보상 획득 가능!",
+        "description": "사용자를 추천하여 보상을 받으세요. 제휴 파트너는 더 높은 보상을 얻습니다.",
         "tradersReferred": "추천된 트레이더",
-        "rewardsEarned": "획득한 보상"
+        "rewardsEarned": "획득한 보상",
+        "rewardHistory": "보상 내역",
+        "enterCode": "코드 입력",
+        "claim": "요청하기",
+        "createCode": "코드 생성"
     },
     "deposit": {
         "prompt": "Fogo에서 {{token}} 입금하기",
@@ -440,6 +446,9 @@
         "skipOpenOrderConfirm": "주문 개시 확인 생략",
         "enableTxNotifications": "거래 알림 활성화",
         "enableBackgroundFillNotif": "백그라운드 체결 알림 활성화",
+        "navigationKeyboardShortcuts": "내비게이션 키보드 단축키 활성화",
+        "tradingKeyboardShortcuts": "거래 키보드 단축키 활성화",
+        "viewKeyboardShortcuts": "키보드 단축키 보기",
         "numberFormat": "숫자 형식",
         "color": "색상",
         "language": "언어"
@@ -512,13 +521,15 @@
     },
     "leverage": {
         "title": "레버리지 조정",
-        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요"
+        "closePositionPrompt": "최소 레버리지를 낮추려면 포지션을 먼저 종료해 주세요",
+        "adjustLeverage": "레버리지 조정, 현재 {{value}}배"
     },
     "share": {
         "prompt": "텍스트 편집",
         "xCTA": "𝕏에 공유",
         "copyLinkCTA": "링크 복사",
-        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요"
+        "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요",
+        "sharePosition": "PnL {{pnl}} 포지션 공유"
     },
     "colors": {
         "default": "기본",
@@ -564,19 +575,149 @@
         "toggleTPSL": "TP/SL 전환",
         "editTPSL": "TP/SL 편집",
         "toggleConfigureAmount": "금액 설정 전환",
-        "toggleLimitPrice": "지정가 전환"
+        "toggleLimitPrice": "지정가 전환",
+        "setMaxAmount": "최대 금액 설정",
+        "rowsPerPage": "페이지당 행 수",
+        "closeModal": "모달 닫기",
+        "goToHome": "홈으로 이동",
+        "spotTradingOpensNewTab": "Ambient v1 현물 거래 (새 탭에서 열기)",
+        "moreOptions": "더 보기",
+        "notifications": "알림",
+        "transferAmount": "송금 금액",
+        "viewOnExplorerNewTab": "탐색기에서 보기 (새 탭에서 열기)",
+        "externalLinkOpensNewTab": "{{linkText}} (새 탭에서 열기)",
+        "opensInNewTab": "(새 탭에서 열기)",
+        "selectTokenCurrent": "토큰 선택, 현재: {{symbol}}",
+        "mobileTradeNavigation": "거래 내비게이션",
+        "takeProfitPrice": "익절 가격",
+        "expectedGain": "예상 수익",
+        "toggleGainCurrency": "수익 통화를 달러와 퍼센트 간 전환",
+        "stopLossPrice": "손절 가격",
+        "expectedLoss": "예상 손실",
+        "toggleLossCurrency": "손실 통화를 달러와 퍼센트 간 전환",
+        "setMidPrice": "중간 가격 설정",
+        "selectSizeDenomination": "수량 단위 선택"
     },
     "chart": {
         "liqPrice": "청산 가격"
     },
     "meta": {
-        "title": "홈 | Ambient",
+        "title": "Ambient Finance | Fogo 무기한 선물",
+        "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",
         "content": "앰비언트에서 페페츄얼 거래"
     },
+    "pageTitles": {
+        "portfolio": "포트폴리오",
+        "referrals": "추천",
+        "points": "포인트",
+        "leaderboard": "리더보드",
+        "newStrategy": "새 전략",
+        "editStrategy": "전략 편집",
+        "strategy": "전략",
+        "strategies": "전략 목록",
+        "vault": "볼트",
+        "vaults": "볼트 목록",
+        "subAccounts": "서브계정",
+        "positions": "포지션",
+        "openOrders": "미체결 주문",
+        "orderHistory": "주문 내역",
+        "tradeHistory": "거래 내역",
+        "twapFillHistory": "TWAP 체결 내역",
+        "twapHistory": "TWAP 내역",
+        "depositsAndWithdrawals": "입출금",
+        "fundingHistory": "펀딩 내역",
+        "more": "더보기",
+        "termsOfService": "이용약관",
+        "privacyPolicy": "개인정보처리방침",
+        "affiliates": "제휴인",
+        "pageNotFound": "페이지를 찾을 수 없습니다"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "이용약관",
+        "menuPrivacy": "개인정보처리방침",
+        "terms": "CROCODILE Labs 이용약관",
+        "privacy": "개인정보처리방침"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "단축키",
+        "title": "키보드 단축키",
+        "hintPress": "",
+        "hintToClose": "로 닫기",
+        "applyDefaults": "기본값 적용",
+        "editShortcut": "단축키 편집",
+        "pressKeys": "키를 누르세요...",
+        "aria": {
+            "close": "키보드 단축키 닫기"
+        },
+        "categoryTitles": {
+            "general": "일반",
+            "trading": "거래",
+            "navigation": "내비게이션"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "단축키 보기"
+            },
+            "settings": {
+                "open": "설정 열기"
+            },
+            "modal": {
+                "close": "모달 닫기 / 취소"
+            },
+            "trading": {
+                "buy": "매수로 전환",
+                "sell": "매도로 전환",
+                "market": "시장가 주문 시작",
+                "limit": "지정가 주문 시작",
+                "marketClose": "시장가로 포지션 청산"
+            },
+            "navigation": {
+                "trade": "거래 페이지로 이동",
+                "home": "홈으로 이동",
+                "portfolio": "포트폴리오로 이동"
+            },
+            "wallet": {
+                "connect": "지갑 연결 열기"
+            },
+            "portfolio": {
+                "deposit": "입금 모달 열기",
+                "withdraw": "출금 모달 열기",
+                "latestTx": "최신 트랜잭션을 탐색기에서 보기"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

@@ -13,6 +13,7 @@
         "error": "エラー",
         "success": "成功",
         "applyDefaults": "デフォルトを適用",
+        "changeApplied": "変更が適用されました",
         "learnMore": "詳細はこちら",
         "deposit": "入金",
         "transfer": "送金",
@@ -337,7 +338,8 @@
         "openLong": "Long新規",
         "openShort": "Short新規",
         "closeLong": "Long決済",
-        "closeShort": "Short決済"
+        "closeShort": "Short決済",
+        "goToMarket": "{{coin}}マーケットへ移動"
     },
     "time": {
         "second": "秒",
@@ -412,9 +414,13 @@
     },
     "referrals": {
         "title": "紹介",
-        "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多く報酬を得られます。",
+        "description": "ユーザーを紹介して報酬を獲得しましょう。アフィリエイトはより多くの報酬を得られます。",
         "tradersReferred": "紹介されたトレーダー",
-        "rewardsEarned": "獲得報酬"
+        "rewardsEarned": "獲得した報酬",
+        "rewardHistory": "報酬履歴",
+        "enterCode": "コードを入力",
+        "claim": "請求する",
+        "createCode": "コードを作成"
     },
     "deposit": {
         "prompt": "Fogoから{{token}}を入金",
@@ -440,6 +446,9 @@
         "skipOpenOrderConfirm": "注文確認をスキップ",
         "enableTxNotifications": "取引通知を有効",
         "enableBackgroundFillNotif": "バックグラウンド約定通知を有効",
+        "navigationKeyboardShortcuts": "ナビゲーションのキーボードショートカットを有効",
+        "tradingKeyboardShortcuts": "取引のキーボードショートカットを有効",
+        "viewKeyboardShortcuts": "キーボードショートカットを表示",
         "numberFormat": "数字形式",
         "color": "色",
         "language": "言語"
@@ -512,13 +521,15 @@
     },
     "leverage": {
         "title": "レバレッジを調整",
-        "closePositionPrompt": "レバレッジを下げるにはポジション終了"
+        "closePositionPrompt": "レバレッジを下げるにはポジション終了",
+        "adjustLeverage": "レバレッジを調整、現在{{value}}倍"
     },
     "share": {
         "prompt": "テキストをカスタマイズ",
         "xCTA": "𝕏で共有",
         "copyLinkCTA": "リンクをコピー",
-        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう"
+        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう",
+        "sharePosition": "PnL {{pnl}}のポジションを共有"
     },
     "colors": {
         "default": "デフォルト",
@@ -564,19 +575,149 @@
         "toggleTPSL": "TP/SLを切り替え",
         "editTPSL": "TP/SLを編集",
         "toggleConfigureAmount": "金額設定を切り替え",
-        "toggleLimitPrice": "指値価格を切り替え"
+        "toggleLimitPrice": "指値価格を切り替え",
+        "setMaxAmount": "最大金額を設定",
+        "rowsPerPage": "ページあたりの行数",
+        "closeModal": "モーダルを閉じる",
+        "goToHome": "ホームへ移動",
+        "spotTradingOpensNewTab": "Ambient v1でのスポット取引（新しいタブで開く）",
+        "moreOptions": "その他のオプション",
+        "notifications": "通知",
+        "transferAmount": "送金額",
+        "viewOnExplorerNewTab": "エクスプローラーで表示（新しいタブで開く）",
+        "externalLinkOpensNewTab": "{{linkText}}（新しいタブで開く）",
+        "opensInNewTab": "（新しいタブで開く）",
+        "selectTokenCurrent": "トークンを選択、現在: {{symbol}}",
+        "mobileTradeNavigation": "取引ナビゲーション",
+        "takeProfitPrice": "利確価格",
+        "expectedGain": "予想利益",
+        "toggleGainCurrency": "利益通貨をドルとパーセントで切り替え",
+        "stopLossPrice": "損切り価格",
+        "expectedLoss": "予想損失",
+        "toggleLossCurrency": "損失通貨をドルとパーセントで切り替え",
+        "setMidPrice": "中間価格を設定",
+        "selectSizeDenomination": "サイズ単位を選択"
     },
     "chart": {
         "liqPrice": "清算価格"
     },
     "meta": {
-        "title": "ホーム | Ambient",
+        "title": "Ambient Finance | Fogo上の無期限先物",
+        "description": "Ambient FinanceでFogo上の無期限先物を取引。テイカー手数料ゼロ、最大100倍レバレッジ、超高速約定。",
         "content": "Ambientでパーペチュアル取引"
     },
+    "pageTitles": {
+        "portfolio": "ポートフォリオ",
+        "referrals": "紹介",
+        "points": "ポイント",
+        "leaderboard": "リーダーボード",
+        "newStrategy": "新規戦略",
+        "editStrategy": "戦略を編集",
+        "strategy": "戦略",
+        "strategies": "戦略一覧",
+        "vault": "ボールト",
+        "vaults": "ボールト一覧",
+        "subAccounts": "サブアカウント",
+        "positions": "ポジション",
+        "openOrders": "未約定注文",
+        "orderHistory": "注文履歴",
+        "tradeHistory": "取引履歴",
+        "twapFillHistory": "TWAP約定履歴",
+        "twapHistory": "TWAP履歴",
+        "depositsAndWithdrawals": "入出金",
+        "fundingHistory": "資金調達履歴",
+        "more": "その他",
+        "termsOfService": "利用規約",
+        "privacyPolicy": "プライバシーポリシー",
+        "affiliates": "アフィリエイト",
+        "pageNotFound": "ページが見つかりません"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "利用規約",
+        "menuPrivacy": "プライバシー",
+        "terms": "CROCODILE Labs 利用規約",
+        "privacy": "プライバシーポリシー"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "ショートカット",
+        "title": "キーボードショートカット",
+        "hintPress": "",
+        "hintToClose": "で閉じる",
+        "applyDefaults": "デフォルトに戻す",
+        "editShortcut": "ショートカットを編集",
+        "pressKeys": "キーを押してください...",
+        "aria": {
+            "close": "キーボードショートカットを閉じる"
+        },
+        "categoryTitles": {
+            "general": "一般",
+            "trading": "取引",
+            "navigation": "ナビゲーション"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "ショートカットを表示"
+            },
+            "settings": {
+                "open": "設定を開く"
+            },
+            "modal": {
+                "close": "モーダルを閉じる / キャンセル"
+            },
+            "trading": {
+                "buy": "買いに切り替え",
+                "sell": "売りに切り替え",
+                "market": "成行注文を開始",
+                "limit": "指値注文を開始",
+                "marketClose": "成行でポジションをクローズ"
+            },
+            "navigation": {
+                "trade": "取引ページへ移動",
+                "home": "ホームへ移動",
+                "portfolio": "ポートフォリオへ移動"
+            },
+            "wallet": {
+                "connect": "ウォレット接続を開く"
+            },
+            "portfolio": {
+                "deposit": "入金モーダルを開く",
+                "withdraw": "出金モーダルを開く",
+                "latestTx": "最新のトランザクションをエクスプローラーで表示"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

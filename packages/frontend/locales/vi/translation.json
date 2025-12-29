@@ -13,6 +13,7 @@
         "error": "Lỗi",
         "success": "Thành công",
         "applyDefaults": "Áp dụng mặc định",
+        "changeApplied": "Đã áp dụng thay đổi",
         "learnMore": "Tìm hiểu thêm",
         "deposit": "Nạp tiền",
         "transfer": "Chuyển tiền",
@@ -201,7 +202,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Lệnh đã khớp",
-            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}"
+            "message": "Đã khớp thành công lệnh {{side}} {{usdValueOfFillStr}} cho {{symbol}} tại {{fillPrice}}",
+            "buySide": "Mua",
+            "sellSide": "Bán"
         },
         "errorUpdatingOrder": {
             "title": "Lỗi khi cập nhật lệnh"
@@ -335,7 +338,8 @@
         "openLong": "Mở Long",
         "openShort": "Mở Short",
         "closeLong": "Đóng Long",
-        "closeShort": "Đóng Short"
+        "closeShort": "Đóng Short",
+        "goToMarket": "Đi đến thị trường {{coin}}"
     },
     "time": {
         "second": "giây",
@@ -410,9 +414,13 @@
     },
     "referrals": {
         "title": "Giới thiệu",
-        "description": "Giới thiệu người dùng để nhận thưởng. Đối tác nhận thưởng cao hơn.",
-        "tradersReferred": "Nhà giao dịch đã giới thiệu",
-        "rewardsEarned": "Phần thưởng nhận được"
+        "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác nhận được phần thưởng cao hơn.",
+        "tradersReferred": "Người giao dịch đã giới thiệu",
+        "rewardsEarned": "Phần thưởng đã nhận",
+        "rewardHistory": "Lịch sử phần thưởng",
+        "enterCode": "Nhập mã",
+        "claim": "Nhận",
+        "createCode": "Tạo mã"
     },
     "deposit": {
         "prompt": "Nạp {{token}} từ Fogo",
@@ -438,6 +446,9 @@
         "skipOpenOrderConfirm": "Bỏ qua xác nhận lệnh mở",
         "enableTxNotifications": "Bật thông báo giao dịch",
         "enableBackgroundFillNotif": "Bật thông báo khớp lệnh nền",
+        "navigationKeyboardShortcuts": "Bật phím tắt bàn phím điều hướng",
+        "tradingKeyboardShortcuts": "Bật phím tắt bàn phím giao dịch",
+        "viewKeyboardShortcuts": "Xem phím tắt bàn phím",
         "numberFormat": "Định dạng số",
         "color": "Màu sắc",
         "language": "Ngôn ngữ"
@@ -510,13 +521,15 @@
     },
     "leverage": {
         "title": "Điều chỉnh đòn bẩy",
-        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu"
+        "closePositionPrompt": "Đóng vị thế để giảm đòn bẩy tối thiểu",
+        "adjustLeverage": "Điều chỉnh đòn bẩy, hiện tại {{value}}x"
     },
     "share": {
         "prompt": "Tùy chỉnh văn bản của bạn",
         "xCTA": "Chia sẻ lên 𝕏",
         "copyLinkCTA": "Sao chép liên kết",
-        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay"
+        "textPlaceholder": "Giao dịch {{coin}} Perps trên {{twitter}} tại {{fogo}} Testnet ngay",
+        "sharePosition": "Chia sẻ vị thế với PnL {{pnl}}"
     },
     "colors": {
         "default": "Mặc định",
@@ -562,19 +575,149 @@
         "toggleTPSL": "Chuyển Chốt lời/Dừng lỗ",
         "editTPSL": "Chỉnh sửa Chốt lời/Dừng lỗ",
         "toggleConfigureAmount": "Chuyển nhập số tiền",
-        "toggleLimitPrice": "Chuyển nhập giá giới hạn"
+        "toggleLimitPrice": "Chuyển nhập giá giới hạn",
+        "setMaxAmount": "Đặt số tiền tối đa",
+        "rowsPerPage": "Số hàng mỗi trang",
+        "closeModal": "Đóng cửa sổ",
+        "goToHome": "Đi đến trang chủ",
+        "spotTradingOpensNewTab": "Giao dịch spot trên Ambient v1 (mở trong tab mới)",
+        "moreOptions": "Tùy chọn khác",
+        "notifications": "Thông báo",
+        "transferAmount": "Số tiền chuyển",
+        "viewOnExplorerNewTab": "Xem trên trình duyệt (mở trong tab mới)",
+        "externalLinkOpensNewTab": "{{linkText}} (mở trong tab mới)",
+        "opensInNewTab": "(mở trong tab mới)",
+        "selectTokenCurrent": "Chọn token, hiện tại: {{symbol}}",
+        "mobileTradeNavigation": "Điều hướng giao dịch",
+        "takeProfitPrice": "Giá chốt lời",
+        "expectedGain": "Lợi nhuận dự kiến",
+        "toggleGainCurrency": "Chuyển đổi đơn vị lợi nhuận giữa đô la và phần trăm",
+        "stopLossPrice": "Giá dừng lỗ",
+        "expectedLoss": "Thua lỗ dự kiến",
+        "toggleLossCurrency": "Chuyển đổi đơn vị thua lỗ giữa đô la và phần trăm",
+        "setMidPrice": "Đặt giá trung bình",
+        "selectSizeDenomination": "Chọn đơn vị kích thước"
     },
     "chart": {
         "liqPrice": "Giá thanh lý"
     },
     "meta": {
-        "title": "Trang chủ | Ambient",
+        "title": "Ambient Finance | Hợp đồng vĩnh viễn trên Fogo",
+        "description": "Giao dịch hợp đồng vĩnh viễn trên Fogo với Ambient Finance. Không phí taker, đòn bẩy lên đến 100x và khớp lệnh siêu nhanh.",
         "content": "Giao dịch Perps với Ambient"
     },
+    "pageTitles": {
+        "portfolio": "Danh mục",
+        "referrals": "Giới thiệu",
+        "points": "Điểm",
+        "leaderboard": "Bảng xếp hạng",
+        "newStrategy": "Chiến lược mới",
+        "editStrategy": "Chỉnh sửa chiến lược",
+        "strategy": "Chiến lược",
+        "strategies": "Danh sách chiến lược",
+        "vault": "Kho bạc",
+        "vaults": "Danh sách kho bạc",
+        "subAccounts": "Tài khoản phụ",
+        "positions": "Vị thế",
+        "openOrders": "Lệnh mở",
+        "orderHistory": "Lịch sử lệnh",
+        "tradeHistory": "Lịch sử giao dịch",
+        "twapFillHistory": "Lịch sử khớp TWAP",
+        "twapHistory": "Lịch sử TWAP",
+        "depositsAndWithdrawals": "Nạp và rút tiền",
+        "fundingHistory": "Lịch sử cấp vốn",
+        "more": "Thêm",
+        "termsOfService": "Điều khoản dịch vụ",
+        "privacyPolicy": "Chính sách bảo mật",
+        "affiliates": "Liên kết",
+        "pageNotFound": "Không Tìm Thấy Trang"
+    },
     "docs": {
-        "menuTerms": "Terms of Service",
-        "menuPrivacy": "Privacy",
-        "terms": "CROCODILE Labs Terms of Service",
-        "privacy": "Privacy Policy"
+        "menuTerms": "Điều khoản dịch vụ",
+        "menuPrivacy": "Bảo mật",
+        "terms": "Điều khoản dịch vụ CROCODILE Labs",
+        "privacy": "Chính sách bảo mật"
+    },
+    "keyboardShortcuts": {
+        "menuLabel": "Phím tắt",
+        "title": "Phím tắt bàn phím",
+        "hintPress": "Nhấn",
+        "hintToClose": "để đóng",
+        "applyDefaults": "Áp dụng mặc định",
+        "editShortcut": "Chỉnh sửa phím tắt",
+        "pressKeys": "Nhấn phím...",
+        "aria": {
+            "close": "Đóng phím tắt bàn phím"
+        },
+        "categoryTitles": {
+            "general": "Chung",
+            "trading": "Giao dịch",
+            "navigation": "Điều hướng"
+        },
+        "descriptions": {
+            "shortcuts": {
+                "open": "Hiển thị phím tắt"
+            },
+            "settings": {
+                "open": "Mở cài đặt"
+            },
+            "modal": {
+                "close": "Đóng hộp thoại / hủy"
+            },
+            "trading": {
+                "buy": "Chuyển sang mua",
+                "sell": "Chuyển sang bán",
+                "market": "Bắt đầu lệnh thị trường",
+                "limit": "Bắt đầu lệnh giới hạn",
+                "marketClose": "Đóng vị thế theo giá thị trường"
+            },
+            "navigation": {
+                "trade": "Đi tới trang giao dịch",
+                "home": "Đi tới trang chủ",
+                "portfolio": "Đi tới trang danh mục"
+            },
+            "wallet": {
+                "connect": "Mở kết nối ví"
+            },
+            "portfolio": {
+                "deposit": "Mở nạp tiền",
+                "withdraw": "Mở rút tiền",
+                "latestTx": "Xem giao dịch mới nhất trên trình khám phá"
+            }
+        },
+        "keyLabels": {
+            "esc": "Esc",
+            "escape": "Esc",
+            "enter": "Enter",
+            "return": "Return",
+            "shift": "Shift",
+            "ctrl": "Ctrl",
+            "control": "Ctrl",
+            "alt": "Alt",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Meta",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "mod": "Mod",
+            "?": "?",
+            "/": "/",
+            "slash": "/"
+        },
+        "keyLabelsMac": {
+            "alt": "Option",
+            "option": "Option",
+            "opt": "Option",
+            "meta": "Cmd",
+            "cmd": "Cmd",
+            "command": "Cmd",
+            "ctrl": "Control",
+            "control": "Control"
+        },
+        "keyLabelsWin": {
+            "meta": "Win",
+            "cmd": "Win",
+            "command": "Win"
+        }
     }
 }

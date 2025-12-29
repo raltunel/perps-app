@@ -345,27 +345,39 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     className={`${styles.cell} ${styles.coinCell}`}
                     style={gradientStyle}
                 >
-                    <span
-                        style={{
-                            color: baseColor,
-                            cursor: isLinkDisabled ? 'default' : 'pointer',
-                        }}
-                        onClick={isLinkDisabled ? undefined : handleCoinClick}
-                    >
-                        {position.coin}
-                    </span>
+                    {isLinkDisabled ? (
+                        <span style={{ color: baseColor }}>
+                            {position.coin}
+                        </span>
+                    ) : (
+                        <button
+                            type='button'
+                            className={styles.coinButton}
+                            style={{ color: baseColor }}
+                            onClick={handleCoinClick}
+                            aria-label={t('tradeTable.goToMarket', {
+                                coin: position.coin,
+                            })}
+                        >
+                            {position.coin}
+                        </button>
+                    )}
                     {position.leverage.value &&
                         position.coin.toLowerCase() === 'btc' && (
-                            <span
+                            <button
+                                type='button'
                                 className={styles.badge}
                                 onClick={openLeverageModal}
                                 style={{
                                     color: baseColor,
                                     backgroundColor: hexToRgba(baseColor, 0.15),
                                 }}
+                                aria-label={t('leverage.adjustLeverage', {
+                                    value: Math.floor(position.leverage.value),
+                                })}
                             >
                                 {Math.floor(position.leverage.value)}x
-                            </span>
+                            </button>
                         )}
                 </div>
                 <div
@@ -385,7 +397,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 <div className={`${styles.cell} ${styles.markPriceCell}`}>
                     {formatNum(coinPriceMap.get(position.coin) ?? 0)}
                 </div>
-                <div
+                <button
+                    type='button'
                     onClick={openShareModal}
                     className={`${styles.cell} ${styles.pnlCell}`}
                     style={{
@@ -396,6 +409,15 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                   ? getBsColor().sell
                                   : 'var(--text2)',
                     }}
+                    aria-label={t('share.sharePosition', {
+                        pnl: formatNum(
+                            position.unrealizedPnl,
+                            2,
+                            true,
+                            true,
+                            true,
+                        ),
+                    })}
                 >
                     {formatNum(position.unrealizedPnl, 2, true, true, true)} (
                     {formatNum(
@@ -406,8 +428,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         true,
                     )}
                     %)
-                    <RiExternalLinkLine color='var(--text2)' />
-                </div>
+                    <RiExternalLinkLine
+                        color='var(--text2)'
+                        aria-hidden='true'
+                    />
+                </button>
                 <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                     {liquidationDisp}
                 </div>
