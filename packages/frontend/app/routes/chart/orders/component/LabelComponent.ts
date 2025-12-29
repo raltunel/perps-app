@@ -17,12 +17,16 @@ import {
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
-import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
+import {
+    formatLineLabel,
+    getPricetoPixel,
+    updateOverlayCanvasSize,
+} from '../customOrderLineUtils';
 import {
     drawLabel,
     drawLiqLabel,
-    type LabelLocation,
     type LabelType,
+    type LabelLocation,
 } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import { t } from 'i18next';
@@ -98,7 +102,9 @@ const LabelComponent = ({
         const draw = () => {
             let heightAttr = canvasSize?.height;
             let widthAttr = canvasSize?.width;
-
+            if (overlayCanvasRef.current) {
+                updateOverlayCanvasSize(overlayCanvasRef.current, canvasSize);
+            }
             if (overlayCanvasRef.current) {
                 const { iframeDoc, paneCanvas } =
                     getPaneCanvasAndIFrameDoc(chart);
