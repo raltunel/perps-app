@@ -35,6 +35,7 @@ interface QuickModeState {
     quickMode: boolean;
     showQuickModeConfirm: boolean;
     activeOrder: OrderConfig | null;
+    shouldByPassConfirmation: boolean;
 }
 
 interface OrderPlacementStore extends OrderState, QuickModeState {

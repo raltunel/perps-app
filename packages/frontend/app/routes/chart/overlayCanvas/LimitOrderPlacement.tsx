@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useTradingView } from '~/contexts/TradingviewContext';
@@ -54,7 +54,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     } | null>(null);
     const { getBsColor } = useAppSettings();
     const colors = getBsColor();
-    const { symbolInfo } = useTradeDataStore();
+    const { symbolInfo, setOrderInputPriceValue } = useTradeDataStore();
     const markPx = symbolInfo?.markPx;
     const { chart, isChartReady } = useTradingView();
     const {
@@ -137,7 +137,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     useEffect(() => {
         if (!chart || !scaleData || !overlayCanvasRef.current) return;
 
-        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
         if (!iframeDoc) return;
 
         const handleChartClick = (e: MouseEvent) => {
@@ -147,11 +147,17 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
             const canvas = overlayCanvasRef.current;
             if (!canvas) return;
+            if (!paneCanvas) return;
 
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
+
+            // added to fix y axis scaling <-> chart click conflict issue
+            if (clickX >= paneCanvas.width / dpr) {
+                return;
+            }
 
             if (buttonBounds) {
                 if (
@@ -191,13 +197,27 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
             if (!quickMode) return;
 
-            const y = e.clientY - canvas.getBoundingClientRect().top;
+            const y = (e.clientY - canvas.getBoundingClientRect().top) * dpr;
 
             const price = scaleData.yScale.invert(y);
 
             const side: 'buy' | 'sell' =
                 markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
 
+            if (!activeOrder?.bypassConfirmation) {
+                useTradeDataStore.getState().setOrderInputPriceValue({
+                    value: price,
+                    changeType: 'quickTradeMode',
+                });
+                useTradeDataStore.getState().setTradeDirection(side);
+                useTradeDataStore.getState().setMarketOrderType('limit');
+                useTradeDataStore.getState().setIsMidModeActive(false);
+                useTradeDataStore
+                    .getState()
+                    .setOrderInputSizeValue(activeOrder?.size || 0);
+
+                return;
+            }
             // Set prepared order immediately on click
             if (mousePrice && activeOrder) {
                 setPreparedOrder({

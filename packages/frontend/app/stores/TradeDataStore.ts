@@ -57,6 +57,8 @@ type TradeDataStore = UserTradeDataStore & {
     setIsPreviewOrderHovered: (isHovered: boolean) => void;
     highlightedTradeOid: number | null;
     setHighlightedTradeOid: (oid: number | null) => void;
+    orderInputSizeValue: number;
+    setOrderInputSizeValue: (size: number) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -176,6 +178,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             highlightedTradeOid: null,
             setHighlightedTradeOid: (oid: number | null) =>
                 set({ highlightedTradeOid: oid }),
+            orderInputSizeValue: 0,
+            setOrderInputSizeValue: (size: number) =>
+                set({ orderInputSizeValue: size }),
         }),
         {
             name: 'TRADE_DATA',
