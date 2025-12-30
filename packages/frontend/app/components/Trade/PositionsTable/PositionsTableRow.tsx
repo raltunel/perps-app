@@ -142,7 +142,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 );
             } else if (modalContent === 'tpsl') {
                 return (
-                    <Modal close={modalCtrl.close} title='TP/SL for Position'>
+                    <Modal
+                        close={modalCtrl.close}
+                        title={t('transactions.tpSlForPosition')}
+                    >
                         <TakeProfitsModal
                             closeTPModal={modalCtrl.close}
                             position={position}
