@@ -160,6 +160,9 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             newCanvas.style.width = `${paneCanvas.width / dpr}px`;
             wrapper.appendChild(newCanvas);
 
+            console.log('>>>>> overlayCanvasLayer.width', newCanvas.width);
+            console.log('>>>>> overlayCanvasLayer.height', newCanvas.height);
+
             canvasRef.current = newCanvas;
             canvasWrapperRef.current = wrapper;
         }
