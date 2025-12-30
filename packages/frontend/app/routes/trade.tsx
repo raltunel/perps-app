@@ -218,6 +218,16 @@ export default function Trade() {
     );
 
     useEffect(() => {
+        const handler = () => switchTab('order');
+        window.addEventListener('trade:nav:trade', handler as EventListener);
+        return () =>
+            window.removeEventListener(
+                'trade:nav:trade',
+                handler as EventListener,
+            );
+    }, [switchTab]);
+
+    useEffect(() => {
         const keydownHandler = (e: KeyboardEvent) => {
             if (e.code === 'KeyD' && e.altKey) {
                 e.preventDefault();
