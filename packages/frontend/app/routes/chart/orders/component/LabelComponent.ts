@@ -603,9 +603,6 @@ const LabelComponent = ({
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
-            const price = scaleDataRef.current?.yScale.invert(offsetY);
-            console.log('>>>>> handleDragStart price', price);
-
             const isLabel = findLimitLabelAtPosition(
                 offsetX,
                 offsetY,
@@ -647,7 +644,6 @@ const LabelComponent = ({
             const { isOutsideArea, frozenPrice } = dragStateRef.current;
 
             if (isOutsideArea && frozenPrice !== undefined) {
-                console.log('>>>>> frozenPrice', frozenPrice);
                 dragStateRef.current.tempSelectedLine = dragStateRef.current
                     .tempSelectedLine
                     ? {
@@ -673,10 +669,7 @@ const LabelComponent = ({
             const clientY = (event.sourceEvent.clientY - rect?.top) * dpr;
             // const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
-            console.log('>>>>> handleDragging clientY', clientY);
-
             let advancedValue = scaleDataRef.current?.yScale.invert(clientY);
-            console.log('>>>>> handleDragging advancedValue', advancedValue);
 
             if (chart) {
                 const paneIndex = getMainSeriesPaneIndex(chart);
