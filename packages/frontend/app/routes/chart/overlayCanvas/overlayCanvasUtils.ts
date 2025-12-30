@@ -67,15 +67,17 @@ export function getXandYLocationForChartDrag(
     event: any,
     rect: DOMRect,
 ) {
-    let offsetY = event.sourceEvent.clientY - rect?.top;
-    let offsetX = event.sourceEvent.clientX - rect?.left;
+    let dpr = window.devicePixelRatio || 1;
+
+    let offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
+    let offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
     if (
         typeof TouchEvent !== 'undefined' &&
         event.sourceEvent instanceof TouchEvent
     ) {
-        offsetY = event.sourceEvent.touches[0].clientY;
-        offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
+        offsetY = event.sourceEvent.touches[0].clientY * dpr;
+        offsetX = (event.sourceEvent.touches[0].clientX - rect?.left) * dpr;
     }
 
     return { offsetX: offsetX, offsetY: offsetY };

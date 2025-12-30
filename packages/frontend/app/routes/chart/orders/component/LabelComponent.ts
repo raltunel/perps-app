@@ -660,13 +660,13 @@ const LabelComponent = ({
                 return;
             }
 
-            // const { offsetY: clientY } = getXandYLocationForChartDrag(
-            //     event,
-            //     canvas.getBoundingClientRect(),
-            // );
+            const { offsetY: clientY } = getXandYLocationForChartDrag(
+                event,
+                canvas.getBoundingClientRect(),
+            );
 
-            const rect = canvas.getBoundingClientRect();
-            const clientY = (event.sourceEvent.clientY - rect?.top) * dpr;
+            // const rect = canvas.getBoundingClientRect();
+            // const clientY = (event.sourceEvent.clientY - rect?.top) * dpr;
             // const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
             let advancedValue = scaleDataRef.current?.yScale.invert(clientY);

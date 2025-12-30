@@ -77,6 +77,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             isClosePrice: boolean;
         };
 
+        const dpr = window.devicePixelRatio || 1;
         const labels: LabelInfo[] = [
             ...allPrices.map((price) => ({
                 price,
@@ -321,8 +322,9 @@ const YAxisOverlayCanvas: React.FC = () => {
         const handleCanvasMouseMove = (e: MouseEvent) => {
             ensureCanvasSize();
 
+            const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
+            const y = (e.clientY - rect.top) * dpr;
 
             setMouseY(y);
         };
@@ -330,8 +332,9 @@ const YAxisOverlayCanvas: React.FC = () => {
         const handleYAxisMouseMove = (e: MouseEvent) => {
             ensureCanvasSize();
 
+            const dpr = window.devicePixelRatio || 1;
             const rect = yAxisCanvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
+            const y = (e.clientY - rect.top) * dpr;
 
             setMouseY(y);
         };
