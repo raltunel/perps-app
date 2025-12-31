@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
     isEstablished,
     SessionButton,
@@ -10,6 +10,7 @@ import {
     useOrderPlacementStore,
     type TradeType,
 } from '../hooks/useOrderPlacement';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './QuickModeConfirmModal.module.css';
 
 interface QuickModeConfirmModalProps {
@@ -44,7 +45,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
     const [size, setSize] = useState<string>('');
     const [tradeType, setTradeType] = useState<TradeType>('Limit');
-    const [denom, setDenom] = useState<'USD' | string>('USD');
+    const [denom, setDenom] = useState<OrderBookMode>('usd');
 
     const [dropdownTradeOpen, setDropdownTradeOpen] = useState(false);
     const [dropdownDenomOpen, setDropdownDenomOpen] = useState(false);
@@ -57,14 +58,26 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
     const tradeTypes: TradeType[] = ['Limit'];
 
+    // Memoized denomination options (same as SizeInput.tsx)
+    const denomOptions = useMemo(() => [upperSymbol, 'USD'], [upperSymbol]);
+
+    // Memoized denomination change handler (same logic as SizeInput.tsx)
+    const handleDenomChange = useCallback(
+        (val: string) => {
+            setDenom(val === upperSymbol ? 'symbol' : 'usd');
+        },
+        [upperSymbol],
+    );
+
     useEffect(() => {
         if (activeOrder) {
             setSize(activeOrder.size.toString());
             setTradeType(activeOrder.tradeType);
-            setDenom(activeOrder.currency);
+            // Convert currency string to internal format (same logic as SizeInput.tsx)
+            setDenom(activeOrder.currency === upperSymbol ? 'symbol' : 'usd');
             setSaveAsDefault(activeOrder.bypassConfirmation);
         }
-    }, [activeOrder]);
+    }, [activeOrder, upperSymbol]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -94,7 +107,8 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
             onSave({
                 size: parsed,
                 tradeType,
-                currency: denom,
+                // Convert internal format to display format (same logic as SizeInput.tsx)
+                currency: denom === 'usd' ? 'USD' : upperSymbol,
                 bypassConfirmation: saveAsDefault,
             });
             onClose();
@@ -107,7 +121,8 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
             onSaveAndEnable({
                 size: parsed,
                 tradeType,
-                currency: denom,
+                // Convert internal format to display format (same logic as SizeInput.tsx)
+                currency: denom === 'usd' ? 'USD' : upperSymbol,
                 bypassConfirmation: saveAsDefault,
             });
             onClose();
@@ -184,17 +199,17 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                             }}
                             className={styles.denomButton}
                         >
-                            {denom}
+                            {denom === 'usd' ? 'USD' : upperSymbol}
                             <span className={styles.denomArrow}>▼</span>
                         </button>
 
                         {dropdownDenomOpen && (
                             <div className={styles.denomDropdown}>
-                                {[upperSymbol, 'USD'].map((opt) => (
+                                {denomOptions.map((opt) => (
                                     <div
                                         key={opt}
                                         onClick={() => {
-                                            setDenom(opt);
+                                            handleDenomChange(opt);
                                             setDropdownDenomOpen(false);
                                         }}
                                         className={styles.denomDropdownItem}
