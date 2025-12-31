@@ -212,9 +212,16 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 useTradeDataStore.getState().setTradeDirection(side);
                 useTradeDataStore.getState().setMarketOrderType('limit');
                 useTradeDataStore.getState().setIsMidModeActive(false);
-                useTradeDataStore
-                    .getState()
-                    .setOrderInputSizeValue(activeOrder?.size || 0);
+
+                // Convert currency string to OrderBookMode
+                const currency = activeOrder?.currency || 'USD';
+                const upperSymbol = symbolInfo?.coin?.toUpperCase() ?? 'BTC';
+                const denom = currency === upperSymbol ? 'symbol' : 'usd';
+
+                useTradeDataStore.getState().setOrderInputSizeValue({
+                    value: activeOrder?.size || 0,
+                    denom: denom,
+                });
 
                 return;
             }

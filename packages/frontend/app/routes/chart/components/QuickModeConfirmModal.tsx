@@ -5,6 +5,7 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     useOrderPlacementStore,
@@ -37,8 +38,11 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     const session = useSession();
     const isSessionEstablished = isEstablished(session);
 
-    const { symbol } = useTradeDataStore();
+    const { symbol, symbolInfo } = useTradeDataStore();
     const upperSymbol = symbol?.toUpperCase() ?? 'BTC';
+    const markPx = symbolInfo?.markPx;
+
+    const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     const activeOrder = useOrderPlacementStore((state) => state.activeOrder);
     const quickMode = useOrderPlacementStore((state) => state.quickMode);
@@ -53,6 +57,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
     const tradeTypeRef = useRef<HTMLDivElement>(null);
     const denomRef = useRef<HTMLDivElement>(null);
+    const prevDenomRef = useRef<OrderBookMode | null>(null);
 
     const isDisabled = !size || parseFloat(size) <= 0;
 
@@ -74,10 +79,39 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
             setSize(activeOrder.size.toString());
             setTradeType(activeOrder.tradeType);
             // Convert currency string to internal format (same logic as SizeInput.tsx)
-            setDenom(activeOrder.currency === upperSymbol ? 'symbol' : 'usd');
+            const newDenom =
+                activeOrder.currency === upperSymbol ? 'symbol' : 'usd';
+            setDenom(newDenom);
+            // Reset prevDenom when loading from activeOrder
+            prevDenomRef.current = newDenom;
             setSaveAsDefault(activeOrder.bypassConfirmation);
         }
     }, [activeOrder, upperSymbol]);
+
+    // Convert size value when denomination changes (same as OrderInput.tsx)
+    useEffect(() => {
+        // Only convert if we have a previous denom and it's different from current
+        if (prevDenomRef.current === null || prevDenomRef.current === denom) {
+            prevDenomRef.current = denom;
+            return;
+        }
+
+        if (!size || !markPx) return;
+        const parsedQty = parseFloat(size);
+        if (isNaN(parsedQty)) return;
+
+        // Determine conversion direction based on previous and current denom (same as OrderInput.tsx)
+        if (prevDenomRef.current === 'symbol' && denom === 'usd') {
+            // Symbol to USD: multiply by markPx
+            setSize(formatNumWithOnlyDecimals(parsedQty * markPx, 2));
+        } else if (prevDenomRef.current === 'usd' && denom === 'symbol') {
+            // USD to Symbol: divide by markPx
+            setSize(formatNumWithOnlyDecimals(parsedQty / markPx, 6, true));
+        }
+
+        // Update previous denom
+        prevDenomRef.current = denom;
+    }, [denom, size, markPx, formatNumWithOnlyDecimals]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

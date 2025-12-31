@@ -978,13 +978,30 @@ function OrderInput({
     }, [orderInputPriceValue.value, usualResolution]);
 
     useEffect(() => {
-        if (orderInputSizeValue > 0) {
-            setSizeDisplay(
-                formatNumWithOnlyDecimals(orderInputSizeValue, 6, true),
-            );
+        if (orderInputSizeValue.value > 0) {
+            let convertedValue = orderInputSizeValue.value;
+
+            // Convert if denominations don't match
+            if (orderInputSizeValue.denom !== selectedDenom && markPx) {
+                if (
+                    orderInputSizeValue.denom === 'usd' &&
+                    selectedDenom === 'symbol'
+                ) {
+                    // USD to Symbol: divide by markPx
+                    convertedValue = orderInputSizeValue.value / markPx;
+                } else if (
+                    orderInputSizeValue.denom === 'symbol' &&
+                    selectedDenom === 'usd'
+                ) {
+                    // Symbol to USD: multiply by markPx
+                    convertedValue = orderInputSizeValue.value * markPx;
+                }
+            }
+
+            setSizeDisplay(formatNumWithOnlyDecimals(convertedValue, 6, true));
             setIsEditingSizeInput(false);
         }
-    }, [orderInputSizeValue]);
+    }, [orderInputSizeValue, selectedDenom, markPx]);
 
     // Set direction when price input value changes (already debounced via assignPrice)
     useEffect(() => {
