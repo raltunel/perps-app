@@ -90,6 +90,8 @@
         "evenPriceDistribution": "Phân phối giá đều",
         "market": "Thị trường",
         "limit": "Giới hạn",
+        "closePosition": "Đóng vị thế",
+
         "price": "Giá",
         "size": "Kích thước",
         "time": "Thời gian",

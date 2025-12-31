@@ -248,29 +248,38 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             onTouchMove={handleTouchMove}
                             onTouchEnd={handleTouchEnd}
                         >
+                            {/* Wrap handle + header in a draggable zone */}
                             <div
-                                className={styles.bottomSheetHandle}
+                                className={styles.dragZone}
                                 onMouseDown={handleMouseDown}
                                 onTouchStart={handleTouchStart}
                             >
-                                <div className={styles.handle} />
+                                <div className={styles.bottomSheetHandle}>
+                                    <div className={styles.handle} />
+                                </div>
+                                <header>
+                                    <span />
+                                    <h3 id='global-modal-title'>
+                                        {payload.title}
+                                    </h3>
+                                    <button
+                                        type='button'
+                                        onClick={() => dismiss('internal')}
+                                        aria-label={t('aria.closeModal')}
+                                        className={styles.closeButton}
+                                        data-modal-close
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        onTouchStart={(e) =>
+                                            e.stopPropagation()
+                                        }
+                                    >
+                                        <MdClose
+                                            color='var(--text2)'
+                                            aria-hidden='true'
+                                        />
+                                    </button>
+                                </header>
                             </div>
-                            <header>
-                                <span />
-                                <h3 id='global-modal-title'>{payload.title}</h3>
-                                <button
-                                    type='button'
-                                    onClick={() => dismiss('internal')}
-                                    aria-label={t('aria.closeModal')}
-                                    className={styles.closeButton}
-                                    data-modal-close
-                                >
-                                    <MdClose
-                                        color='var(--text2)'
-                                        aria-hidden='true'
-                                    />
-                                </button>
-                            </header>
                             <div className={styles.modalContent}>
                                 {payload.content}
                                 <div className={styles.safeAreaSpacer} />

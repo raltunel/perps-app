@@ -90,6 +90,8 @@
         "evenPriceDistribution": "Répartition des prix égale",
         "market": "Marché",
         "limit": "Limite",
+        "closePosition": "Clôturer la position",
+
         "price": "Prix",
         "size": "Taille",
         "time": "Heure",

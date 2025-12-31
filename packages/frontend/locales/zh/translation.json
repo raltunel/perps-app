@@ -90,6 +90,8 @@
         "evenPriceDistribution": "平均价格分布",
         "market": "市价",
         "limit": "限价",
+        "closePosition": "平仓",
+
         "price": "价格",
         "size": "数量",
         "time": "时间",

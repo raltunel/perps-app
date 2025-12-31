@@ -90,6 +90,8 @@
         "evenPriceDistribution": "Eşit Fiyat Dağılımı",
         "market": "Piyasa",
         "limit": "Limit",
+        "closePosition": "Pozisyonu kapat",
+
         "price": "Fiyat",
         "size": "Büyüklük",
         "time": "Zaman",

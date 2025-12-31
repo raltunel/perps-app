@@ -94,6 +94,8 @@
         "evenPriceDistribution": "Even Price Distribution",
         "market": "Market",
         "limit": "Limit",
+        "closePosition": "Close Position",
+
         "price": "Price",
         "size": "Size",
         "time": "Time",

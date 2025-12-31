@@ -90,6 +90,8 @@
         "evenPriceDistribution": "均等価格分布",
         "market": "成行",
         "limit": "指値",
+        "closePosition": "ポジションを決済",
+
         "price": "価格",
         "size": "サイズ",
         "time": "時間",
