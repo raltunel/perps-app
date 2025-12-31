@@ -128,9 +128,14 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
 
     // ---- bottom sheet drag  ----
     const sheetRef = useRef<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLDivElement | null>(null);
     const drag = useRef({ startY: 0, y: 0, active: false });
 
     const onDragStart = (clientY: number) => {
+        // Only allow drag if content is scrolled to top (or near top)
+        const scrollTop = contentRef.current?.scrollTop ?? 0;
+        if (scrollTop > 5) return; // Don't start drag if user is scrolling content
+
         drag.current = { startY: clientY, y: 0, active: true };
         if (sheetRef.current) sheetRef.current.style.transition = 'none';
     };
@@ -245,42 +250,42 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             onMouseLeave={
                                 drag.current.active ? handleMouseUp : undefined
                             }
+                            onMouseDown={handleMouseDown}
+                            onTouchStart={handleTouchStart}
                             onTouchMove={handleTouchMove}
                             onTouchEnd={handleTouchEnd}
                         >
                             {/* Wrap handle + header in a draggable zone */}
-                            <div
+                            {/* <div
                                 className={styles.dragZone}
-                                onMouseDown={handleMouseDown}
-                                onTouchStart={handleTouchStart}
-                            >
-                                <div className={styles.bottomSheetHandle}>
-                                    <div className={styles.handle} />
-                                </div>
-                                <header>
-                                    <span />
-                                    <h3 id='global-modal-title'>
-                                        {payload.title}
-                                    </h3>
-                                    <button
-                                        type='button'
-                                        onClick={() => dismiss('internal')}
-                                        aria-label={t('aria.closeModal')}
-                                        className={styles.closeButton}
-                                        data-modal-close
-                                        onMouseDown={(e) => e.stopPropagation()}
-                                        onTouchStart={(e) =>
-                                            e.stopPropagation()
-                                        }
-                                    >
-                                        <MdClose
-                                            color='var(--text2)'
-                                            aria-hidden='true'
-                                        />
-                                    </button>
-                                </header>
+                             
+                            > */}
+                            <div className={styles.bottomSheetHandle}>
+                                <div className={styles.handle} />
                             </div>
-                            <div className={styles.modalContent}>
+                            <header>
+                                <span />
+                                <h3 id='global-modal-title'>{payload.title}</h3>
+                                <button
+                                    type='button'
+                                    onClick={() => dismiss('internal')}
+                                    aria-label={t('aria.closeModal')}
+                                    className={styles.closeButton}
+                                    data-modal-close
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onTouchStart={(e) => e.stopPropagation()}
+                                >
+                                    <MdClose
+                                        color='var(--text2)'
+                                        aria-hidden='true'
+                                    />
+                                </button>
+                            </header>
+                            {/* </div> */}
+                            <div
+                                className={styles.modalContent}
+                                ref={contentRef}
+                            >
                                 {payload.content}
                                 <div className={styles.safeAreaSpacer} />
                             </div>

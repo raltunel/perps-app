@@ -164,24 +164,41 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         title={t('transactions.closePosition')}
                         close={modalCtrl.close}
                     >
-                        <div className={styles.closeOptions}>
-                            <button
-                                className={styles.closeOption}
-                                onClick={() => setModalContent('marketClose')}
-                            >
-                                <div className={styles.optionTitle}>
-                                    {t('transactions.market')}
-                                </div>
-                            </button>
+                        <div className={styles.closeOptionsContainer}>
+                            <div className={styles.positionInfo}>
+                                Current Position: {Math.abs(position.szi)}{' '}
+                                {position.coin}
+                            </div>
 
-                            <button
-                                className={styles.closeOption}
-                                onClick={() => setModalContent('limitChase')}
-                            >
-                                <div className={styles.optionTitle}>
-                                    {t('transactions.limit')}
-                                </div>
-                            </button>
+                            <div className={styles.closeOptions}>
+                                <button
+                                    className={styles.closeOption}
+                                    onClick={() =>
+                                        setModalContent('marketClose')
+                                    }
+                                >
+                                    <div className={styles.optionTitle}>
+                                        {t('transactions.market')}
+                                    </div>
+                                    <div className={styles.optionDescription}>
+                                        Exit now at current price
+                                    </div>
+                                </button>
+
+                                <button
+                                    className={styles.closeOption}
+                                    onClick={() =>
+                                        setModalContent('limitChase')
+                                    }
+                                >
+                                    <div className={styles.optionTitle}>
+                                        {t('transactions.limit')}
+                                    </div>
+                                    <div className={styles.optionDescription}>
+                                        Exit at a price you set
+                                    </div>
+                                </button>
+                            </div>
                         </div>
                     </Modal>
                 );

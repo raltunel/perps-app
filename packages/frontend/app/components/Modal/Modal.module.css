@@ -189,6 +189,10 @@
         /* height: 90%; */
         min-height: 150px;
     }
+    .bottomSheet,
+    .modalContent {
+        user-select: none;
+    }
 
     /* Add a spacer at the bottom to ensure content isn't hidden */
     .safeAreaSpacer {
