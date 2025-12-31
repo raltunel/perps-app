@@ -98,6 +98,8 @@
         "market": "Thị trường",
         "limit": "Giới hạn",
         "closePosition": "Đóng vị thế",
+        "closeAtCurrentPrice": "Đóng tại giá hiện tại",
+        "closeAtAPriceYouSet": "Đóng tại mức giá bạn đặt",
 
         "price": "Giá",
         "size": "Kích thước",

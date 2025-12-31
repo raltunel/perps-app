@@ -94,6 +94,8 @@
         "market": "市价",
         "limit": "限价",
         "closePosition": "平仓",
+        "closeAtCurrentPrice": "按当前价格平仓",
+        "closeAtAPriceYouSet": "按你设定的价格平仓",
 
         "price": "价格",
         "size": "数量",

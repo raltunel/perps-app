@@ -98,6 +98,8 @@
         "market": "Piyasa",
         "limit": "Limit",
         "closePosition": "Pozisyonu kapat",
+        "closeAtCurrentPrice": "Mevcut fiyattan kapat",
+        "closeAtAPriceYouSet": "Belirlediğin fiyattan kapat",
 
         "price": "Fiyat",
         "size": "Büyüklük",

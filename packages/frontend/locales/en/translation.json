@@ -98,6 +98,8 @@
         "market": "Market",
         "limit": "Limit",
         "closePosition": "Close Position",
+        "closeAtCurrentPrice": "Close at Current Price",
+        "closeAtAPriceYouSet": "Close at a Price You Set",
 
         "price": "Price",
         "size": "Size",

@@ -169,8 +169,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     >
                         <div className={styles.closeOptionsContainer}>
                             <div className={styles.positionInfo}>
-                                Current Position: {Math.abs(position.szi)}{' '}
-                                {position.coin}
+                                {t('transactions.currentPosition')}:{' '}
+                                {Math.abs(position.szi)} {position.coin}
                             </div>
 
                             <div className={styles.closeOptions}>
@@ -184,7 +184,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                         {t('transactions.market')}
                                     </div>
                                     <div className={styles.optionDescription}>
-                                        Exit now at current price
+                                        {t('transactions.closeAtCurrentPrice')}
                                     </div>
                                 </button>
 
@@ -198,7 +198,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                         {t('transactions.limit')}
                                     </div>
                                     <div className={styles.optionDescription}>
-                                        Exit at a price you set
+                                        {t('transactions.closeAtAPriceYouSet')}
                                     </div>
                                 </button>
                             </div>

@@ -94,6 +94,8 @@
         "market": "Marché",
         "limit": "Limite",
         "closePosition": "Clôturer la position",
+        "closeAtCurrentPrice": "Clôturer au prix actuel",
+        "closeAtAPriceYouSet": "Clôturer à un prix défini",
 
         "price": "Prix",
         "size": "Taille",
