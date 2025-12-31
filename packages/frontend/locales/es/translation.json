@@ -93,6 +93,10 @@
         "evenPriceDistribution": "Distribución equitativa de precios",
         "market": "Mercado",
         "limit": "Límite",
+        "closePosition": "Cerrar posición",
+        "closeAtCurrentPrice": "Cerrar al precio actual",
+        "closeAtAPriceYouSet": "Cerrar a un precio que establezcas",
+
         "price": "Precio",
         "size": "Cantidad",
         "time": "Hora",
