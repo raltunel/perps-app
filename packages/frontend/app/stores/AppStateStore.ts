@@ -40,7 +40,7 @@ export const useAppStateStore = create<AppStateStore>((set, get) => ({
     isTabActiveDelayed: true,
     setIsTabActiveDelayed: (isTabActiveDelayed: boolean) =>
         set({ isTabActiveDelayed }),
-    debugToolbarOpen: false,
+    debugToolbarOpen: true,
     setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
         set({ debugToolbarOpen }),
     isTabActive: true,

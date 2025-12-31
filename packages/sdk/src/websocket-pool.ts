@@ -125,6 +125,7 @@ export class WebSocketPool {
         subscription: Subscription,
     ): WebSocketInstance | undefined {
         if (this.useMarketOnly) {
+            console.log('>>>> using market only');
             return this.sockets.get('market');
         }
 
