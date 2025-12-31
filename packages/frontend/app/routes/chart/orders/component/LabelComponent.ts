@@ -4,6 +4,7 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useMobile } from '~/hooks/useMediaQuery';
 import type { LimitOrderParams } from '~/services/limitOrderService';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -72,6 +73,8 @@ const LabelComponent = ({
     const { executeLimitOrder } = useLimitOrderService();
     const { updateYPosition } = usePreviewOrderLines();
     const ctx = overlayCanvasRef.current?.getContext('2d');
+
+    const isMobile = useMobile();
 
     const [isDrag, setIsDrag] = useState(false);
     const dragStateRef = useRef<{
@@ -253,6 +256,8 @@ const LabelComponent = ({
     ]);
 
     useLayoutEffect(() => {
+        if (isMobile) return;
+
         if (!isDrag) {
             const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
             const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
@@ -287,9 +292,12 @@ const LabelComponent = ({
         overlayCanvasMousePositionRef.current.y,
         JSON.stringify(drawnLabelsRef.current),
         isDrag,
+        isMobile,
     ]);
 
     useEffect(() => {
+        if (isMobile) return;
+
         if (chart && !isDrag) {
             chart.onChartReady(() => {
                 chart
@@ -332,7 +340,7 @@ const LabelComponent = ({
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
                                             if (
-                                                isLabel.label.type === 'Cancel'
+                                                isLabel.label?.type === 'Cancel'
                                             ) {
                                                 if (pane) {
                                                     (
@@ -389,7 +397,73 @@ const LabelComponent = ({
                     });
             });
         }
-    }, [chart, drawnLabelsRef.current, isDrag]);
+    }, [chart, drawnLabelsRef.current, isDrag, isMobile]);
+
+    useEffect(() => {
+        if (!overlayCanvasRef.current || isDrag) return;
+
+        if (!isMobile) return;
+
+        if (!chart) return;
+        const { paneCanvas, iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        if (!paneCanvas) return;
+        const iframeBody = iframeDoc?.body;
+        if (!iframeBody) return;
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const rect = paneCanvas.getBoundingClientRect();
+
+            if (rect) {
+                const cssOffsetX = event.clientX - rect.left;
+                const cssOffsetY = event.clientY - rect.top;
+
+                const scaleY = paneCanvas.height / rect.height;
+                const scaleX = paneCanvas.width / rect.width;
+
+                const overlayOffsetX = cssOffsetX * scaleX;
+                const overlayOffsetY = cssOffsetY * scaleY;
+
+                const isLabel = findLimitLabelAtPosition(
+                    overlayOffsetX,
+                    overlayOffsetY,
+                    drawnLabelsRef.current,
+                );
+
+                overlayCanvasMousePositionRef.current = {
+                    x: overlayOffsetX,
+                    y: overlayOffsetY,
+                };
+
+                if (overlayCanvasRef.current) {
+                    if (
+                        isLabel &&
+                        isLabel.matchType === 'onLabel' &&
+                        (isLabel.parentLine.type === 'LIMIT' ||
+                            isLabel.parentLine.type === 'PREVIEW_ORDER' ||
+                            (isLabel.parentLine.type === 'LIQ' &&
+                                isLiqPriceLineDraggable)) &&
+                        isLabel.label?.type !== 'Cancel'
+                    ) {
+                        overlayCanvasRef.current.style.pointerEvents = 'auto';
+
+                        if (overlayCanvasRef.current) {
+                            overlayCanvasRef.current?.setPointerCapture(
+                                event.pointerId,
+                            );
+                        }
+                    } else {
+                        overlayCanvasRef.current.style.cursor = 'pointer';
+                    }
+                }
+            }
+        };
+
+        iframeBody.addEventListener('pointerdown', handlePointerDown);
+
+        return () => {
+            iframeBody.removeEventListener('pointerdown', handlePointerDown);
+        };
+    }, [chart, isDrag, drawnLabelsRef.current, isMobile]);
 
     const handleCancel = async (order: LineData) => {
         if (!order.oid) {
@@ -554,7 +628,7 @@ const LabelComponent = ({
                         if (
                             found &&
                             found.matchType === 'onLabel' &&
-                            found.label.type === 'Cancel'
+                            found.label?.type === 'Cancel'
                         ) {
                             console.log({ found });
                             if (found.parentLine.oid)
@@ -593,23 +667,34 @@ const LabelComponent = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
             const rect = canvas.getBoundingClientRect();
-            const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
-            const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
+            const { offsetY, offsetX } = getXandYLocationForChartDrag(
+                event,
+                rect,
+            );
 
             const isLabel = findLimitLabelAtPosition(
-                offsetX,
-                offsetY,
+                offsetX * dpr,
+                offsetY * dpr,
                 drawnLabelsRef.current,
             );
 
-            if (
+            const isMobile = true;
+
+            const isValidMatchType = isMobile
+                ? isLabel?.matchType === 'onLabel' ||
+                  isLabel?.matchType === 'onLine'
+                : isLabel?.matchType === 'onLabel';
+
+            const shouldStartDrag =
                 isLabel &&
-                isLabel.label.type !== 'Cancel' &&
-                isLabel.matchType === 'onLabel' &&
+                isValidMatchType &&
+                isLabel.label?.type !== 'Cancel' &&
                 (isLabel.parentLine.type === 'LIMIT' ||
+                    isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                     (isLabel.parentLine.type === 'LIQ' &&
-                        isLiqPriceLineDraggable))
-            ) {
+                        isLiqPriceLineDraggable));
+
+            if (shouldStartDrag) {
                 canvas.style.cursor = 'grabbing';
                 dragStateRef.current.tempSelectedLine = isLabel;
                 dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
@@ -984,6 +1069,9 @@ const LabelComponent = ({
             dragStateRef.current.frozenPrice = undefined;
             setIsDrag(false);
 
+            if (overlayCanvasRef.current) {
+                overlayCanvasRef.current.style.pointerEvents = 'none';
+            }
             if (chart) {
                 const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
                 if (iframeDoc?.body) {
@@ -1015,7 +1103,7 @@ const LabelComponent = ({
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [overlayCanvasRef.current, chart, selectedLine, drawnLabelsRef.current]);
+    }, [overlayCanvasRef.current, chart]);
 
     // Handle ESC key press to cancel drag
     useEffect(() => {
