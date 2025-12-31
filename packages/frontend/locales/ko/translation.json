@@ -93,6 +93,10 @@
         "evenPriceDistribution": "균등 가격 분포",
         "market": "시장가",
         "limit": "지정가",
+        "closePosition": "포지션 청산",
+        "closeAtCurrentPrice": "현재 가격으로 청산",
+        "closeAtAPriceYouSet": "지정한 가격으로 청산",
+
         "price": "가격",
         "size": "수량",
         "time": "시간",
