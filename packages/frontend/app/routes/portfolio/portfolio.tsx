@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import Modal from '~/components/Modal/Modal';
@@ -26,12 +28,13 @@ const MemoizedPerformancePanel = memo(PerformancePanel);
 
 export function meta() {
     return [
-        { title: 'Portfolio | Ambient Finance' },
+        { title: `${t('pageTitles.portfolio')} | Ambient Finance` },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 
 function Portfolio() {
+    const { t } = useTranslation();
     const mainRef = useRef<HTMLDivElement | null>(null);
 
     const DEFAULT_PANEL_HEIGHT = 480;
@@ -293,16 +296,21 @@ function Portfolio() {
                     {/* Desktop Details Container */}
                     <div className={styles.detailsContainer}>
                         <div className={styles.detailsContent}>
-                            <h6>Fees</h6>
-                            <Tooltip content='Maker fees 0.1%' position='top'>
-                                <h3>Always 0.00%</h3>
+                            <h6>{t('portfolio.fees')}</h6>
+                            <Tooltip
+                                content={t('portfolio.makerFeesPercent', {
+                                    percent: '0.1%',
+                                })}
+                                position='top'
+                            >
+                                <h3>{t('portfolio.alwaysZero')}</h3>
                             </Tooltip>
                             <div
                                 className={styles.view_detail_clickable}
                                 style={{ visibility: 'hidden' }}
                                 onClick={() => feeScheduleModalCtrl.open()}
                             >
-                                View fee schedule
+                                {t('portfolio.viewFeeSchedule')}
                             </div>
                         </div>
 
@@ -324,14 +332,14 @@ function Portfolio() {
                                         onClick={openDepositModal}
                                         bg='accent1'
                                     >
-                                        Deposit
+                                        {t('common.deposit')}
                                     </SimpleButton>
                                     <SimpleButton
                                         onClick={openWithdrawModal}
                                         bg='dark3'
                                         hoverBg='accent1'
                                     >
-                                        Withdraw
+                                        {t('common.withdraw')}
                                     </SimpleButton>
                                     <SimpleButton
                                         onClick={openSendModal}
@@ -339,7 +347,7 @@ function Portfolio() {
                                         bg='dark3'
                                         hoverBg='accent1'
                                     >
-                                        Send
+                                        {t('common.send')}
                                     </SimpleButton>
                                 </div>
                             </div>
@@ -497,16 +505,16 @@ function Portfolio() {
             {feeScheduleModalCtrl.isOpen && (
                 <Modal
                     close={feeScheduleModalCtrl.close}
-                    title={'Fee Schedule'}
+                    title={t('portfolio.feeSchedule')}
                 >
                     <div className={styles.fee_schedule_modal}>
                         <section className={styles.fee_table}>
-                            <h4>VIP Tiers</h4>
+                            <h4>{t('portfolio.vipTiers')}</h4>
                             <header>
-                                <div>Tier</div>
-                                <div>14D Volume</div>
-                                <div>Taker</div>
-                                <div>Maker</div>
+                                <div>{t('portfolio.tier')}</div>
+                                <div>{t('portfolio.vol14dVolume')}</div>
+                                <div>{t('portfolio.taker')}</div>
+                                <div>{t('portfolio.maker')}</div>
                             </header>
                             <ol>
                                 {feeSchedules.vip.map((feeTier: feeTierIF) => (
@@ -521,12 +529,12 @@ function Portfolio() {
                         </section>
 
                         <section className={styles.fee_table}>
-                            <h4>Market Maker Tiers</h4>
+                            <h4>{t('portfolio.marketMakerTiers')}</h4>
                             <header>
-                                <div>Tier</div>
-                                <div>14D Volume</div>
+                                <div>{t('portfolio.tier')}</div>
+                                <div>{t('portfolio.vol14dVolume')}</div>
                                 <div />
-                                <div>Maker</div>
+                                <div>{t('portfolio.maker')}</div>
                             </header>
                             <ol>
                                 {feeSchedules.marketMaker.map(
@@ -543,7 +551,7 @@ function Portfolio() {
                         </section>
 
                         <div className={styles.neg_fees}>
-                            Negative fees are rebates
+                            {t('portfolio.negativeFeesRebate')}
                         </div>
                     </div>
                 </Modal>

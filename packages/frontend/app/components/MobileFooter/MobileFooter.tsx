@@ -136,6 +136,16 @@ const MobileFooter: React.FC<MobileFooterProps> = ({
         },
     ];
 
+    const handleNavItemClick = useCallback(
+        (item: NavItem) => {
+            if (item.path === '/v2/trade') {
+                window.dispatchEvent(new Event('trade:nav:trade'));
+            }
+            closePanel();
+        },
+        [closePanel],
+    );
+
     const menuDisplay: FooterMenuItem[] = [
         {
             label: '𝕏 / Twitter',
@@ -276,7 +286,7 @@ const MobileFooter: React.FC<MobileFooterProps> = ({
                             <NavItem
                                 key={item.name}
                                 item={item}
-                                onClick={closePanel}
+                                onClick={() => handleNavItemClick(item)}
                             />
                         ))}
 
