@@ -496,6 +496,7 @@ export default function WebDataConsumer() {
                 setAccountOverview(accountOverviewRef.current);
             }
             if (debugWalletActiveRef.current) {
+                console.log('>>>> set position');
                 setPositions(positionsRef.current);
                 setUnifiedPositions(positionsRef.current);
                 setUserBalances(userBalancesRef.current);
