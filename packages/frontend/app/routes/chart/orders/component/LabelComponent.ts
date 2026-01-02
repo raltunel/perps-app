@@ -82,11 +82,6 @@ const LabelComponent = ({
 
     useEffect(() => {
         if (isMobile && selectedOrderLine) {
-            console.log(
-                { selectedOrderLine },
-                activeDragLine,
-                activeDragLine?.parentLine !== selectedOrderLine,
-            );
             if (activeDragLine?.parentLine !== selectedOrderLine) {
                 setActiveDragLine(
                     activeDragLine
@@ -96,6 +91,10 @@ const LabelComponent = ({
             }
         } else if (!selectedOrderLine && activeDragLine) {
             setActiveDragLine(undefined);
+        }
+
+        if (overlayCanvasRef.current && !selectedOrderLine && isMobile) {
+            overlayCanvasRef.current.style.pointerEvents = 'none';
         }
     }, [selectedOrderLine, isMobile, isDrag]);
 
@@ -1156,9 +1155,6 @@ const LabelComponent = ({
             dragStateRef.current.frozenPrice = undefined;
             setIsDrag(false);
 
-            if (overlayCanvasRef.current) {
-                overlayCanvasRef.current.style.pointerEvents = 'none';
-            }
             if (chart) {
                 const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
                 if (iframeDoc?.body) {
