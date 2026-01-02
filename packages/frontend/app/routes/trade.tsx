@@ -118,19 +118,6 @@ export default function Trade() {
         return () => window.removeEventListener('keydown', onKey);
     }, [positionsMenuOpen]);
 
-    // Label map (swap to i18n if you want)
-    const MOBILE_VIEW_LABELS: Record<PortfolioViewKey, string> = {
-        'common.positions': 'Positions',
-        'common.balances': 'Balances',
-        'common.openOrders': ' Orders',
-        'common.tradeHistory': 'Transactions',
-        'common.orderHistory': 'History',
-    };
-
-    // In case selectedTradeTab is something not in our mobile list, default the button label:
-    const currentMobileLabel =
-        MOBILE_VIEW_LABELS[selectedTradeTab as PortfolioViewKey] ?? 'Positions';
-
     // The list of mobile options (order = how the menu shows)
     const MOBILE_OPTIONS: PortfolioViewKey[] = [
         'common.positions',
@@ -144,6 +131,12 @@ export default function Trade() {
     const isUserConnected = isEstablished(sessionState);
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
+
+    const currentMobileLabel = MOBILE_OPTIONS.includes(
+        selectedTradeTab as PortfolioViewKey,
+    )
+        ? t(selectedTradeTab as PortfolioViewKey)
+        : t('common.positions');
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
 
@@ -223,6 +216,16 @@ export default function Trade() {
         },
         [activeTab],
     );
+
+    useEffect(() => {
+        const handler = () => switchTab('order');
+        window.addEventListener('trade:nav:trade', handler as EventListener);
+        return () =>
+            window.removeEventListener(
+                'trade:nav:trade',
+                handler as EventListener,
+            );
+    }, [switchTab]);
 
     useEffect(() => {
         const keydownHandler = (e: KeyboardEvent) => {
@@ -714,7 +717,7 @@ export default function Trade() {
                                                         switchTab('positions');
                                                 }}
                                             >
-                                                {MOBILE_VIEW_LABELS[opt]}
+                                                {t(opt)}
                                             </button>
                                         ))}
                                     </div>
@@ -1401,14 +1404,14 @@ export default function Trade() {
                                         expandWalletToDefault();
                                     }}
                                     aria-label={t(
-                                        'portfolio.expandWallet',
+                                        'aria.expandWallet',
                                         'Expand wallet',
                                     )}
                                     aria-expanded={false}
                                 >
                                     <span>
                                         {t(
-                                            'portfolio.accountOverview',
+                                            'accountOverview.heading',
                                             'Account Overview',
                                         )}
                                     </span>
@@ -1434,12 +1437,9 @@ export default function Trade() {
                             }}
                             aria-label={
                                 isWalletCollapsed
-                                    ? t?.(
-                                          'portfolio.expandWallet',
-                                          'Expand wallet',
-                                      )
+                                    ? t?.('aria.expandWallet', 'Expand wallet')
                                     : t?.(
-                                          'portfolio.collapseWallet',
+                                          'aria.collapseWallet',
                                           'Collapse wallet',
                                       )
                             }
