@@ -81,7 +81,8 @@ const LabelComponent = ({
     const [isDrag, setIsDrag] = useState(false);
 
     useEffect(() => {
-        if (isMobile && selectedOrderLine) {
+        if (!isMobile) return;
+        if (selectedOrderLine) {
             if (activeDragLine?.parentLine !== selectedOrderLine) {
                 setActiveDragLine(
                     activeDragLine
@@ -93,7 +94,7 @@ const LabelComponent = ({
             setActiveDragLine(undefined);
         }
 
-        if (overlayCanvasRef.current && !selectedOrderLine && isMobile) {
+        if (overlayCanvasRef.current && !selectedOrderLine) {
             overlayCanvasRef.current.style.pointerEvents = 'none';
         }
     }, [selectedOrderLine, isMobile, isDrag]);
