@@ -387,7 +387,8 @@
         "chart": "Grafik",
         "book": "Emir Defteri",
         "recent": "Son",
-        "positions": "Pozisyonlar"
+        "positions": "Pozisyonlar",
+        "portfolio": "Portföy"
     },
     "auth": {
         "login": "Giriş",
