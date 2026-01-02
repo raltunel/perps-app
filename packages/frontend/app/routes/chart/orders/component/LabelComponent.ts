@@ -8,6 +8,7 @@ import { useMobile } from '~/hooks/useMediaQuery';
 import type { LimitOrderParams } from '~/services/limitOrderService';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
@@ -40,8 +41,8 @@ interface LabelProps {
     drawnLabelsRef: React.MutableRefObject<LineData[]>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData: any;
-    selectedLine: LabelLocationData | undefined;
-    setSelectedLine: React.Dispatch<
+    activeDragLine: LabelLocationData | undefined;
+    setActiveDragLine: React.Dispatch<
         React.SetStateAction<LabelLocationData | undefined>
     >;
     overlayCanvasMousePositionRef: React.MutableRefObject<{
@@ -57,8 +58,8 @@ const LabelComponent = ({
     canvasSize,
     drawnLabelsRef,
     scaleData,
-    selectedLine,
-    setSelectedLine,
+    activeDragLine,
+    setActiveDragLine,
     overlayCanvasMousePositionRef,
 }: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
@@ -75,8 +76,34 @@ const LabelComponent = ({
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const isMobile = useMobile();
+    const { setSelectedOrderLine, selectedOrderLine } = useChartLinesStore();
 
     const [isDrag, setIsDrag] = useState(false);
+
+    useEffect(() => {
+        if (isMobile && selectedOrderLine) {
+            console.log(
+                { selectedOrderLine },
+                activeDragLine,
+                activeDragLine?.parentLine !== selectedOrderLine,
+            );
+            if (activeDragLine?.parentLine !== selectedOrderLine) {
+                setActiveDragLine(
+                    activeDragLine
+                        ? { ...activeDragLine, parentLine: selectedOrderLine }
+                        : undefined,
+                );
+            }
+        } else if (!selectedOrderLine && activeDragLine) {
+            setActiveDragLine(undefined);
+        }
+    }, [selectedOrderLine, isMobile, isDrag]);
+
+    useEffect(() => {
+        if (!selectedOrderLine && overlayCanvasRef.current) {
+            overlayCanvasRef.current.style.pointerEvents = 'none';
+        }
+    }, [selectedOrderLine]);
     const dragStateRef = useRef<{
         tempSelectedLine: LabelLocationData | undefined;
         originalPrice: number | undefined;
@@ -226,6 +253,48 @@ const LabelComponent = ({
             });
 
             drawnLabelsRef.current = linesWithLabels;
+
+            if (selectedOrderLine) {
+                const focusedLine = linesWithLabels.find(
+                    (line) =>
+                        line.oid !== undefined &&
+                        line.oid === selectedOrderLine.oid,
+                );
+
+                if (focusedLine?.labelLocations) {
+                    const dpr = window.devicePixelRatio || 1;
+                    const borderPadding = 4 * dpr;
+                    const borderWidth = 2 * dpr;
+                    const borderRadius = 4 * dpr;
+
+                    const labels = focusedLine.labelLocations;
+                    if (labels.length > 0) {
+                        const minY = Math.min(...labels.map((l) => l.y));
+                        const maxY = Math.max(
+                            ...labels.map((l) => l.y + l.height),
+                        );
+                        const x = 0;
+                        const y = minY - borderPadding;
+                        const width = widthAttr;
+                        const height = maxY - minY + borderPadding * 2;
+
+                        ctx.save();
+
+                        ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, width, height, borderRadius);
+                        ctx.fill();
+
+                        ctx.strokeStyle = '#3b82f6';
+                        ctx.lineWidth = borderWidth;
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, width, height, borderRadius);
+                        ctx.stroke();
+
+                        ctx.restore();
+                    }
+                }
+            }
         };
 
         if (zoomChanged && animationFrameId === null) {
@@ -252,7 +321,8 @@ const LabelComponent = ({
         ctx,
         zoomChanged,
         canvasSize,
-        selectedLine,
+        activeDragLine,
+        selectedOrderLine,
     ]);
 
     useLayoutEffect(() => {
@@ -275,7 +345,7 @@ const LabelComponent = ({
                     isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                     (isLabel.parentLine.type === 'LIQ' &&
                         isLiqPriceLineDraggable)) &&
-                isLabel.label.type !== 'Cancel'
+                isLabel.label?.type !== 'Cancel'
             ) {
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
@@ -435,16 +505,26 @@ const LabelComponent = ({
                 };
 
                 if (overlayCanvasRef.current) {
+                    const isValidMatchType = isMobile
+                        ? isLabel?.matchType === 'onLabel' ||
+                          isLabel?.matchType === 'onLine'
+                        : isLabel?.matchType === 'onLabel';
+
                     if (
                         isLabel &&
-                        isLabel.matchType === 'onLabel' &&
+                        isValidMatchType &&
+                        isLabel.label?.type !== 'Cancel' &&
                         (isLabel.parentLine.type === 'LIMIT' ||
                             isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                             (isLabel.parentLine.type === 'LIQ' &&
-                                isLiqPriceLineDraggable)) &&
-                        isLabel.label?.type !== 'Cancel'
+                                isLiqPriceLineDraggable))
                     ) {
                         overlayCanvasRef.current.style.pointerEvents = 'auto';
+
+                        if (isMobile) {
+                            setActiveDragLine(isLabel);
+                            setSelectedOrderLine(isLabel.parentLine);
+                        }
 
                         if (overlayCanvasRef.current) {
                             overlayCanvasRef.current?.setPointerCapture(
@@ -453,6 +533,8 @@ const LabelComponent = ({
                         }
                     } else {
                         overlayCanvasRef.current.style.cursor = 'pointer';
+                        setSelectedOrderLine(undefined);
+                        setActiveDragLine(undefined);
                     }
                 }
             }
@@ -699,7 +781,7 @@ const LabelComponent = ({
                 dragStateRef.current.tempSelectedLine = isLabel;
                 dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
                 dragStateRef.current.isDragging = true;
-                setSelectedLine(isLabel);
+                setActiveDragLine(isLabel);
                 setIsDrag(true);
             }
 
@@ -734,7 +816,7 @@ const LabelComponent = ({
                       }
                     : undefined;
 
-                setSelectedLine(dragStateRef.current.tempSelectedLine);
+                setActiveDragLine(dragStateRef.current.tempSelectedLine);
                 return;
             }
 
@@ -780,7 +862,7 @@ const LabelComponent = ({
                     dragStateRef.current.tempSelectedLine.parentLine.yPrice,
                 );
             } else {
-                setSelectedLine(dragStateRef.current.tempSelectedLine);
+                setActiveDragLine(dragStateRef.current.tempSelectedLine);
             }
         };
 
@@ -838,7 +920,7 @@ const LabelComponent = ({
                     await executeLimitOrder(newOrderParams);
 
                 if (!limitOrderResult.success) {
-                    setSelectedLine(undefined);
+                    setActiveDragLine(undefined);
                     console.error(
                         'Failed to create new order:',
                         limitOrderResult.error,
@@ -913,7 +995,7 @@ const LabelComponent = ({
                     });
                 }
             } catch (error) {
-                setSelectedLine(undefined);
+                setActiveDragLine(undefined);
                 console.error('Error updating order:', error);
                 notifications.remove(slug);
                 notifications.add({
@@ -946,7 +1028,7 @@ const LabelComponent = ({
                 'Liq. Price Line dragend',
                 tempSelectedLine.parentLine.yPrice,
             );
-            setSelectedLine(undefined);
+            setActiveDragLine(undefined);
         }
 
         function updatePreviewOrderPrice(tempSelectedLine: LabelLocationData) {
@@ -955,7 +1037,7 @@ const LabelComponent = ({
                 value: newPrice,
                 changeType: 'dragEnd',
             });
-            setSelectedLine(undefined);
+            setActiveDragLine(undefined);
         }
 
         const handleDragEnd = async () => {
@@ -975,7 +1057,7 @@ const LabelComponent = ({
                         yPrice: originalPrice,
                     },
                 };
-                setSelectedLine(restoredLine);
+                setActiveDragLine(restoredLine);
 
                 if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
                     updateYPosition(originalPrice);
@@ -987,7 +1069,7 @@ const LabelComponent = ({
                 dragStateRef.current.isOutsideArea = false;
                 dragStateRef.current.frozenPrice = undefined;
                 setIsDrag(false);
-                setSelectedLine(undefined);
+                setActiveDragLine(undefined);
 
                 if (chart) {
                     const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
@@ -1016,7 +1098,7 @@ const LabelComponent = ({
                         yPrice: originalPrice,
                     },
                 };
-                setSelectedLine(restoredLine);
+                setActiveDragLine(restoredLine);
 
                 if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
                     updateYPosition(originalPrice);
@@ -1028,7 +1110,7 @@ const LabelComponent = ({
                 dragStateRef.current.isOutsideArea = false;
                 dragStateRef.current.frozenPrice = undefined;
                 setIsDrag(false);
-                setSelectedLine(undefined);
+                setActiveDragLine(undefined);
 
                 if (chart) {
                     const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
@@ -1050,16 +1132,21 @@ const LabelComponent = ({
             }
 
             let cursorText = 'pointer';
-            if (tempSelectedLine.parentLine.type === 'LIMIT') {
-                limitOrderDragEnd(tempSelectedLine);
-            }
 
-            if (tempSelectedLine.parentLine.type === 'LIQ') {
-                liqPriceDragEnd(tempSelectedLine);
-            }
-            if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
-                updatePreviewOrderPrice(tempSelectedLine);
-                cursorText = 'row-resize';
+            if (isMobile) {
+                setSelectedOrderLine(tempSelectedLine.parentLine);
+            } else {
+                if (tempSelectedLine.parentLine.type === 'LIMIT') {
+                    limitOrderDragEnd(tempSelectedLine);
+                }
+
+                if (tempSelectedLine.parentLine.type === 'LIQ') {
+                    liqPriceDragEnd(tempSelectedLine);
+                }
+                if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
+                    updatePreviewOrderPrice(tempSelectedLine);
+                    cursorText = 'row-resize';
+                }
             }
 
             dragStateRef.current.tempSelectedLine = undefined;
@@ -1122,7 +1209,7 @@ const LabelComponent = ({
                             yPrice: originalPrice,
                         },
                     };
-                    setSelectedLine(restoredLine);
+                    setActiveDragLine(restoredLine);
 
                     if (restoredLine.parentLine.type === 'PREVIEW_ORDER') {
                         updateYPosition(originalPrice);
@@ -1134,7 +1221,7 @@ const LabelComponent = ({
                     dragStateRef.current.isOutsideArea = false;
                     dragStateRef.current.frozenPrice = undefined;
                     setIsDrag(false);
-                    setSelectedLine(undefined);
+                    setActiveDragLine(undefined);
 
                     if (chart) {
                         const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
