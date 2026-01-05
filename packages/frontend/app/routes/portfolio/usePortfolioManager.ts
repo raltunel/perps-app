@@ -188,7 +188,6 @@ export function usePortfolioManager() {
     });
 
     const [userData, setUserData] = useState<any>();
-
     const fetchUserData = useCallback(async () => {
         if (!userAddress) {
             setUserData(undefined);
@@ -197,17 +196,17 @@ export function usePortfolioManager() {
 
         try {
             const EMBER_ENDPOINT_ALL =
-                'https://ember-leaderboard.liquidity.tools/leaderboard';
+                'https://ember-leaderboard-v2.liquidity.tools/user';
             const emberEndpointForUser =
                 EMBER_ENDPOINT_ALL + '/' + userAddress.toString();
 
             const response = await fetch(emberEndpointForUser);
             const data = await response.json();
-
+            const userData = data.stats;
             if (data.error) {
                 console.log('error fetching user data');
-            } else if (data.leaderboard && data.leaderboard.length > 0) {
-                setUserData({ data });
+            } else if (data.stats) {
+                setUserData(userData);
             }
         } catch (error) {
             console.log(error);

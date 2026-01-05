@@ -38,42 +38,33 @@ export default function PerformancePanel({
 
     const { formatNum } = useNumFormatter();
 
-    const pnlFormatted = userData?.data?.leaderboard[0]?.pnl
-        ? formatNum(userData?.data?.leaderboard[0]?.pnl, 2, true, true)
+    const pnlFormatted = userData?.pnl
+        ? formatNum(userData?.pnl, 2, true, true)
         : '$0.00';
-    const volumeFormatted = userData?.data?.leaderboard[0]?.volume
-        ? formatNum(userData?.data?.leaderboard[0]?.volume, 2, true, true)
+
+    const volumeFormatted = userData?.total_volume
+        ? formatNum(userData?.total_volume, 2, true, true)
         : '$0.00';
-    const maxDrawdownFormatted = userData?.data?.leaderboard[0]?.maxDrawdown
-        ? formatNum(userData?.data?.leaderboard[0]?.maxDrawdown, 2)
+    const maxDrawdownFormatted = userData?.max_drawdown
+        ? formatNum(userData?.max_drawdown, 2)
         : '0.00%';
-    const totalEquityFormatted = userData?.data?.leaderboard[0]?.account_value
-        ? formatNum(
-              userData?.data?.leaderboard[0]?.account_value,
-              2,
-              true,
-              true,
-          )
+    const totalEquityFormatted = userData?.account_value
+        ? formatNum(userData?.account_value, 2, true, true)
         : '$0.00';
-    const accountEquityFormatted = userData?.data?.leaderboard[0]?.account_value
-        ? formatNum(
-              userData?.data?.leaderboard[0]?.account_value,
-              2,
-              true,
-              true,
-          )
+    const accountEquityFormatted = userData?.account_value
+        ? formatNum(userData?.account_value, 2, true, true)
         : '$0.00';
-    const vaultEquityFormatted = userData?.data?.leaderboard[0]?.vaultEquity
-        ? formatNum(userData?.data?.leaderboard[0]?.vaultEquity)
+    const vaultEquityFormatted = userData?.vaultEquity
+        ? formatNum(userData?.vaultEquity)
         : '$0.00';
 
     const PERFORMANCE_METRICS = [
         { label: 'PNL', value: pnlFormatted },
         { label: 'Volume', value: volumeFormatted },
-        { label: 'Max Drawdown', value: maxDrawdownFormatted },
-        { label: 'Total Equity', value: totalEquityFormatted },
+        // { label: 'Max Drawdown', value: maxDrawdownFormatted },
+        // { label: 'Total Equity', value: totalEquityFormatted },
         { label: 'Account Equity', value: accountEquityFormatted },
-        { label: 'Vault Equity', value: vaultEquityFormatted },
+        // { label: 'Vault Equity', value: vaultEquityFormatted },
     ];
 
     const MetricsDisplay = React.memo(() => (

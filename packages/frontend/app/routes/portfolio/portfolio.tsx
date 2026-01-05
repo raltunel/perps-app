@@ -119,32 +119,28 @@ function Portfolio() {
 
     const feeScheduleModalCtrl = useModal('closed');
 
-    // Extract user stats from leaderboard data (same as PerformancePanel)
-    const userStats = userData?.data?.leaderboard?.[0];
-
-    // Format stats the same way as PerformancePanel
-    const pnlFormatted = userStats?.pnl
-        ? formatNum(userStats.pnl, 2, true, true)
+    const pnlFormatted = userData?.pnl
+        ? formatNum(userData.pnl, 2, true, true)
         : '$0.00';
-    const volumeFormatted = userStats?.volume
-        ? formatNum(userStats.volume, 2, true, true)
+    const volumeFormatted = userData?.volume
+        ? formatNum(userData.volume, 2, true, true)
         : '$0.00';
-    const maxDrawdownFormatted = userStats?.maxDrawdown
-        ? formatNum(userStats.maxDrawdown, 2)
+    const maxDrawdownFormatted = userData?.maxDrawdown
+        ? formatNum(userData.maxDrawdown, 2)
         : '0.00%';
-    const totalEquityFormatted = userStats?.account_value
-        ? formatNum(userStats.account_value, 2, true, true)
+    const totalEquityFormatted = userData?.account_value
+        ? formatNum(userData.account_value, 2, true, true)
         : '$0.00';
-    const accountEquityFormatted = userStats?.account_value
-        ? formatNum(userStats.account_value, 2, true, true)
+    const accountEquityFormatted = userData?.account_value
+        ? formatNum(userData.account_value, 2, true, true)
         : '$0.00';
-    const vaultEquityFormatted = userStats?.vaultEquity
-        ? formatNum(userStats.vaultEquity)
+    const vaultEquityFormatted = userData?.vaultEquity
+        ? formatNum(userData.vaultEquity)
         : '$0.00';
 
     // Calculate PNL percentage for display
     const totalValue = portfolio.balances.contract + portfolio.balances.wallet;
-    const pnlValue = userStats?.pnl ?? 0;
+    const pnlValue = userData?.pnl ?? 0;
     const pnlPercent = totalValue > 0 ? (pnlValue / totalValue) * 100 : 0;
     const isPnlPositive = pnlValue >= 0;
 
