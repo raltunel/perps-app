@@ -496,7 +496,6 @@ export default function WebDataConsumer() {
                 setAccountOverview(accountOverviewRef.current);
             }
             if (debugWalletActiveRef.current) {
-                console.log('>>>> set position');
                 setPositions(positionsRef.current);
                 setUnifiedPositions(positionsRef.current);
                 setUserBalances(userBalancesRef.current);
@@ -515,12 +514,12 @@ export default function WebDataConsumer() {
             clearInterval(userDataInterval);
             // clearInterval(monitorInterval);
             unsubscribeWebData2?.();
-            unsubscribeOrderHistory();
-            unsubscribeUserFills();
-            unsubscribeUserTwapSliceFills();
-            unsubscribeUserTwapHistory();
-            unsubscribeUserFundings();
-            unsubscribeUserNonFundingLedgerUpdates();
+            unsubscribeOrderHistory?.();
+            unsubscribeUserFills?.();
+            unsubscribeUserTwapSliceFills?.();
+            unsubscribeUserTwapHistory?.();
+            unsubscribeUserFundings?.();
+            unsubscribeUserNonFundingLedgerUpdates?.();
         };
     }, [userAddress, info, isDebugWalletActive, wsContext]);
 
@@ -571,6 +570,7 @@ export default function WebDataConsumer() {
             lastDataTimestampRef.current = Date.now();
 
             if (debugWalletActiveRef.current) {
+                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
             }

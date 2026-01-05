@@ -86,15 +86,7 @@ export default function ComboBoxContainer() {
         [setManualAddress],
     );
 
-    const shouldResetPage = useRef(false);
     useEffect(() => {
-        if (isDebugWalletActive) {
-            shouldResetPage.current = true;
-        } else {
-            if (shouldResetPage.current) {
-                window.location.reload();
-            }
-        }
         setAddressInputVal('');
     }, [isDebugWalletActive]);
 

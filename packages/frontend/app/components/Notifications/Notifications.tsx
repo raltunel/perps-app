@@ -160,10 +160,6 @@ export default function Notifications() {
 
         if (isDebugWalletActive && wsContext) {
             // Use wsContext in debug mode (avoid duplicate connection to same endpoint)
-            console.log(
-                '[NOTIFICATION] Setting up subscription via wsContext with user:',
-                userAddress,
-            );
             const notificationConfig = {
                 handler: (data: any) => {
                     // WsContext passes msg.data directly to handler
@@ -180,10 +176,6 @@ export default function Notifications() {
             };
         } else {
             // Use SDK in normal mode
-            console.log(
-                '[NOTIFICATION] Setting up subscription via SDK with user:',
-                userAddress,
-            );
             const { unsubscribe } = info.subscribe(
                 {
                     type: WsChannels.NOTIFICATION,
@@ -194,7 +186,9 @@ export default function Notifications() {
             unsubscribeNotification = unsubscribe;
         }
 
-        return unsubscribeNotification;
+        return () => {
+            unsubscribeNotification?.();
+        };
     }, [userAddress, info, isDebugWalletActive, wsContext]);
 
     const postNotification = useCallback((payload: NotificationMsg) => {

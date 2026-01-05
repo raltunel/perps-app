@@ -260,6 +260,8 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
             } else {
                 subscriptions.current.set(key, configs);
             }
+            // Send unsubscribe message to server
+            registerWsSubscription(key, config.payload || {}, true);
         }
     };
 
