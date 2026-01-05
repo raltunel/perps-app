@@ -130,6 +130,17 @@ function Portfolio() {
     const sessionState = useSession();
     const hasSession = isEstablished(sessionState);
 
+    // Determine if the user is viewing their own portfolio
+    const loggedInAddress = hasSession
+        ? sessionState.walletPublicKey?.toString()
+        : null;
+    const isViewingOwnPortfolio =
+        !urlAddress ||
+        (!!loggedInAddress &&
+            urlAddress.toLowerCase() === loggedInAddress.toLowerCase());
+
+    const showTransactButtons = hasSession && isViewingOwnPortfolio;
+
     // Determine if we should show the "connect" view
     // Show it when: no session AND no userAddress AND no address in URL
     // We check userAddress in addition to session state because session may not be
@@ -216,7 +227,8 @@ function Portfolio() {
             <div className={styles.mobileHeroCard}>
                 <div className={styles.heroLabel}>Total Net Value</div>
                 <div className={styles.heroValue}>
-                    {formatCurrency(totalValue)}
+                    {totalEquityFormatted}
+                    {/* {formatCurrency(totalValue)} */}
                 </div>
                 <div
                     className={`${styles.heroPnl} ${isPnlPositive ? styles.positive : styles.negative}`}
@@ -370,39 +382,43 @@ function Portfolio() {
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
                             <h6>Total Net USD Value</h6>
-                            <h3>{formatCurrency(totalValue)}</h3>
+                            <h3>{totalEquityFormatted}</h3>
+                            {/* <h3>{formatCurrency(totalValue)}</h3> */}
                         </div>
 
                         <div className={styles.totalNetDisplay}>
                             <h6>
                                 <span>Total Net USD Value:</span>{' '}
-                                {formatCurrency(totalValue)}
+                                {totalEquityFormatted}
+                                {/* {formatCurrency(totalValue)} */}
                             </h6>
-                            <div className={styles.buttonContainer}>
-                                <div className={styles.rowButton}>
-                                    <SimpleButton
-                                        onClick={openDepositModal}
-                                        bg='accent1'
-                                    >
-                                        {t('common.deposit')}
-                                    </SimpleButton>
-                                    <SimpleButton
-                                        onClick={openWithdrawModal}
-                                        bg='dark3'
-                                        hoverBg='accent1'
-                                    >
-                                        {t('common.withdraw')}
-                                    </SimpleButton>
-                                    <SimpleButton
-                                        onClick={openSendModal}
-                                        className={styles.sendMobile}
-                                        bg='dark3'
-                                        hoverBg='accent1'
-                                    >
-                                        {t('common.send')}
-                                    </SimpleButton>
+                            {showTransactButtons && (
+                                <div className={styles.buttonContainer}>
+                                    <div className={styles.rowButton}>
+                                        <SimpleButton
+                                            onClick={openDepositModal}
+                                            bg='accent1'
+                                        >
+                                            {t('common.deposit')}
+                                        </SimpleButton>
+                                        <SimpleButton
+                                            onClick={openWithdrawModal}
+                                            bg='dark3'
+                                            hoverBg='accent1'
+                                        >
+                                            {t('common.withdraw')}
+                                        </SimpleButton>
+                                        <SimpleButton
+                                            onClick={openSendModal}
+                                            className={styles.sendMobile}
+                                            bg='dark3'
+                                            hoverBg='accent1'
+                                        >
+                                            {t('common.send')}
+                                        </SimpleButton>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
@@ -507,20 +523,22 @@ function Portfolio() {
                                     {/* Mobile Stats */}
                                     {mobileStatsSection}
                                     {/* Mobile Action Buttons */}
-                                    <div className={styles.mobileActions}>
-                                        <button
-                                            className={`${styles.mobileActionBtn} ${styles.primary}`}
-                                            onClick={openDepositModal}
-                                        >
-                                            Deposit
-                                        </button>
-                                        <button
-                                            className={`${styles.mobileActionBtn} ${styles.secondary}`}
-                                            onClick={openWithdrawModal}
-                                        >
-                                            Withdraw
-                                        </button>
-                                    </div>
+                                    {showTransactButtons && (
+                                        <div className={styles.mobileActions}>
+                                            <button
+                                                className={`${styles.mobileActionBtn} ${styles.primary}`}
+                                                onClick={openDepositModal}
+                                            >
+                                                Deposit
+                                            </button>
+                                            <button
+                                                className={`${styles.mobileActionBtn} ${styles.secondary}`}
+                                                onClick={openWithdrawModal}
+                                            >
+                                                Withdraw
+                                            </button>
+                                        </div>
+                                    )}
 
                                     {/* Stacked Tables - right under performance */}
                                     <section
