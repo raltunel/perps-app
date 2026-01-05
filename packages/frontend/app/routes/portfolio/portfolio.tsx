@@ -41,6 +41,7 @@ export function meta() {
 function Portfolio() {
     const { t } = useTranslation();
     const mainRef = useRef<HTMLDivElement | null>(null);
+    const prevLoggedInAddressRef = useRef<string | null>(null);
 
     const DEFAULT_PANEL_HEIGHT = 480;
     const PANEL_MIN = 180;
@@ -165,6 +166,44 @@ function Portfolio() {
         hasSession,
         isTransactionsView,
         location.pathname,
+        loggedInAddress,
+        navigate,
+        urlAddress,
+    ]);
+
+    useEffect(() => {
+        if (!hasSession) return;
+        if (!loggedInAddress) return;
+
+        const prevLoggedInAddress = prevLoggedInAddressRef.current;
+        prevLoggedInAddressRef.current = loggedInAddress;
+
+        if (!urlAddress) return;
+        if (!prevLoggedInAddress) return;
+
+        // Only redirect when the user WAS viewing their own portfolio (bound to the previous wallet)
+        // and the wallet has since changed.
+        const wasViewingOwnPortfolio =
+            urlAddress.toLowerCase() === prevLoggedInAddress.toLowerCase();
+        if (!wasViewingOwnPortfolio) return;
+
+        const hasAddressChanged =
+            urlAddress.toLowerCase() !== loggedInAddress.toLowerCase();
+        if (!hasAddressChanged) return;
+
+        const suffix = isTransactionsView ? '/transactions' : '';
+        const nextPath = `/v2/portfolio/${loggedInAddress}${suffix}`;
+        const nextUrl = `${nextPath}${location.search}${location.hash}`;
+        const currentUrl = `${location.pathname}${location.search}${location.hash}`;
+
+        if (currentUrl === nextUrl) return;
+        navigate(nextPath, { replace: true });
+    }, [
+        hasSession,
+        isTransactionsView,
+        location.hash,
+        location.pathname,
+        location.search,
         loggedInAddress,
         navigate,
         urlAddress,
