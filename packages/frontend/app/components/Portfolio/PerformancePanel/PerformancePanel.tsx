@@ -42,6 +42,14 @@ export default function PerformancePanel({
         ? formatNum(userData?.pnl, 2, true, true)
         : '$0.00';
 
+    const realizedPnlFormatted = userData?.realized_pnl
+        ? formatNum(userData?.realized_pnl, 2, true, true)
+        : '$0.00';
+
+    const unrealizedPnlFormatted = userData?.unrealized_pnl
+        ? formatNum(userData?.unrealized_pnl, 2, true, true)
+        : '$0.00';
+
     const volumeFormatted = userData?.total_volume
         ? formatNum(userData?.total_volume, 2, true, true)
         : '$0.00';
@@ -58,8 +66,14 @@ export default function PerformancePanel({
         ? formatNum(userData?.vaultEquity)
         : '$0.00';
 
+    const collateralFormatted = userData?.collateral
+        ? formatNum(userData?.collateral)
+        : '$0.00';
+
     const PERFORMANCE_METRICS = [
         { label: 'PNL', value: pnlFormatted },
+        { label: 'Realized PNL', value: realizedPnlFormatted },
+        { label: 'Unrealized PNL', value: unrealizedPnlFormatted },
         { label: 'Volume', value: volumeFormatted },
         // { label: 'Max Drawdown', value: maxDrawdownFormatted },
         // { label: 'Total Equity', value: totalEquityFormatted },
