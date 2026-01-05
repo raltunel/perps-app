@@ -159,6 +159,7 @@
         "positionClosed": "Position Closed",
         "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} {{symbol}} position",
         "tpSlForPosition": "TP/SL for Position",
+        "failedToClosePosition": "Failed to close position",
         "transactionTimedOut": "Transaction timed out after {{timeInSeconds}} seconds",
         "txFailedOrNotConfirmed": "Transaction failed or was not confirmed",
         "walletBalance": "Wallet balance",
@@ -315,6 +316,8 @@
         "withdrawal": "Withdrawal",
         "spotTransfer": "Spot Transfer",
         "reduceOnly": "Reduce Only",
+        "triggerConditions": "Trigger Conditions",
+        "status": "Status",
         "order": "Order",
         "long": "Long",
         "short": "Short",
@@ -458,7 +461,8 @@
         "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",
         "claimRewardsWithAmount": "Claim {{amount}} in rewards",
         "selectATabToViewData": "Select a tab to view data",
-        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive a <1>{{userPercent}}</1> discount."
+        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive a <1>{{userPercent}}</1> discount.",
+        "claim": "Claim"
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
