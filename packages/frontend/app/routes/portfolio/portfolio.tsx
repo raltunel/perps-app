@@ -244,7 +244,7 @@ function Portfolio() {
                 <div className={styles.heroBalances}>
                     <div className={styles.heroBalanceItem}>
                         <span className={styles.heroBalanceLabel}>
-                            Contract
+                            {t('tradeTable.contract')}
                         </span>
                         <span className={styles.heroBalanceValue}>
                             {formatCurrency(portfolio.balances.contract)}
@@ -252,14 +252,18 @@ function Portfolio() {
                     </div>
                     <div className={styles.heroBalanceDivider} />
                     <div className={styles.heroBalanceItem}>
-                        <span className={styles.heroBalanceLabel}>Wallet</span>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('transactions.walletBalance')}
+                        </span>
                         <span className={styles.heroBalanceValue}>
                             {formatCurrency(portfolio.balances.wallet)}
                         </span>
                     </div>
                     <div className={styles.heroBalanceDivider} />
                     <div className={styles.heroBalanceItem}>
-                        <span className={styles.heroBalanceLabel}>Fees</span>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('portfolio.fees')}
+                        </span>
                         <span className={styles.heroBalanceValue}>0.00%</span>
                     </div>
                 </div>
@@ -349,7 +353,7 @@ function Portfolio() {
                         </Link>
                     </header>
                 ) : hasSession || urlAddress ? (
-                    <header>Portfolio</header>
+                    <header>{t('pageTitles.portfolio')}</header>
                 ) : null}
 
                 <div className={styles.column}>
@@ -380,14 +384,14 @@ function Portfolio() {
                         <div
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
-                            <h6>Total Net USD Value</h6>
+                            <h6>{t('portfolio.totalNetUsdValue')}</h6>
                             <h3>{totalEquityFormatted}</h3>
                             {/* <h3>{formatCurrency(totalValue)}</h3> */}
                         </div>
 
                         <div className={styles.totalNetDisplay}>
                             <h6>
-                                <span>Total Net USD Value:</span>{' '}
+                                <span>{t('portfolio.totalNetUsdValue')}:</span>{' '}
                                 {totalEquityFormatted}
                                 {/* {formatCurrency(totalValue)} */}
                             </h6>

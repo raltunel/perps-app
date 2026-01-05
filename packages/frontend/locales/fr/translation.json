@@ -679,6 +679,8 @@
         "accountValue": "Valeur du compte",
         "collateral": "Collatéral",
         "pnl": "PnL",
+        "realizedPnl": "PnL réalisé",
+        "unrealizedPnl": "PnL non réalisé",
         "volume": "Volume",
         "maxDrawdown": "Drawdown maximum",
         "totalEquity": "Équité totale",
