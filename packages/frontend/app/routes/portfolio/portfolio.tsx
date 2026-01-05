@@ -483,7 +483,7 @@ function Portfolio() {
                             </Resizable>
 
                             <section className={styles.table}>
-                                <PortfolioTables />
+                                <PortfolioTables urlAddress={urlAddress} />
                             </section>
                         </div>
 
@@ -501,6 +501,7 @@ function Portfolio() {
                                             'common.orderHistory',
                                         ]}
                                         stackedTableHeight={250}
+                                        urlAddress={urlAddress}
                                     />
                                 </section>
                             ) : (
@@ -552,6 +553,7 @@ function Portfolio() {
                                                 'common.balances',
                                             ]}
                                             stackedTableHeight={180}
+                                            urlAddress={urlAddress}
                                         />
                                     </section>
 
