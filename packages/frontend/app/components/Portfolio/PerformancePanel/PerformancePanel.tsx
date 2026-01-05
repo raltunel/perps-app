@@ -1,10 +1,4 @@
-import React, {
-    useEffect,
-    useMemo,
-    useState,
-    useCallback,
-    useRef,
-} from 'react';
+import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Tabs from '~/components/Tabs/Tabs';
@@ -109,15 +103,6 @@ export default function PerformancePanel({
     >();
 
     const [userProfileLineData, setUserProfileLineData] = useState<any>();
-
-    useEffect(() => {
-        // Initialize tab as empty, then change to Performance after 2 seconds
-        const timer = setTimeout(() => {
-            setActiveTab('performance');
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, []);
 
     const handleTabChange = useCallback((tab: string) => {
         setActiveTab(tab);
