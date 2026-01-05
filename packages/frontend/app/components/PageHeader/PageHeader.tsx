@@ -98,7 +98,7 @@ export default function PageHeader() {
                 if (data.error) {
                     referralStore.setTotVolume(0);
                 } else if (data.stats) {
-                    const volume = data.stats.volume;
+                    const volume = data.stats.taker_volume;
                     referralStore.setTotVolume(volume);
                 }
             } catch (error) {
