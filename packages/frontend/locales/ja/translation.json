@@ -45,7 +45,11 @@
         "announcements": "お知らせ",
         "leverage": "レバレッジ",
         "comingSoon": "近日公開",
-        "clearFilter": "フィルターをクリア"
+        "enter": "入力",
+        "claim": "受け取る",
+        "seeDocsForMore": "詳細はドキュメントをご覧ください。",
+        "clearFilter": "フィルターをクリア",
+        "activate": "有効化"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -591,6 +595,7 @@
         "withdrawInput": "出金入力欄",
         "scrollTabsLeft": "タブを左にスクロール",
         "scrollTabsRight": "タブを右にスクロール",
+        "mobileActionMenu": "モバイルアクションメニューを切り替え",
         "leverageValue": "レバレッジ値",
         "leverageAmount": "レバレッジ金額",
         "setLeverageTo": "{{value}}倍にレバレッジを設定",
@@ -679,6 +684,8 @@
         "accountValue": "アカウント価値",
         "collateral": "証拠金",
         "pnl": "損益",
+        "realizedPnl": "実現損益",
+        "unrealizedPnl": "未実現損益",
         "volume": "出来高",
         "maxDrawdown": "最大ドローダウン",
         "totalEquity": "総資産",

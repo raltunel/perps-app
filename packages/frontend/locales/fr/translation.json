@@ -45,7 +45,11 @@
         "announcements": "Annonces",
         "leverage": "Effet de levier",
         "comingSoon": "Bientôt disponible",
-        "clearFilter": "Effacer le filtre"
+        "enter": "Entrer",
+        "claim": "Réclamer",
+        "seeDocsForMore": "Voir la documentation pour en savoir plus.",
+        "clearFilter": "Effacer le filtre",
+        "activate": "Activer"
     },
     "transactions": {
         "orderTypes": "Types d'ordre",
@@ -591,6 +595,7 @@
         "withdrawInput": "Champ de saisie du retrait",
         "scrollTabsLeft": "Faire défiler les onglets vers la gauche",
         "scrollTabsRight": "Faire défiler les onglets vers la droite",
+        "mobileActionMenu": "Basculer le menu d'actions mobile",
         "leverageValue": "Valeur de l'effet de levier",
         "leverageAmount": "Montant de l'effet de levier",
         "setLeverageTo": "Définir l'effet de levier à {{value}}x",

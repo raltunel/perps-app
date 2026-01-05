@@ -45,7 +45,11 @@
         "announcements": "공지사항",
         "leverage": "레버리지",
         "comingSoon": "출시 예정",
-        "clearFilter": "필터 지우기"
+        "enter": "입력",
+        "claim": "받기",
+        "seeDocsForMore": "자세한 내용은 문서를 확인하세요.",
+        "clearFilter": "필터 지우기",
+        "activate": "활성화"
     },
     "transactions": {
         "orderTypes": "주문 유형",
@@ -591,6 +595,7 @@
         "withdrawInput": "출금 입력란",
         "scrollTabsLeft": "탭 왼쪽으로 스크롤",
         "scrollTabsRight": "탭 오른쪽으로 스크롤",
+        "mobileActionMenu": "모바일 작업 메뉴 전환",
         "leverageValue": "레버리지 값",
         "leverageAmount": "레버리지 금액",
         "setLeverageTo": "레버리지를 {{value}}배로 설정",
@@ -679,6 +684,8 @@
         "accountValue": "계정 가치",
         "collateral": "담보",
         "pnl": "PnL",
+        "realizedPnl": "실현 손익",
+        "unrealizedPnl": "미실현 손익",
         "volume": "거래량",
         "maxDrawdown": "최대 낙폭",
         "totalEquity": "총 자본",
