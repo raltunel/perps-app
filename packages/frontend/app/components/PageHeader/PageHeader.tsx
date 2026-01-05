@@ -94,11 +94,10 @@ export default function PageHeader() {
 
                 const response = await fetch(emberEndpointForUser);
                 const data = await response.json();
-
                 if (data.error) {
                     referralStore.setTotVolume(0);
                 } else if (data.stats) {
-                    const volume = data.stats.taker_volume;
+                    const volume = data.stats.total_volume;
                     referralStore.setTotVolume(volume);
                 }
             } catch (error) {
