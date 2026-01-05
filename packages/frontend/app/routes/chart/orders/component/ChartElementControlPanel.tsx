@@ -58,13 +58,6 @@ export const ChartElementControlPanel: React.FC<
         setSelectedOrderLine({ ...selectedOrderLine, yPrice: newPrice });
     };
 
-    const saveChanges = () => {
-        if (!selectedOrderLine || previewPrice === null) return;
-
-        setSelectedOrderLine({ ...selectedOrderLine, yPrice: previewPrice });
-        setOriginalPrice(previewPrice);
-    };
-
     const cancelChanges = () => {
         if (originalPrice !== null) {
             setPreviewPrice(originalPrice);
@@ -72,18 +65,11 @@ export const ChartElementControlPanel: React.FC<
         setSelectedOrderLine(undefined);
     };
 
-    const hasChanges = () => {
-        if (previewPrice === null || originalPrice === null) return false;
-        return Math.abs(previewPrice - originalPrice) > 0.001;
-    };
+    if (!isMobile || !selectedOrderLine) {
+        return null;
+    }
 
-    if (
-        !isMobile ||
-        !selectedOrderLine ||
-        !chart ||
-        !canvasHeight ||
-        !canvasWidth
-    ) {
+    if (!chart || !canvasHeight || !canvasWidth) {
         return null;
     }
 
@@ -175,29 +161,6 @@ export const ChartElementControlPanel: React.FC<
                     display: 'flex',
                 }}
             >
-                {hasChanges() && (
-                    <button
-                        onClick={saveChanges}
-                        style={{
-                            width: '28px',
-                            height: '28px',
-                            padding: '0',
-                            backgroundColor: 'transparent',
-                            color: '#999',
-                            border: '1px solid #444',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            fontWeight: 400,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                        title='Save'
-                    >
-                        ✓
-                    </button>
-                )}
                 <button
                     onClick={cancelChanges}
                     style={{

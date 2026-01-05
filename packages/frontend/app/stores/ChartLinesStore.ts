@@ -3,12 +3,16 @@ import type { LineData } from '~/routes/chart/orders/component/LineComponent';
 
 export const CHART_LINES_KEY = 'perps.tv.chart.lines';
 
+interface SelectedOrderLine extends LineData {
+    originalPrice?: number;
+}
+
 interface ChartLinesStore {
     obPreviewLine: LineData | null;
     setObPreviewLine: (line: LineData | null) => void;
 
-    selectedOrderLine: LineData | undefined;
-    setSelectedOrderLine: (line: LineData | undefined) => void;
+    selectedOrderLine: SelectedOrderLine | undefined;
+    setSelectedOrderLine: (line: SelectedOrderLine | undefined) => void;
 }
 
 export const useChartLinesStore = create<ChartLinesStore>((set) => ({
@@ -17,6 +21,6 @@ export const useChartLinesStore = create<ChartLinesStore>((set) => ({
         set({ obPreviewLine: line ?? undefined }),
 
     selectedOrderLine: undefined,
-    setSelectedOrderLine: (line: LineData | undefined) =>
+    setSelectedOrderLine: (line: SelectedOrderLine | undefined) =>
         set({ selectedOrderLine: line ?? undefined }),
 }));

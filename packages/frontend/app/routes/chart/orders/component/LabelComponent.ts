@@ -22,6 +22,7 @@ import {
 import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import {
     drawLabel,
+    drawLabelMobile,
     drawLiqLabel,
     type LabelLocation,
     type LabelType,
@@ -120,6 +121,174 @@ const LabelComponent = ({
 
     const isLiqPriceLineDraggable = false;
 
+    // Keep dragStateRef.originalPrice in sync with selectedOrderLine for mobile
+    useEffect(() => {
+        if (
+            isMobile &&
+            selectedOrderLine &&
+            selectedOrderLine.originalPrice !== undefined
+        ) {
+            dragStateRef.current.originalPrice =
+                selectedOrderLine.originalPrice;
+        } else if (!selectedOrderLine) {
+            dragStateRef.current.originalPrice = undefined;
+        }
+    }, [selectedOrderLine, isMobile]);
+
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
+    }
+
+    const limitOrderDragEnd = async (tempSelectedLine: LabelLocationData) => {
+        const orderId = tempSelectedLine.parentLine.oid;
+        const newPrice = tempSelectedLine.parentLine.yPrice;
+        const quantity = tempSelectedLine.parentLine.quantityTextValue;
+        const side = tempSelectedLine.parentLine.side;
+
+        const slug = makeSlug(10);
+
+        if (!orderId || !side) return;
+        try {
+            const usdValueOfOrderStr = formatNum(
+                (quantity || 0) * (symbolInfo?.markPx || 1),
+                2,
+                true,
+                true,
+            );
+            // Show pending notification
+            notifications.add({
+                title: t('transactions.limitOrderUpdatePending.title'),
+                message: t('transactions.limitOrderUpdatePending.message', {
+                    side,
+                    value: usdValueOfOrderStr,
+                    coin: symbolInfo?.coin,
+                    limitPrice: formatNum(
+                        roundDownToTenth(newPrice),
+                        newPrice > 10_000 ? 0 : 2,
+                        true,
+                        true,
+                    ),
+                }),
+                icon: 'spinner',
+                slug,
+                removeAfter: 60000,
+            });
+
+            const newOrderParams: LimitOrderParams = {
+                price: roundDownToTenth(newPrice),
+                side,
+                quantity: quantity,
+                replaceOrderId: BigInt(orderId),
+            } as LimitOrderParams;
+
+            const timeOfTxBuildStart = Date.now();
+            const limitOrderResult = await executeLimitOrder(newOrderParams);
+
+            if (!limitOrderResult.success) {
+                setActiveDragLine(undefined);
+                console.error(
+                    'Failed to create new order:',
+                    limitOrderResult.error,
+                );
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Update Fail',
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            success: false,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                limitOrderResult.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                limitOrderResult.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: limitOrderResult.signature,
+                        },
+                    });
+                }
+                notifications.add({
+                    title: t('transactions.failedToUpdatedOrder.title'),
+                    message:
+                        limitOrderResult.error ||
+                        t('transactions.unknownErrorOccurred'),
+                    icon: 'error',
+                    removeAfter: 10000,
+                    txLink: getTxLink(limitOrderResult.signature),
+                });
+            } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Update Success',
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            success: true,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                limitOrderResult.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                limitOrderResult.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: limitOrderResult.signature,
+                        },
+                    });
+                }
+                notifications.add({
+                    title: t('transactions.orderUpdated.title'),
+                    message: t('transactions.orderUpdated.message', {
+                        usdValueOfOrderStr,
+                        symbol: symbolInfo?.coin,
+                        limitPrice: formatNum(
+                            roundDownToTenth(newPrice),
+                            newPrice > 10_000 ? 0 : 2,
+                            true,
+                            true,
+                        ),
+                    }),
+                    icon: 'check',
+                    removeAfter: 10000,
+                    txLink: getTxLink(limitOrderResult.signature),
+                });
+            }
+            setTimeout(() => {
+                setSelectedOrderLine(undefined);
+            }, 300);
+        } catch (error) {
+            setActiveDragLine(undefined);
+            console.error('Error updating order:', error);
+            notifications.remove(slug);
+            notifications.add({
+                title: t('transactions.errorUpdatingOrder.title'),
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : t('transactions.unknownErrorOccurred'),
+                icon: 'error',
+            });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Update Fail',
+                        orderType: 'Limit',
+                        direction: side === 'buy' ? 'Buy' : 'Sell',
+                        success: false,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
+        }
+    };
+
     useEffect(() => {
         if (!chart || !isChartReady || !ctx || !canvasSize) return;
 
@@ -208,16 +377,63 @@ const LabelComponent = ({
 
                 if (line.textValue) {
                     if (line.type !== 'LIQ') {
-                        labelLocations = drawLabel(
-                            ctx,
-                            {
-                                x: xPixel,
-                                y: yPricePixel,
-                                labelOptions,
-                                color: line.color,
-                            },
-                            line.type === 'LIMIT',
-                        );
+                        if (isMobile) {
+                            const isLineSelected =
+                                selectedOrderLine?.oid === line.oid;
+
+                            const currentPrice =
+                                isLineSelected &&
+                                activeDragLine &&
+                                activeDragLine.parentLine.oid === line.oid
+                                    ? activeDragLine.parentLine.yPrice
+                                    : line.yPrice;
+
+                            const hasChanges =
+                                isLineSelected &&
+                                selectedOrderLine &&
+                                selectedOrderLine.originalPrice !== undefined &&
+                                Math.abs(
+                                    currentPrice -
+                                        selectedOrderLine.originalPrice,
+                                ) > 0.001;
+
+                            const mobileLabelOptions = [
+                                ...labelOptions,
+                                ...(hasChanges
+                                    ? [
+                                          {
+                                              type: 'Confirm' as LabelType,
+                                              text: '✓',
+                                              backgroundColor: '#3b82f6',
+                                              textColor: '#FFFFFF',
+                                              borderColor: '#3b82f6',
+                                          },
+                                      ]
+                                    : []),
+                            ];
+
+                            labelLocations = drawLabelMobile(
+                                ctx,
+                                {
+                                    x: xPixel,
+                                    y: yPricePixel,
+                                    labelOptions: mobileLabelOptions,
+                                    color: line.color,
+                                },
+                                line.type === 'LIMIT',
+                            );
+                        } else {
+                            labelLocations = drawLabel(
+                                ctx,
+                                {
+                                    x: xPixel,
+                                    y: yPricePixel,
+                                    labelOptions,
+                                    color: line.color,
+                                },
+                                line.type === 'LIMIT',
+                            );
+                        }
                     } else {
                         labelLocations = drawLiqLabel(
                             ctx,
@@ -505,6 +721,29 @@ const LabelComponent = ({
                 };
 
                 if (overlayCanvasRef.current) {
+                    if (
+                        isLabel &&
+                        isLabel.matchType === 'onLabel' &&
+                        isLabel.label?.type === 'Confirm' &&
+                        isMobile
+                    ) {
+                        if (isLabel.parentLine.type === 'LIMIT') {
+                            limitOrderDragEnd(isLabel);
+                        }
+                        return;
+                    }
+
+                    if (
+                        isLabel &&
+                        isLabel.matchType === 'onLabel' &&
+                        isLabel.label?.type === 'Cancel' &&
+                        isMobile &&
+                        selectedOrderLine
+                    ) {
+                        handleCancel(isLabel.parentLine);
+                        return;
+                    }
+
                     const isValidMatchType = isMobile
                         ? isLabel?.matchType === 'onLabel' ||
                           isLabel?.matchType === 'onLine'
@@ -514,16 +753,24 @@ const LabelComponent = ({
                         isLabel &&
                         isValidMatchType &&
                         isLabel.label?.type !== 'Cancel' &&
+                        isLabel.label?.type !== 'Confirm' &&
                         (isLabel.parentLine.type === 'LIMIT' ||
                             isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                             (isLabel.parentLine.type === 'LIQ' &&
                                 isLiqPriceLineDraggable))
                     ) {
+                        const isAlreadySelected =
+                            selectedOrderLine?.oid === isLabel.parentLine.oid;
+
+                        if (isAlreadySelected) return;
                         overlayCanvasRef.current.style.pointerEvents = 'auto';
 
                         if (isMobile) {
                             setActiveDragLine(isLabel);
-                            setSelectedOrderLine(isLabel.parentLine);
+                            setSelectedOrderLine({
+                                ...isLabel.parentLine,
+                                originalPrice: isLabel.parentLine.yPrice,
+                            });
                         }
 
                         if (overlayCanvasRef.current) {
@@ -710,7 +957,8 @@ const LabelComponent = ({
                         if (
                             found &&
                             found.matchType === 'onLabel' &&
-                            found.label?.type === 'Cancel'
+                            found.label?.type === 'Cancel' &&
+                            !isMobile
                         ) {
                             console.log({ found });
                             if (found.parentLine.oid)
@@ -736,10 +984,6 @@ const LabelComponent = ({
             }
         };
     }, [chart, JSON.stringify(drawnLabelsRef.current)]);
-
-    function roundDownToTenth(value: number) {
-        return Math.floor(value * 10) / 10;
-    }
 
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
@@ -779,7 +1023,12 @@ const LabelComponent = ({
             if (shouldStartDrag) {
                 canvas.style.cursor = 'grabbing';
                 dragStateRef.current.tempSelectedLine = isLabel;
-                dragStateRef.current.originalPrice = isLabel.parentLine.yPrice;
+
+                if (dragStateRef.current.originalPrice === undefined) {
+                    dragStateRef.current.originalPrice =
+                        isLabel.parentLine.yPrice;
+                }
+
                 dragStateRef.current.isDragging = true;
                 setActiveDragLine(isLabel);
                 setIsDrag(true);
@@ -866,169 +1115,13 @@ const LabelComponent = ({
             }
         };
 
-        async function limitOrderDragEnd(tempSelectedLine: LabelLocationData) {
-            const orderId = tempSelectedLine.parentLine.oid;
-            const newPrice = tempSelectedLine.parentLine.yPrice;
-            const quantity = tempSelectedLine.parentLine.quantityTextValue;
-            const side = tempSelectedLine.parentLine.side;
-
-            const slug = makeSlug(10);
-
-            if (!orderId || !side) return;
-            try {
-                const usdValueOfOrderStr = formatNum(
-                    (quantity || 0) * (symbolInfo?.markPx || 1),
-                    2,
-                    true,
-                    true,
-                );
-                // Show pending notification
-                notifications.add({
-                    title: t('transactions.limitOrderUpdatePending.title'),
-                    message: t('transactions.limitOrderUpdatePending.message', {
-                        side,
-                        value: usdValueOfOrderStr,
-                        coin: symbolInfo?.coin,
-                        limitPrice: formatNum(
-                            roundDownToTenth(newPrice),
-                            newPrice > 10_000 ? 0 : 2,
-                            true,
-                            true,
-                        ),
-                    }),
-                    icon: 'spinner',
-                    slug,
-                    removeAfter: 60000,
-                });
-
-                // If cancel was successful, create a new order with the updated price
-                // Note: You'll need to provide the correct order parameters based on your application's needs
-                const newOrderParams: LimitOrderParams = {
-                    // Example parameters - replace with actual parameters from your order
-                    price: roundDownToTenth(newPrice),
-                    // Add other required parameters for the limit order
-                    // For example:
-                    // symbol: 'BTC/USD',
-                    side,
-                    quantity: quantity,
-                    replaceOrderId: BigInt(orderId),
-                    // ... other required parameters
-                } as LimitOrderParams; // Cast to the correct type
-
-                const timeOfTxBuildStart = Date.now();
-                const limitOrderResult =
-                    await executeLimitOrder(newOrderParams);
-
-                if (!limitOrderResult.success) {
-                    setActiveDragLine(undefined);
-                    console.error(
-                        'Failed to create new order:',
-                        limitOrderResult.error,
-                    );
-                    // Show error notification to user
-                    notifications.remove(slug);
-                    if (typeof plausible === 'function') {
-                        plausible('Onchain Action', {
-                            props: {
-                                actionType: 'Limit Update Fail',
-                                orderType: 'Limit',
-                                direction: side === 'buy' ? 'Buy' : 'Sell',
-                                success: false,
-                                txBuildDuration: getDurationSegment(
-                                    timeOfTxBuildStart,
-                                    limitOrderResult.timeOfSubmission,
-                                ),
-                                txDuration: getDurationSegment(
-                                    limitOrderResult.timeOfSubmission,
-                                    Date.now(),
-                                ),
-                                txSignature: limitOrderResult.signature,
-                            },
-                        });
-                    }
-                    notifications.add({
-                        title: t('transactions.failedToUpdatedOrder.title'),
-                        message:
-                            limitOrderResult.error ||
-                            t('transactions.unknownErrorOccurred'),
-                        icon: 'error',
-                        removeAfter: 10000,
-                        txLink: getTxLink(limitOrderResult.signature),
-                    });
-                } else {
-                    // Show success notification
-                    notifications.remove(slug);
-                    if (typeof plausible === 'function') {
-                        plausible('Onchain Action', {
-                            props: {
-                                actionType: 'Limit Update Success',
-                                orderType: 'Limit',
-                                direction: side === 'buy' ? 'Buy' : 'Sell',
-                                success: true,
-                                txBuildDuration: getDurationSegment(
-                                    timeOfTxBuildStart,
-                                    limitOrderResult.timeOfSubmission,
-                                ),
-                                txDuration: getDurationSegment(
-                                    limitOrderResult.timeOfSubmission,
-                                    Date.now(),
-                                ),
-                                txSignature: limitOrderResult.signature,
-                            },
-                        });
-                    }
-                    notifications.add({
-                        title: t('transactions.orderUpdated.title'),
-                        message: t('transactions.orderUpdated.message', {
-                            usdValueOfOrderStr,
-                            symbol: symbolInfo?.coin,
-                            limitPrice: formatNum(
-                                roundDownToTenth(newPrice),
-                                newPrice > 10_000 ? 0 : 2,
-                                true,
-                                true,
-                            ),
-                        }),
-                        icon: 'check',
-                        removeAfter: 10000,
-                        txLink: getTxLink(limitOrderResult.signature),
-                    });
-                }
-            } catch (error) {
-                setActiveDragLine(undefined);
-                console.error('Error updating order:', error);
-                notifications.remove(slug);
-                notifications.add({
-                    title: t('transactions.errorUpdatingOrder.title'),
-                    message:
-                        error instanceof Error
-                            ? error.message
-                            : t('transactions.unknownErrorOccurred'),
-                    icon: 'error',
-                });
-                if (typeof plausible === 'function') {
-                    plausible('Offchain Failure', {
-                        props: {
-                            actionType: 'Limit Update Fail',
-                            orderType: 'Limit',
-                            direction: side === 'buy' ? 'Buy' : 'Sell',
-                            success: false,
-                            errorMessage:
-                                error instanceof Error
-                                    ? error.message
-                                    : 'Unknown error occurred',
-                        },
-                    });
-                }
-            }
-        }
-
         function liqPriceDragEnd(tempSelectedLine: LabelLocationData) {
             console.log(
                 'Liq. Price Line dragend',
                 tempSelectedLine.parentLine.yPrice,
             );
             setActiveDragLine(undefined);
+            setSelectedOrderLine(undefined);
         }
 
         function updatePreviewOrderPrice(tempSelectedLine: LabelLocationData) {
@@ -1038,6 +1131,7 @@ const LabelComponent = ({
                 changeType: 'dragEnd',
             });
             setActiveDragLine(undefined);
+            setSelectedOrderLine(undefined);
         }
 
         const handleDragEnd = async () => {
@@ -1134,7 +1228,10 @@ const LabelComponent = ({
             let cursorText = 'pointer';
 
             if (isMobile) {
-                setSelectedOrderLine(tempSelectedLine.parentLine);
+                setSelectedOrderLine({
+                    ...tempSelectedLine.parentLine,
+                    originalPrice: originalPrice,
+                });
             } else {
                 if (tempSelectedLine.parentLine.type === 'LIMIT') {
                     limitOrderDragEnd(tempSelectedLine);
