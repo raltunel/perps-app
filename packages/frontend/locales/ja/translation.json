@@ -701,7 +701,9 @@
         "amountGreaterThanZero": "金額は0より大きく設定してください",
         "minDepositAmount": "最低入金額は {{amount}} です",
         "exceedsAvailableBalance": "金額が利用可能残高 {{balance}} を超えています",
-        "transactionTimedOut": "取引は15秒後にタイムアウトしました"
+        "transactionTimedOut": "取引は15秒後にタイムアウトしました",
+        "connectToViewPortfolio": "ポートフォリオを表示するには接続してください",
+        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。"
     },
     "pageTitles": {
         "portfolio": "ポートフォリオ",

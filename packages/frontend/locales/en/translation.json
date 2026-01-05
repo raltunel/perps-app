@@ -701,7 +701,9 @@
         "amountGreaterThanZero": "Amount must be greater than 0",
         "minDepositAmount": "Minimum deposit amount is {{amount}}",
         "exceedsAvailableBalance": "Amount exceeds available balance of {{balance}}",
-        "transactionTimedOut": "Transaction timed out after 15 seconds"
+        "transactionTimedOut": "Transaction timed out after 15 seconds",
+        "connectToViewPortfolio": "Connect to View Your Portfolio",
+        "connectDescription": "Sign in with your wallet to view your portfolio, positions, and trading history."
     },
     "pageTitles": {
         "portfolio": "Portfolio",

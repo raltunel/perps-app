@@ -701,7 +701,9 @@
         "amountGreaterThanZero": "Der Betrag muss größer als 0 sein",
         "minDepositAmount": "Mindesteinzahlungsbetrag ist {{amount}}",
         "exceedsAvailableBalance": "Der Betrag überschreitet das verfügbare Guthaben von {{balance}}",
-        "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten"
+        "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten",
+        "connectToViewPortfolio": "Verbinden um Ihr Portfolio anzuzeigen",
+        "connectDescription": "Melden Sie sich mit Ihrer Wallet an, um Ihr Portfolio, Positionen und Handelshistorie anzuzeigen."
     },
     "pageTitles": {
         "portfolio": "Portfolio",

@@ -701,7 +701,9 @@
         "amountGreaterThanZero": "금액은 0보다 커야 합니다",
         "minDepositAmount": "최소 입금 금액은 {{amount}}입니다",
         "exceedsAvailableBalance": "금액이 사용 가능 잔액 {{balance}}을 초과합니다",
-        "transactionTimedOut": "15초 후 트랜잭션 시간 초과"
+        "transactionTimedOut": "15초 후 트랜잭션 시간 초과",
+        "connectToViewPortfolio": "포트폴리오를 보려면 연결하세요",
+        "connectDescription": "지갑으로 로그인하여 포트폴리오, 포지션 및 거래 내역을 확인하세요."
     },
     "pageTitles": {
         "portfolio": "포트폴리오",

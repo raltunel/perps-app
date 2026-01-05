@@ -681,26 +681,10 @@
         "enterAddress": "Nhập địa chỉ...",
         "enterAmount": "Nhập số tiền",
         "invalidAddress": "Địa chỉ không hợp lệ",
-        "insufficientFunds": "Không đủ tiền",
-        "validAmountRequired": "Vui lòng nhập số tiền hợp lệ",
-        "amountGreaterThanZero": "Số tiền phải lớn hơn 0",
-        "minDepositAmount": "Số tiền nạp tối thiểu là {{amount}}",
-        "exceedsAvailableBalance": "Số tiền vượt quá số dư khả dụng {{balance}}",
-        "transactionTimedOut": "Giao dịch hết thời gian sau 15 giây"
-    },
-    "pageTitles": {
-        "portfolio": "Danh mục",
-        "referrals": "Giới thiệu",
-        "points": "Điểm",
-        "leaderboard": "Bảng xếp hạng",
-        "newStrategy": "Chiến lược mới",
-        "editStrategy": "Chỉnh sửa chiến lược",
-        "strategy": "Chiến lược",
         "strategies": "Danh sách chiến lược",
         "vault": "Kho bạc",
         "vaults": "Danh sách kho bạc",
         "subAccounts": "Tài khoản phụ",
-        "positions": "Vị thế",
         "openOrders": "Lệnh mở",
         "orderHistory": "Lịch sử lệnh",
         "tradeHistory": "Lịch sử giao dịch",
@@ -712,7 +696,10 @@
         "termsOfService": "Điều khoản dịch vụ",
         "privacyPolicy": "Chính sách bảo mật",
         "affiliates": "Liên kết",
-        "pageNotFound": "Không Tìm Thấy Trang"
+        "pageNotFound": "Không Tìm Thấy Trang",
+        "transactionTimedOut": "Giao dịch bị hết thời gian sau 15 giây",
+        "connectToViewPortfolio": "Kết nối để Xem Danh Mục Đầu Tư",
+        "connectDescription": "Đăng nhập bằng ví của bạn để xem danh mục đầu tư, vị thế và lịch sử giao dịch."
     },
     "docs": {
         "menuTerms": "Điều khoản dịch vụ",

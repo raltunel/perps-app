@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import { useModal } from '~/hooks/useModal';
@@ -23,6 +23,11 @@ import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTabl
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -45,7 +50,7 @@ function Portfolio() {
 
     // Hydration state
     const [isHydrated, setIsHydrated] = useState(false);
-    const [isLayoutReady, setIsLayoutReady] = useState(false);
+    const [isLayoutReady, setIsLayoutReady] = useState(true);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,6 +72,15 @@ function Portfolio() {
         return unsub;
     }, []);
 
+    useEffect(() => {
+        if (!isHydrated) return;
+        if (isLayoutReady) return;
+        const raf = requestAnimationFrame(() => {
+            setIsLayoutReady(true);
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [isHydrated, isLayoutReady]);
+
     const [panelHeight, setPanelHeight] = useState<number>(
         portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT,
     );
@@ -77,7 +91,10 @@ function Portfolio() {
     useLayoutEffect(() => {
         if (!isHydrated || hasInitialized.current) return;
         const el = mainRef.current;
-        if (!el) return;
+        if (!el) {
+            setIsLayoutReady(true);
+            return;
+        }
         const gap =
             parseFloat(
                 getComputedStyle(document.documentElement).getPropertyValue(
@@ -103,9 +120,21 @@ function Portfolio() {
         });
     }, [maxTop]);
 
-    const { portfolio, formatCurrency, userData } = usePortfolioManager();
+    const { address: urlAddress } = useParams<{ address?: string }>();
+    const { portfolio, formatCurrency, userData, userAddress } =
+        usePortfolioManager(urlAddress);
     const { formatNum } = useNumFormatter();
     const location = useLocation();
+
+    // Check if user has an established session
+    const sessionState = useSession();
+    const hasSession = isEstablished(sessionState);
+
+    // Determine if we should show the "connect" view
+    // Show it when: no session AND no userAddress AND no address in URL
+    // We check userAddress in addition to session state because session may not be
+    // immediately established on hydration, but userAddress persists in the store
+    const showConnectView = !hasSession && !userAddress && !urlAddress;
 
     // Check if we're on the transactions sub-route (mobile only)
     const isTransactionsView = location.pathname.includes('/transactions');
@@ -146,6 +175,36 @@ function Portfolio() {
 
     if (!isHydrated) {
         return null;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // CONNECT VIEW - Show when no session and no URL address
+    // ═══════════════════════════════════════════════════════════════════════
+    if (showConnectView) {
+        return (
+            <div className={styles.outer}>
+                <div className={styles.container}>
+                    <AnimatedBackground
+                        mode='absolute'
+                        layers={1}
+                        opacity={1}
+                        duration='15s'
+                        strokeWidth='2'
+                        palette={{
+                            color1: '#1E1E24',
+                            color2: '#7371FC',
+                            color3: '#CDC1FF',
+                        }}
+                    />
+                    <header>Portfolio</header>
+                    <div className={styles.connectView}>
+                        <h2>{t('portfolio.connectToViewPortfolio')}</h2>
+                        <p>{t('portfolio.connectDescription')}</p>
+                        <SessionButton />
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -244,10 +303,7 @@ function Portfolio() {
     );
 
     return (
-        <div
-            className={styles.outer}
-            style={{ opacity: isLayoutReady ? 1 : 0 }}
-        >
+        <div className={styles.outer}>
             <div className={styles.container}>
                 <AnimatedBackground
                     mode='absolute'
