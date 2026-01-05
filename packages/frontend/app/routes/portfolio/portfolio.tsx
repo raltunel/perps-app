@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import { useModal } from '~/hooks/useModal';
@@ -125,6 +125,7 @@ function Portfolio() {
         usePortfolioManager(urlAddress);
     const { formatNum } = useNumFormatter();
     const location = useLocation();
+    const navigate = useNavigate();
 
     // Check if user has an established session
     const sessionState = useSession();
@@ -149,6 +150,25 @@ function Portfolio() {
 
     // Check if we're on the transactions sub-route (mobile only)
     const isTransactionsView = location.pathname.includes('/transactions');
+
+    useEffect(() => {
+        if (!hasSession) return;
+        if (urlAddress) return;
+        if (!loggedInAddress) return;
+
+        const suffix = isTransactionsView ? '/transactions' : '';
+        const nextPath = `/v2/portfolio/${loggedInAddress}${suffix}`;
+
+        if (location.pathname === nextPath) return;
+        navigate(nextPath, { replace: true });
+    }, [
+        hasSession,
+        isTransactionsView,
+        location.pathname,
+        loggedInAddress,
+        navigate,
+        urlAddress,
+    ]);
 
     const {
         openDepositModal,
