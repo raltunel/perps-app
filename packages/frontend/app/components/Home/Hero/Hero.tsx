@@ -116,7 +116,7 @@ export default function Hero() {
                     </div> */}
                 </div>
             </div>
-            <DebugLimitCloseModal />
+            {/* <DebugLimitCloseModal /> */}
         </div>
     );
 }
