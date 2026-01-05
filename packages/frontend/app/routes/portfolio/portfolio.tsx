@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import { useModal } from '~/hooks/useModal';
@@ -23,6 +23,11 @@ import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTabl
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -45,7 +50,7 @@ function Portfolio() {
 
     // Hydration state
     const [isHydrated, setIsHydrated] = useState(false);
-    const [isLayoutReady, setIsLayoutReady] = useState(false);
+    const [isLayoutReady, setIsLayoutReady] = useState(true);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,6 +72,15 @@ function Portfolio() {
         return unsub;
     }, []);
 
+    useEffect(() => {
+        if (!isHydrated) return;
+        if (isLayoutReady) return;
+        const raf = requestAnimationFrame(() => {
+            setIsLayoutReady(true);
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [isHydrated, isLayoutReady]);
+
     const [panelHeight, setPanelHeight] = useState<number>(
         portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT,
     );
@@ -77,7 +91,10 @@ function Portfolio() {
     useLayoutEffect(() => {
         if (!isHydrated || hasInitialized.current) return;
         const el = mainRef.current;
-        if (!el) return;
+        if (!el) {
+            setIsLayoutReady(true);
+            return;
+        }
         const gap =
             parseFloat(
                 getComputedStyle(document.documentElement).getPropertyValue(
@@ -103,12 +120,55 @@ function Portfolio() {
         });
     }, [maxTop]);
 
-    const { portfolio, formatCurrency, userData } = usePortfolioManager();
+    const { address: urlAddress } = useParams<{ address?: string }>();
+    const { portfolio, formatCurrency, userData, userAddress } =
+        usePortfolioManager(urlAddress);
     const { formatNum } = useNumFormatter();
     const location = useLocation();
+    const navigate = useNavigate();
+
+    // Check if user has an established session
+    const sessionState = useSession();
+    const hasSession = isEstablished(sessionState);
+
+    // Determine if the user is viewing their own portfolio
+    const loggedInAddress = hasSession
+        ? sessionState.walletPublicKey?.toString()
+        : null;
+    const isViewingOwnPortfolio =
+        !urlAddress ||
+        (!!loggedInAddress &&
+            urlAddress.toLowerCase() === loggedInAddress.toLowerCase());
+
+    const showTransactButtons = hasSession && isViewingOwnPortfolio;
+
+    // Determine if we should show the "connect" view
+    // Show it when: no session AND no userAddress AND no address in URL
+    // We check userAddress in addition to session state because session may not be
+    // immediately established on hydration, but userAddress persists in the store
+    const showConnectView = !hasSession && !userAddress && !urlAddress;
 
     // Check if we're on the transactions sub-route (mobile only)
     const isTransactionsView = location.pathname.includes('/transactions');
+
+    useEffect(() => {
+        if (!hasSession) return;
+        if (urlAddress) return;
+        if (!loggedInAddress) return;
+
+        const suffix = isTransactionsView ? '/transactions' : '';
+        const nextPath = `/v2/portfolio/${loggedInAddress}${suffix}`;
+
+        if (location.pathname === nextPath) return;
+        navigate(nextPath, { replace: true });
+    }, [
+        hasSession,
+        isTransactionsView,
+        location.pathname,
+        loggedInAddress,
+        navigate,
+        urlAddress,
+    ]);
 
     const {
         openDepositModal,
@@ -119,37 +179,62 @@ function Portfolio() {
 
     const feeScheduleModalCtrl = useModal('closed');
 
-    // Extract user stats from leaderboard data (same as PerformancePanel)
-    const userStats = userData?.data?.leaderboard?.[0];
-
-    // Format stats the same way as PerformancePanel
-    const pnlFormatted = userStats?.pnl
-        ? formatNum(userStats.pnl, 2, true, true)
+    const pnlFormatted = userData?.pnl
+        ? formatNum(userData.pnl, 2, true, true)
         : '$0.00';
-    const volumeFormatted = userStats?.volume
-        ? formatNum(userStats.volume, 2, true, true)
+    const volumeFormatted = userData?.volume
+        ? formatNum(userData.volume, 2, true, true)
         : '$0.00';
-    const maxDrawdownFormatted = userStats?.maxDrawdown
-        ? formatNum(userStats.maxDrawdown, 2)
+    const maxDrawdownFormatted = userData?.maxDrawdown
+        ? formatNum(userData.maxDrawdown, 2)
         : '0.00%';
-    const totalEquityFormatted = userStats?.account_value
-        ? formatNum(userStats.account_value, 2, true, true)
+    const totalEquityFormatted = userData?.account_value
+        ? formatNum(userData.account_value, 2, true, true)
         : '$0.00';
-    const accountEquityFormatted = userStats?.account_value
-        ? formatNum(userStats.account_value, 2, true, true)
+    const accountEquityFormatted = userData?.account_value
+        ? formatNum(userData.account_value, 2, true, true)
         : '$0.00';
-    const vaultEquityFormatted = userStats?.vaultEquity
-        ? formatNum(userStats.vaultEquity)
+    const vaultEquityFormatted = userData?.vaultEquity
+        ? formatNum(userData.vaultEquity)
         : '$0.00';
 
     // Calculate PNL percentage for display
     const totalValue = portfolio.balances.contract + portfolio.balances.wallet;
-    const pnlValue = userStats?.pnl ?? 0;
+    const pnlValue = userData?.pnl ?? 0;
     const pnlPercent = totalValue > 0 ? (pnlValue / totalValue) * 100 : 0;
     const isPnlPositive = pnlValue >= 0;
 
     if (!isHydrated) {
         return null;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // CONNECT VIEW - Show when no session and no URL address
+    // ═══════════════════════════════════════════════════════════════════════
+    if (showConnectView) {
+        return (
+            <div className={styles.outer}>
+                <div className={styles.container}>
+                    <AnimatedBackground
+                        mode='absolute'
+                        layers={1}
+                        opacity={1}
+                        duration='15s'
+                        strokeWidth='2'
+                        palette={{
+                            color1: '#1E1E24',
+                            color2: '#7371FC',
+                            color3: '#CDC1FF',
+                        }}
+                    />
+                    <div className={styles.connectView}>
+                        <h2>{t('portfolio.connectToViewPortfolio')}</h2>
+                        <p>{t('portfolio.connectDescription')}</p>
+                        <SessionButton />
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -161,7 +246,8 @@ function Portfolio() {
             <div className={styles.mobileHeroCard}>
                 <div className={styles.heroLabel}>Total Net Value</div>
                 <div className={styles.heroValue}>
-                    {formatCurrency(totalValue)}
+                    {totalEquityFormatted}
+                    {/* {formatCurrency(totalValue)} */}
                 </div>
                 <div
                     className={`${styles.heroPnl} ${isPnlPositive ? styles.positive : styles.negative}`}
@@ -178,7 +264,7 @@ function Portfolio() {
                 <div className={styles.heroBalances}>
                     <div className={styles.heroBalanceItem}>
                         <span className={styles.heroBalanceLabel}>
-                            Contract
+                            {t('tradeTable.contract')}
                         </span>
                         <span className={styles.heroBalanceValue}>
                             {formatCurrency(portfolio.balances.contract)}
@@ -186,14 +272,18 @@ function Portfolio() {
                     </div>
                     <div className={styles.heroBalanceDivider} />
                     <div className={styles.heroBalanceItem}>
-                        <span className={styles.heroBalanceLabel}>Wallet</span>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('transactions.walletBalance')}
+                        </span>
                         <span className={styles.heroBalanceValue}>
                             {formatCurrency(portfolio.balances.wallet)}
                         </span>
                     </div>
                     <div className={styles.heroBalanceDivider} />
                     <div className={styles.heroBalanceItem}>
-                        <span className={styles.heroBalanceLabel}>Fees</span>
+                        <span className={styles.heroBalanceLabel}>
+                            {t('portfolio.fees')}
+                        </span>
                         <span className={styles.heroBalanceValue}>0.00%</span>
                     </div>
                 </div>
@@ -248,10 +338,7 @@ function Portfolio() {
     );
 
     return (
-        <div
-            className={styles.outer}
-            style={{ opacity: isLayoutReady ? 1 : 0 }}
-        >
+        <div className={styles.outer}>
             <div className={styles.container}>
                 <AnimatedBackground
                     mode='absolute'
@@ -285,9 +372,9 @@ function Portfolio() {
                             </span>
                         </Link>
                     </header>
-                ) : (
-                    <header>Portfolio</header>
-                )}
+                ) : hasSession || urlAddress ? (
+                    <header>{t('pageTitles.portfolio')}</header>
+                ) : null}
 
                 <div className={styles.column}>
                     {/* Mobile Hero Section */}
@@ -317,40 +404,44 @@ function Portfolio() {
                         <div
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
-                            <h6>Total Net USD Value</h6>
-                            <h3>{formatCurrency(totalValue)}</h3>
+                            <h6>{t('portfolio.totalNetUsdValue')}</h6>
+                            <h3>{totalEquityFormatted}</h3>
+                            {/* <h3>{formatCurrency(totalValue)}</h3> */}
                         </div>
 
                         <div className={styles.totalNetDisplay}>
                             <h6>
-                                <span>Total Net USD Value:</span>{' '}
-                                {formatCurrency(totalValue)}
+                                <span>{t('portfolio.totalNetUsdValue')}:</span>{' '}
+                                {totalEquityFormatted}
+                                {/* {formatCurrency(totalValue)} */}
                             </h6>
-                            <div className={styles.buttonContainer}>
-                                <div className={styles.rowButton}>
-                                    <SimpleButton
-                                        onClick={openDepositModal}
-                                        bg='accent1'
-                                    >
-                                        {t('common.deposit')}
-                                    </SimpleButton>
-                                    <SimpleButton
-                                        onClick={openWithdrawModal}
-                                        bg='dark3'
-                                        hoverBg='accent1'
-                                    >
-                                        {t('common.withdraw')}
-                                    </SimpleButton>
-                                    <SimpleButton
-                                        onClick={openSendModal}
-                                        className={styles.sendMobile}
-                                        bg='dark3'
-                                        hoverBg='accent1'
-                                    >
-                                        {t('common.send')}
-                                    </SimpleButton>
+                            {showTransactButtons && (
+                                <div className={styles.buttonContainer}>
+                                    <div className={styles.rowButton}>
+                                        <SimpleButton
+                                            onClick={openDepositModal}
+                                            bg='accent1'
+                                        >
+                                            {t('common.deposit')}
+                                        </SimpleButton>
+                                        <SimpleButton
+                                            onClick={openWithdrawModal}
+                                            bg='dark3'
+                                            hoverBg='accent1'
+                                        >
+                                            {t('common.withdraw')}
+                                        </SimpleButton>
+                                        <SimpleButton
+                                            onClick={openSendModal}
+                                            className={styles.sendMobile}
+                                            bg='dark3'
+                                            hoverBg='accent1'
+                                        >
+                                            {t('common.send')}
+                                        </SimpleButton>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
@@ -415,7 +506,7 @@ function Portfolio() {
                             </Resizable>
 
                             <section className={styles.table}>
-                                <PortfolioTables />
+                                <PortfolioTables urlAddress={urlAddress} />
                             </section>
                         </div>
 
@@ -433,6 +524,7 @@ function Portfolio() {
                                             'common.orderHistory',
                                         ]}
                                         stackedTableHeight={250}
+                                        urlAddress={urlAddress}
                                     />
                                 </section>
                             ) : (
@@ -455,20 +547,22 @@ function Portfolio() {
                                     {/* Mobile Stats */}
                                     {mobileStatsSection}
                                     {/* Mobile Action Buttons */}
-                                    <div className={styles.mobileActions}>
-                                        <button
-                                            className={`${styles.mobileActionBtn} ${styles.primary}`}
-                                            onClick={openDepositModal}
-                                        >
-                                            Deposit
-                                        </button>
-                                        <button
-                                            className={`${styles.mobileActionBtn} ${styles.secondary}`}
-                                            onClick={openWithdrawModal}
-                                        >
-                                            Withdraw
-                                        </button>
-                                    </div>
+                                    {showTransactButtons && (
+                                        <div className={styles.mobileActions}>
+                                            <button
+                                                className={`${styles.mobileActionBtn} ${styles.primary}`}
+                                                onClick={openDepositModal}
+                                            >
+                                                Deposit
+                                            </button>
+                                            <button
+                                                className={`${styles.mobileActionBtn} ${styles.secondary}`}
+                                                onClick={openWithdrawModal}
+                                            >
+                                                Withdraw
+                                            </button>
+                                        </div>
+                                    )}
 
                                     {/* Stacked Tables - right under performance */}
                                     <section
@@ -482,6 +576,7 @@ function Portfolio() {
                                                 'common.balances',
                                             ]}
                                             stackedTableHeight={180}
+                                            urlAddress={urlAddress}
                                         />
                                     </section>
 

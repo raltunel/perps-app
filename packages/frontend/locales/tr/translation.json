@@ -316,6 +316,8 @@
         "withdrawal": "Çekim",
         "spotTransfer": "Spot Transfer",
         "reduceOnly": "Sadece Azalt",
+        "triggerConditions": "Tetikleme Koşulları",
+        "status": "Durum",
         "order": "Emir",
         "long": "Long",
         "short": "Short",
@@ -592,6 +594,7 @@
         "withdrawInput": "Çekim girişi",
         "scrollTabsLeft": "Sekmeleri sola kaydır",
         "scrollTabsRight": "Sekmeleri sağa kaydır",
+        "mobileActionMenu": "Mobil aksiyon menüsünü aç/kapat",
         "leverageValue": "Kaldıraç değeri",
         "leverageAmount": "Kaldıraç tutarı",
         "setLeverageTo": "{{value}}x kaldıraç ayarla",
@@ -702,7 +705,9 @@
         "amountGreaterThanZero": "Tutar sıfırdan büyük olmalıdır",
         "minDepositAmount": "Minimum yatırma tutarı {{amount}}",
         "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır",
-        "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı"
+        "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı",
+        "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
+        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın."
     },
     "pageTitles": {
         "portfolio": "Portföy",

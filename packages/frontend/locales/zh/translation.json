@@ -682,7 +682,9 @@
         "amountGreaterThanZero": "金额必须大于 0",
         "minDepositAmount": "最小存入金额为 {{amount}}",
         "exceedsAvailableBalance": "金额超出可用余额 {{balance}}",
-        "transactionTimedOut": "交易在 15 秒后超时"
+        "transactionTimedOut": "交易在 15 秒后超时",
+        "connectToViewPortfolio": "连接以查看您的投资组合",
+        "connectDescription": "使用您的钱包登录以查看您的投资组合、持仓和交易历史。"
     },
     "pageTitles": {
         "portfolio": "投资组合",

@@ -30,6 +30,35 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CONNECT VIEW - Shown when no session and no URL address
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.connectView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-l);
+    height: 100%;
+    min-height: 400px;
+    text-align: center;
+    padding: var(--padding-xl);
+}
+
+.connectView h2 {
+    font-size: var(--font-size-xl);
+    color: var(--text1);
+    margin: 0;
+}
+
+.connectView p {
+    font-size: var(--font-size-m);
+    color: var(--text2);
+    max-width: 400px;
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    DETAILS SECTION - DESKTOP
    ═══════════════════════════════════════════════════════════════════════════ */
 

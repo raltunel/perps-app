@@ -679,6 +679,8 @@
         "accountValue": "Valeur du compte",
         "collateral": "Collatéral",
         "pnl": "PnL",
+        "realizedPnl": "PnL réalisé",
+        "unrealizedPnl": "PnL non réalisé",
         "volume": "Volume",
         "maxDrawdown": "Drawdown maximum",
         "totalEquity": "Équité totale",
@@ -701,7 +703,9 @@
         "amountGreaterThanZero": "Le montant doit être supérieur à 0",
         "minDepositAmount": "Montant minimum de dépôt : {{amount}}",
         "exceedsAvailableBalance": "Le montant dépasse le solde disponible de {{balance}}",
-        "transactionTimedOut": "La transaction a expiré après 15 secondes"
+        "transactionTimedOut": "La transaction a expiré après 15 secondes",
+        "connectToViewPortfolio": "Connectez-vous pour Voir Votre Portefeuille",
+        "connectDescription": "Connectez-vous avec votre portefeuille pour voir votre portefeuille, vos positions et votre historique de trading."
     },
     "pageTitles": {
         "portfolio": "Portefeuille",

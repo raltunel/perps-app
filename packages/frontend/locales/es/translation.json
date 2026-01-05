@@ -701,7 +701,9 @@
         "amountGreaterThanZero": "El monto debe ser mayor a 0",
         "minDepositAmount": "El monto mínimo de depósito es {{amount}}",
         "exceedsAvailableBalance": "El monto excede el saldo disponible de {{balance}}",
-        "transactionTimedOut": "La transacción expiró después de 15 segundos"
+        "transactionTimedOut": "La transacción expiró después de 15 segundos",
+        "connectToViewPortfolio": "Conectar para Ver Tu Portafolio",
+        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones."
     },
     "pageTitles": {
         "portfolio": "Portafolio",
