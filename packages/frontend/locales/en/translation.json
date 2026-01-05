@@ -314,6 +314,7 @@
         "completed": "Completed",
         "withdrawal": "Withdrawal",
         "spotTransfer": "Spot Transfer",
+        "reduceOnly": "Reduce Only",
         "order": "Order",
         "long": "Long",
         "short": "Short",

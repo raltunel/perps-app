@@ -315,6 +315,7 @@
         "completed": "Tamamlandı",
         "withdrawal": "Çekim",
         "spotTransfer": "Spot Transfer",
+        "reduceOnly": "Sadece Azalt",
         "order": "Emir",
         "long": "Long",
         "short": "Short",
