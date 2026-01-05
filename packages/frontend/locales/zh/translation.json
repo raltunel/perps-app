@@ -93,6 +93,10 @@
         "evenPriceDistribution": "平均价格分布",
         "market": "市价",
         "limit": "限价",
+        "closePosition": "平仓",
+        "closeAtCurrentPrice": "按当前价格平仓",
+        "closeAtAPriceYouSet": "按你设定的价格平仓",
+
         "price": "价格",
         "size": "数量",
         "time": "时间",
@@ -383,7 +387,8 @@
         "chart": "图表",
         "book": "订单簿",
         "recent": "最近",
-        "positions": "持仓"
+        "positions": "持仓",
+        "portfolio": "资产"
     },
     "auth": {
         "login": "登录",

@@ -93,6 +93,10 @@
         "evenPriceDistribution": "Répartition des prix égale",
         "market": "Marché",
         "limit": "Limite",
+        "closePosition": "Clôturer la position",
+        "closeAtCurrentPrice": "Clôturer au prix actuel",
+        "closeAtAPriceYouSet": "Clôturer à un prix défini",
+
         "price": "Prix",
         "size": "Taille",
         "time": "Heure",
@@ -383,7 +387,8 @@
         "chart": "Graphique",
         "book": "Carnet d'ordres",
         "recent": "Récent",
-        "positions": "Positions"
+        "positions": "Positions",
+        "portfolio": "Portefeuille"
     },
     "auth": {
         "login": "Connexion",

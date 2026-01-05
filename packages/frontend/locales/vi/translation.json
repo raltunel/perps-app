@@ -97,6 +97,10 @@
         "evenPriceDistribution": "Phân phối giá đều",
         "market": "Thị trường",
         "limit": "Giới hạn",
+        "closePosition": "Đóng vị thế",
+        "closeAtCurrentPrice": "Đóng tại giá hiện tại",
+        "closeAtAPriceYouSet": "Đóng tại mức giá bạn đặt",
+
         "price": "Giá",
         "size": "Kích thước",
         "time": "Thời gian",
@@ -387,7 +391,8 @@
         "chart": "Biểu đồ",
         "book": "Sổ lệnh",
         "recent": "Gần đây",
-        "positions": "Vị thế"
+        "positions": "Vị thế",
+        "portfolio": "Danh mục"
     },
     "auth": {
         "login": "Đăng nhập",
