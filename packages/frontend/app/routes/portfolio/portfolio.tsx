@@ -207,7 +207,6 @@ function Portfolio() {
                             color3: '#CDC1FF',
                         }}
                     />
-                    <header>Portfolio</header>
                     <div className={styles.connectView}>
                         <h2>{t('portfolio.connectToViewPortfolio')}</h2>
                         <p>{t('portfolio.connectDescription')}</p>
@@ -349,9 +348,9 @@ function Portfolio() {
                             </span>
                         </Link>
                     </header>
-                ) : (
+                ) : hasSession || urlAddress ? (
                     <header>Portfolio</header>
-                )}
+                ) : null}
 
                 <div className={styles.column}>
                     {/* Mobile Hero Section */}
