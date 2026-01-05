@@ -391,7 +391,8 @@
         "chart": "Biểu đồ",
         "book": "Sổ lệnh",
         "recent": "Gần đây",
-        "positions": "Vị thế"
+        "positions": "Vị thế",
+        "portfolio": "Danh mục"
     },
     "auth": {
         "login": "Đăng nhập",

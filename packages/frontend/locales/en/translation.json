@@ -386,7 +386,8 @@
         "chart": "Chart",
         "book": "Order Book",
         "recent": "Recent",
-        "positions": "Positions"
+        "positions": "Positions",
+        "portfolio": "Portfolio"
     },
     "auth": {
         "login": "Login",
