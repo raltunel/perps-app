@@ -45,7 +45,11 @@
         "announcements": "Ankündigungen",
         "leverage": "Hebel",
         "comingSoon": "Demnächst verfügbar",
-        "clearFilter": "Filter löschen"
+        "enter": "Eingeben",
+        "claim": "Beanspruchen",
+        "seeDocsForMore": "Weitere Informationen finden Sie in der Dokumentation.",
+        "clearFilter": "Filter löschen",
+        "activate": "Aktivieren"
     },
     "transactions": {
         "orderTypes": "Ordertypen",
@@ -591,6 +595,7 @@
         "withdrawInput": "Auszahlungsfeld",
         "scrollTabsLeft": "Tabs nach links scrollen",
         "scrollTabsRight": "Tabs nach rechts scrollen",
+        "mobileActionMenu": "Mobiles Aktionsmenü umschalten",
         "leverageValue": "Hebelwert",
         "leverageAmount": "Hebelbetrag",
         "setLeverageTo": "Hebel auf {{value}}x setzen",
@@ -679,6 +684,8 @@
         "accountValue": "Kontowert",
         "collateral": "Sicherheit",
         "pnl": "PNL",
+        "realizedPnl": "Realisierter PnL",
+        "unrealizedPnl": "Nicht realisierter PnL",
         "volume": "Volumen",
         "maxDrawdown": "Max. Drawdown",
         "totalEquity": "Gesamtkapital",
@@ -728,7 +735,7 @@
         "more": "Mehr",
         "termsOfService": "Nutzungsbedingungen",
         "privacyPolicy": "Datenschutzrichtlinie",
-        "affiliates": "Affiliates",
+        "affiliates": "Partnerprogramm",
         "pageNotFound": "Seite nicht gefunden"
     },
     "docs": {

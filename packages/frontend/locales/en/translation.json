@@ -317,6 +317,7 @@
         "spotTransfer": "Spot Transfer",
         "reduceOnly": "Reduce Only",
         "triggerConditions": "Trigger Conditions",
+        "tpsl": "TP/SL",
         "status": "Status",
         "order": "Order",
         "long": "Long",

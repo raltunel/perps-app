@@ -45,7 +45,11 @@
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
         "comingSoon": "Próximamente",
-        "clearFilter": "Borrar filtro"
+        "enter": "Ingresar",
+        "claim": "Reclamar",
+        "seeDocsForMore": "Consulta la documentación para más información.",
+        "clearFilter": "Borrar filtro",
+        "activate": "Activar"
     },
     "transactions": {
         "orderTypes": "Tipos de orden",
@@ -591,6 +595,7 @@
         "withdrawInput": "Campo de entrada de retiro",
         "scrollTabsLeft": "Desplazar pestañas a la izquierda",
         "scrollTabsRight": "Desplazar pestañas a la derecha",
+        "mobileActionMenu": "Alternar menú de acciones móvil",
         "leverageValue": "Valor de apalancamiento",
         "leverageAmount": "Monto de apalancamiento",
         "setLeverageTo": "Establecer apalancamiento a {{value}}x",
@@ -679,6 +684,8 @@
         "accountValue": "Valor de cuenta",
         "collateral": "Colateral",
         "pnl": "PnL",
+        "realizedPnl": "PnL realizado",
+        "unrealizedPnl": "PnL no realizado",
         "volume": "Volumen",
         "maxDrawdown": "Máx. Drawdown",
         "totalEquity": "Capital total",
