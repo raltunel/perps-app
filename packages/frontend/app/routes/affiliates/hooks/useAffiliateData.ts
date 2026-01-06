@@ -94,7 +94,7 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
             // });
 
             const apiKey =
-                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+                '6e6cf24f708ecb688968212aa9ee0b4b2774a5070bcc054e4f1c920969d7cc89';
             const url = `https://api.fuul.xyz/api/v1/audiences/audience-segments/user?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
 
             const headers = {
