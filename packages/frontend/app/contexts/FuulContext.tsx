@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Fuul, UserIdentifierType, type Affiliate } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
-// import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
+import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
 
 interface FuulContextType {
     isInitialized: boolean;
@@ -39,15 +39,12 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
     const [isInitialized, setIsInitialized] = useState(false);
 
-    const TEMP_API_KEY =
-        'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
-
     useEffect(() => {
         console.log('fuul', { isInitialized });
         if (FUUL_API_KEY && !isInitialized) {
             try {
                 const result = Fuul.init({
-                    apiKey: TEMP_API_KEY,
+                    apiKey: FUUL_API_KEY,
                 });
                 console.log('fuul', { result });
                 // Assume initialization is successful if no error is thrown
