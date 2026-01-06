@@ -399,10 +399,32 @@ export function useAffiliateCode(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getAffiliateCode(
-                userIdentifier,
-                UserIdentifierType.SolanaAddress,
-            );
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getAffiliateCode(
+            //     userIdentifier,
+            //     UserIdentifierType.SolanaAddress,
+            // );
+
+            const url = `https://api.fuul.xyz/api/v1/affiliates/${userIdentifier}?identifier_type=solana_address`;
+            const headers = { accept: 'application/json' };
+
+            console.log('FUUL getAffiliateCode request:', { url, headers });
+
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log('FUUL getAffiliateCode response status:', res.status);
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData(null);
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getAffiliateCode error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getAffiliateCode success:', response);
             setData(response);
         } catch (err) {
             if (isNotFoundError(err)) {
