@@ -13,6 +13,7 @@ import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 import { usePreviewOrderLines } from './usePreviewOrderLines';
 import { ChartElementControlPanel } from './component/ChartElementControlPanel';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -52,6 +53,7 @@ export default function OrderLines({
     const [activeDragLine, setActiveDragLine] = useState<
         undefined | LabelLocationData
     >(undefined);
+    const { setSelectedOrderLine } = useChartLinesStore();
 
     const arePricesEqual = (a?: number, b?: number) => {
         if (a === undefined || b === undefined) return false;
@@ -121,6 +123,7 @@ export default function OrderLines({
 
         if (activeDragLine && !matchFound) {
             setActiveDragLine(undefined);
+            setSelectedOrderLine(undefined);
         }
 
         setLines(updatedLines);

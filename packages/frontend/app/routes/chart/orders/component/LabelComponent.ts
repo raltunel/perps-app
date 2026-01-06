@@ -257,9 +257,6 @@ const LabelComponent = ({
                     txLink: getTxLink(limitOrderResult.signature),
                 });
             }
-            setTimeout(() => {
-                setSelectedOrderLine(undefined);
-            }, 300);
         } catch (error) {
             setActiveDragLine(undefined);
             console.error('Error updating order:', error);
