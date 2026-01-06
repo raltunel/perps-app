@@ -218,28 +218,35 @@ function Portfolio() {
 
     const feeScheduleModalCtrl = useModal('closed');
 
-    const pnlFormatted = userData?.pnl
+    const DASH_PLACEHOLDER = '-';
+    const hasPnl = typeof userData?.pnl === 'number';
+    const hasVolume = typeof userData?.volume === 'number';
+    const hasMaxDrawdown = typeof userData?.maxDrawdown === 'number';
+    const hasAccountValue = typeof userData?.account_value === 'number';
+    const hasVaultEquity = typeof userData?.vaultEquity === 'number';
+
+    const pnlFormatted = hasPnl
         ? formatNum(userData.pnl, 2, true, true)
-        : '$0.00';
-    const volumeFormatted = userData?.volume
+        : DASH_PLACEHOLDER;
+    const volumeFormatted = hasVolume
         ? formatNum(userData.volume, 2, true, true)
-        : '$0.00';
-    const maxDrawdownFormatted = userData?.maxDrawdown
-        ? formatNum(userData.maxDrawdown, 2)
-        : '0.00%';
-    const totalEquityFormatted = userData?.account_value
+        : DASH_PLACEHOLDER;
+    const maxDrawdownFormatted = hasMaxDrawdown
+        ? `${formatNum(userData.maxDrawdown, 2)}%`
+        : DASH_PLACEHOLDER;
+    const totalEquityFormatted = hasAccountValue
         ? formatNum(userData.account_value, 2, true, true)
-        : '$0.00';
-    const accountEquityFormatted = userData?.account_value
+        : DASH_PLACEHOLDER;
+    const accountEquityFormatted = hasAccountValue
         ? formatNum(userData.account_value, 2, true, true)
-        : '$0.00';
-    const vaultEquityFormatted = userData?.vaultEquity
+        : DASH_PLACEHOLDER;
+    const vaultEquityFormatted = hasVaultEquity
         ? formatNum(userData.vaultEquity)
-        : '$0.00';
+        : DASH_PLACEHOLDER;
 
     // Calculate PNL percentage for display
     const totalValue = portfolio.balances.contract + portfolio.balances.wallet;
-    const pnlValue = userData?.pnl ?? 0;
+    const pnlValue = hasPnl ? userData.pnl : 0;
     const pnlPercent = totalValue > 0 ? (pnlValue / totalValue) * 100 : 0;
     const isPnlPositive = pnlValue >= 0;
 
@@ -294,9 +301,15 @@ function Portfolio() {
                     <span className={styles.heroPnlIcon}>
                         {isPnlPositive ? <IoArrowUp /> : <IoArrowDown />}
                     </span>
-                    {formatCurrency(Math.abs(pnlValue))} (
-                    {isPnlPositive ? '+' : ''}
-                    {pnlPercent.toFixed(2)}%)
+                    {hasPnl ? (
+                        <>
+                            {formatCurrency(Math.abs(pnlValue))} (
+                            {isPnlPositive ? '+' : ''}
+                            {pnlPercent.toFixed(2)}%)
+                        </>
+                    ) : (
+                        DASH_PLACEHOLDER
+                    )}
                 </div>
 
                 {/* Balance breakdown inside hero */}
