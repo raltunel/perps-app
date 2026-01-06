@@ -38,37 +38,48 @@ export default function PerformancePanel({
 
     const { formatNum } = useNumFormatter();
 
-    const pnlFormatted = userData?.pnl
-        ? formatNum(userData?.pnl, 2, true, true)
-        : '$0.00';
+    const DASH_PLACEHOLDER = '-';
 
-    const realizedPnlFormatted = userData?.realized_pnl
-        ? formatNum(userData?.realized_pnl, 2, true, true)
-        : '$0.00';
+    const pnlFormatted =
+        typeof userData?.pnl === 'number'
+            ? formatNum(userData.pnl, 2, true, true)
+            : DASH_PLACEHOLDER;
 
-    const unrealizedPnlFormatted = userData?.unrealized_pnl
-        ? formatNum(userData?.unrealized_pnl, 2, true, true)
-        : '$0.00';
+    const realizedPnlFormatted =
+        typeof userData?.realized_pnl === 'number'
+            ? formatNum(userData.realized_pnl, 2, true, true)
+            : DASH_PLACEHOLDER;
 
-    const volumeFormatted = userData?.total_volume
-        ? formatNum(userData?.total_volume, 2, true, true)
-        : '$0.00';
-    const maxDrawdownFormatted = userData?.max_drawdown
-        ? formatNum(userData?.max_drawdown, 2)
-        : '0.00%';
-    const totalEquityFormatted = userData?.account_value
-        ? formatNum(userData?.account_value, 2, true, true)
-        : '$0.00';
-    const accountEquityFormatted = userData?.account_value
-        ? formatNum(userData?.account_value, 2, true, true)
-        : '$0.00';
-    const vaultEquityFormatted = userData?.vaultEquity
-        ? formatNum(userData?.vaultEquity)
-        : '$0.00';
+    const unrealizedPnlFormatted =
+        typeof userData?.unrealized_pnl === 'number'
+            ? formatNum(userData.unrealized_pnl, 2, true, true)
+            : DASH_PLACEHOLDER;
 
-    const collateralFormatted = userData?.collateral
-        ? formatNum(userData?.collateral)
-        : '$0.00';
+    const volumeFormatted =
+        typeof userData?.total_volume === 'number'
+            ? formatNum(userData.total_volume, 2, true, true)
+            : DASH_PLACEHOLDER;
+    const maxDrawdownFormatted =
+        typeof userData?.max_drawdown === 'number'
+            ? `${formatNum(userData.max_drawdown, 2)}%`
+            : DASH_PLACEHOLDER;
+    const totalEquityFormatted =
+        typeof userData?.account_value === 'number'
+            ? formatNum(userData.account_value, 2, true, true)
+            : DASH_PLACEHOLDER;
+    const accountEquityFormatted =
+        typeof userData?.account_value === 'number'
+            ? formatNum(userData.account_value, 2, true, true)
+            : DASH_PLACEHOLDER;
+    const vaultEquityFormatted =
+        typeof userData?.vaultEquity === 'number'
+            ? formatNum(userData.vaultEquity)
+            : DASH_PLACEHOLDER;
+
+    const collateralFormatted =
+        typeof userData?.collateral === 'number'
+            ? formatNum(userData.collateral)
+            : DASH_PLACEHOLDER;
 
     const PERFORMANCE_METRICS = [
         { label: t('portfolio.pnl'), value: pnlFormatted },
