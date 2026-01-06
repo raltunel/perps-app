@@ -45,7 +45,11 @@
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
         "comingSoon": "Próximamente",
-        "clearFilter": "Borrar filtro"
+        "enter": "Ingresar",
+        "claim": "Reclamar",
+        "seeDocsForMore": "Consulta la documentación para más información.",
+        "clearFilter": "Borrar filtro",
+        "activate": "Activar"
     },
     "transactions": {
         "orderTypes": "Tipos de orden",
@@ -315,6 +319,9 @@
         "triggerConditions": "Condiciones de activación",
         "tpsl": "TP/SL",
         "status": "Estado",
+        "network": "Red",
+        "action": "Acción",
+        "accountValueChange": "Cambio en el valor de la cuenta",
         "order": "Orden",
         "long": "Long",
         "short": "Short",
@@ -591,6 +598,7 @@
         "withdrawInput": "Campo de entrada de retiro",
         "scrollTabsLeft": "Desplazar pestañas a la izquierda",
         "scrollTabsRight": "Desplazar pestañas a la derecha",
+        "mobileActionMenu": "Alternar menú de acciones móvil",
         "leverageValue": "Valor de apalancamiento",
         "leverageAmount": "Monto de apalancamiento",
         "setLeverageTo": "Establecer apalancamiento a {{value}}x",
@@ -679,6 +687,8 @@
         "accountValue": "Valor de cuenta",
         "collateral": "Colateral",
         "pnl": "PnL",
+        "realizedPnl": "PnL realizado",
+        "unrealizedPnl": "PnL no realizado",
         "volume": "Volumen",
         "maxDrawdown": "Máx. Drawdown",
         "totalEquity": "Capital total",
@@ -701,7 +711,9 @@
         "amountGreaterThanZero": "El monto debe ser mayor a 0",
         "minDepositAmount": "El monto mínimo de depósito es {{amount}}",
         "exceedsAvailableBalance": "El monto excede el saldo disponible de {{balance}}",
-        "transactionTimedOut": "La transacción expiró después de 15 segundos"
+        "transactionTimedOut": "La transacción expiró después de 15 segundos",
+        "connectToViewPortfolio": "Conectar para Ver Tu Portafolio",
+        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones."
     },
     "pageTitles": {
         "portfolio": "Portafolio",

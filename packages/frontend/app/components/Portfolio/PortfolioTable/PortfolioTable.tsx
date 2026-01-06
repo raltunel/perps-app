@@ -37,6 +37,9 @@ interface PortfolioTablesProps {
 
     /** Max height for each table in stacked mode (default: 300) */
     stackedTableHeight?: number;
+
+    /** Optional address to view portfolio for (overrides session) */
+    urlAddress?: string;
 }
 
 // Section labels for stacked mode headers
@@ -76,6 +79,7 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
         layout = 'tabs',
         visibleSections,
         stackedTableHeight = 300,
+        urlAddress,
     } = props;
 
     const filterOptions: FilterOption[] = [

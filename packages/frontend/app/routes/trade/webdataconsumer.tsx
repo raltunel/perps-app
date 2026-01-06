@@ -350,10 +350,8 @@ export default function WebDataConsumer() {
             //     setCoinPriceMap(data.data.coinPriceMap);
             // }
 
-            if (
-                isEstablished(sessionState) &&
-                data.data.user?.toLowerCase() === addressRef.current
-            ) {
+            // Process data if it matches the target address (from URL or session)
+            if (data.data.user?.toLowerCase() === addressRef.current) {
                 // Open orders now come from order history subscription
                 // Positions now come from RPC polling
                 userBalancesRef.current = data.data.userBalances;
