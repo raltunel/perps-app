@@ -87,10 +87,37 @@ export function useAffiliateAudience(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const audiences = await Fuul.getUserAudiences({
-                user_identifier: userIdentifier,
-                user_identifier_type: UserIdentifierType.SolanaAddress,
-            });
+            // Disabled SDK call, using direct fetch instead
+            // const audiences = await Fuul.getUserAudiences({
+            //     user_identifier: userIdentifier,
+            //     user_identifier_type: UserIdentifierType.SolanaAddress,
+            // });
+
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const url = `https://api.fuul.xyz/api/v1/audiences/audience-segments/user?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getUserAudiences request:', { url, headers });
+
+            const response = await fetch(url, { method: 'GET', headers });
+            console.log(
+                'FUUL getUserAudiences response status:',
+                response.status,
+            );
+
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('FUUL getUserAudiences error:', text);
+                throw new Error(text);
+            }
+
+            const audiences = await response.json();
+            console.log('FUUL getUserAudiences success:', audiences);
 
             const isAffiliateAccepted = (audiences.results?.length ?? 0) > 0;
 
