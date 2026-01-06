@@ -605,20 +605,17 @@ const YAxisOverlayCanvas: React.FC = () => {
                 ? scaleData.scaleSymlog(price)
                 : scaleData.yScale(price);
 
-            const dpr = window.devicePixelRatio || 1;
-
-            const fontSize = 10 * dpr;
-            const padding = 4 * dpr;
-            const borderWidth = 2 * dpr;
+            const fontSize = 12;
+            const padding = 4;
+            const borderWidth = 2;
 
             const priceText = price.toFixed(price > 10000 ? 0 : 2);
 
-            // Set font with better rendering
             ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif`;
             const textWidth = ctx.measureText(priceText).width;
 
             const labelWidth = textWidth + padding * 2;
-            const labelHeight = fontSize + padding * 2 + 2;
+            const labelHeight = 20;
 
             const x = 0;
             const y = yPixel - labelHeight / 2 - 1;
