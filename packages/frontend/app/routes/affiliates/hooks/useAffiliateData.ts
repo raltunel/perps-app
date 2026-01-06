@@ -375,11 +375,48 @@ export function useUserPayoutMovements(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getUserPayoutMovements({
-                user_identifier: userIdentifier,
-                identifier_type: UserIdentifierType.SolanaAddress,
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getUserPayoutMovements({
+            //     user_identifier: userIdentifier,
+            //     identifier_type: UserIdentifierType.SolanaAddress,
+            // });
+
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const url = `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userIdentifier}&identifier_type=solana_address&type=onchain-currency`;
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getUserPayoutMovements request:', {
+                url,
+                headers,
             });
 
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log(
+                'FUUL getUserPayoutMovements response status:',
+                res.status,
+            );
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData({
+                        total_results: 0,
+                        page: 1,
+                        page_size: 10,
+                        results: [],
+                    });
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getUserPayoutMovements error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getUserPayoutMovements success:', response);
             setData(response);
         } catch (err) {
             if (isNotFoundError(err)) {
