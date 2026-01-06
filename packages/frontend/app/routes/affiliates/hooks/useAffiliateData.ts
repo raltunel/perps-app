@@ -164,20 +164,74 @@ export function useAffiliateStats(userIdentifier: string, enabled = true) {
                 return { from, to };
             };
 
-            const [stats, newTradersData, activeTradersData] =
-                await Promise.all([
-                    Fuul.getAffiliateStats({
-                        user_identifier: userIdentifier,
-                        user_identifier_type: UserIdentifierType.SolanaAddress,
-                    }),
-                    Fuul.getAffiliateNewTraders({
-                        user_identifier: userIdentifier,
-                    }),
-                    Fuul.getAffiliateNewTraders({
-                        user_identifier: userIdentifier,
-                        ...getDateRange30Days(),
-                    }),
-                ]);
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            // Fetch affiliate stats
+            const statsUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/stats?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+            console.log('FUUL getAffiliateStats request:', { url: statsUrl });
+            const statsRes = await fetch(statsUrl, { method: 'GET', headers });
+            console.log(
+                'FUUL getAffiliateStats response status:',
+                statsRes.status,
+            );
+            if (!statsRes.ok) {
+                const text = await statsRes.text();
+                console.error('FUUL getAffiliateStats error:', text);
+                throw new Error(text);
+            }
+            const stats = await statsRes.json();
+            console.log('FUUL getAffiliateStats success:', stats);
+
+            // Fetch new traders (all time)
+            const newTradersUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/new-traders?user_identifier=${userIdentifier}`;
+            console.log('FUUL getAffiliateNewTraders request:', {
+                url: newTradersUrl,
+            });
+            const newTradersRes = await fetch(newTradersUrl, {
+                method: 'GET',
+                headers,
+            });
+            console.log(
+                'FUUL getAffiliateNewTraders response status:',
+                newTradersRes.status,
+            );
+            if (!newTradersRes.ok) {
+                const text = await newTradersRes.text();
+                console.error('FUUL getAffiliateNewTraders error:', text);
+                throw new Error(text);
+            }
+            const newTradersData = await newTradersRes.json();
+            console.log('FUUL getAffiliateNewTraders success:', newTradersData);
+
+            // Fetch active traders (last 30 days)
+            const { from, to } = getDateRange30Days();
+            const activeTradersUrl = `https://api.fuul.xyz/api/v1/affiliate-portal/new-traders?user_identifier=${userIdentifier}&from=${from}&to=${to}`;
+            console.log('FUUL getAffiliateNewTraders (30d) request:', {
+                url: activeTradersUrl,
+            });
+            const activeTradersRes = await fetch(activeTradersUrl, {
+                method: 'GET',
+                headers,
+            });
+            console.log(
+                'FUUL getAffiliateNewTraders (30d) response status:',
+                activeTradersRes.status,
+            );
+            if (!activeTradersRes.ok) {
+                const text = await activeTradersRes.text();
+                console.error('FUUL getAffiliateNewTraders (30d) error:', text);
+                throw new Error(text);
+            }
+            const activeTradersData = await activeTradersRes.json();
+            console.log(
+                'FUUL getAffiliateNewTraders (30d) success:',
+                activeTradersData,
+            );
 
             const newTraders =
                 newTradersData.length > 0
