@@ -460,41 +460,52 @@ function Portfolio() {
                             <h3>{totalEquityFormatted}</h3>
                             {/* <h3>{formatCurrency(totalValue)}</h3> */}
                         </div>
-
-                        <div className={styles.totalNetDisplay}>
-                            <h6>
-                                <span>{t('portfolio.totalNetUsdValue')}:</span>{' '}
-                                {totalEquityFormatted}
-                                {/* {formatCurrency(totalValue)} */}
-                            </h6>
-                            {showTransactButtons && (
-                                <div className={styles.buttonContainer}>
-                                    <div className={styles.rowButton}>
-                                        <SimpleButton
-                                            onClick={openDepositModal}
-                                            bg='accent1'
-                                        >
-                                            {t('common.deposit')}
-                                        </SimpleButton>
-                                        <SimpleButton
-                                            onClick={openWithdrawModal}
-                                            bg='dark3'
-                                            hoverBg='accent1'
-                                        >
-                                            {t('common.withdraw')}
-                                        </SimpleButton>
-                                        <SimpleButton
-                                            onClick={openSendModal}
-                                            className={styles.sendMobile}
-                                            bg='dark3'
-                                            hoverBg='accent1'
-                                        >
-                                            {t('common.send')}
-                                        </SimpleButton>
+                        {showTransactButtons ? (
+                            <div className={styles.totalNetDisplay}>
+                                <h6>
+                                    <span>
+                                        {t('portfolio.totalNetUsdValue')}:
+                                    </span>{' '}
+                                    {totalEquityFormatted}
+                                    {/* {formatCurrency(totalValue)} */}
+                                </h6>
+                                {showTransactButtons && (
+                                    <div className={styles.buttonContainer}>
+                                        <div className={styles.rowButton}>
+                                            <SimpleButton
+                                                onClick={openDepositModal}
+                                                bg='accent1'
+                                            >
+                                                {t('common.deposit')}
+                                            </SimpleButton>
+                                            <SimpleButton
+                                                onClick={openWithdrawModal}
+                                                bg='dark3'
+                                                hoverBg='accent1'
+                                            >
+                                                {t('common.withdraw')}
+                                            </SimpleButton>
+                                            <SimpleButton
+                                                onClick={openSendModal}
+                                                className={styles.sendMobile}
+                                                bg='dark3'
+                                                hoverBg='accent1'
+                                            >
+                                                {t('common.send')}
+                                            </SimpleButton>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className={styles.totalNetDisplayNonUser}>
+                                <span>{t('portfolio.totalNetUsdValue')}</span>{' '}
+                                <h6>
+                                    {totalEquityFormatted}
+                                    {/* {formatCurrency(totalValue)} */}
+                                </h6>
+                            </div>
+                        )}
                     </div>
 
                     <section
