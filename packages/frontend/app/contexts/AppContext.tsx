@@ -80,19 +80,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         }
 
         // 3. Established Session takes third priority
-        if (isEstablished(sessionState)) {
+        if (isEstablished(sessionState) && !isDebugWalletActive) {
             setUserAddress(sessionState.walletPublicKey.toString());
             return;
         }
 
         // 4. Fallback to Debug Wallet or Empty
         if (isDebugWalletActive) {
-            setUserAddress(debugWallets[2].address);
+            setUserAddress(debugWallet.address);
         } else {
             setUserAddress('');
             resetUserData();
         }
-    }, [location.pathname, sessionState, setUserAddress, resetUserData]);
+    }, [
+        location.pathname,
+        sessionState,
+        setUserAddress,
+        resetUserData,
+        isDebugWalletActive,
+        debugWallet,
+    ]);
 
     // Initialize Pyth price service on mount
     useEffect(() => {

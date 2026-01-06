@@ -18,6 +18,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { RPC_ENDPOINT } from '~/utils/Constants';
+import { isValidBase58 } from '~/utils/functions/makeAddress';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
 
@@ -132,6 +133,12 @@ export const UnifiedMarginDataProvider: React.FC<
             lastSubscribedAddressRef.current !== targetAddress ||
             forceRestart.current
         ) {
+            console.log('>>>>>>>>>> hellowwww');
+            if (isDebugWalletActiveRef.current) return;
+
+            // Skip if targetAddress is not a valid base58 address (case triggered if debug address has been saved to userDataStore)
+            if (!isValidBase58(targetAddress)) return;
+
             hasSubscribedRef.current = true;
             unifiedMarginPollingManager.unsubscribe(); // Clean up previous if any
             unifiedMarginPollingManager.subscribe(
@@ -146,7 +153,7 @@ export const UnifiedMarginDataProvider: React.FC<
         return () => {
             // Only cleanup if the entire provider is unmounting or we explicitly want to stop
         };
-    }, [isSessionEstablished, isDebugWalletActive, userAddress, manualAddress]);
+    }, [isSessionEstablished, userAddress, manualAddress]);
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished && !userAddress) {
