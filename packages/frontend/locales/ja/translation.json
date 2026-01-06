@@ -45,7 +45,11 @@
         "announcements": "お知らせ",
         "leverage": "レバレッジ",
         "comingSoon": "近日公開",
-        "clearFilter": "フィルターをクリア"
+        "enter": "入力",
+        "claim": "受け取る",
+        "seeDocsForMore": "詳細はドキュメントをご覧ください。",
+        "clearFilter": "フィルターをクリア",
+        "activate": "有効化"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -315,9 +319,12 @@
         "triggerConditions": "発動条件",
         "tpsl": "TP/SL",
         "status": "ステータス",
+        "network": "ネットワーク",
+        "action": "アクション",
+        "accountValueChange": "口座価値の変化",
         "order": "注文",
-        "long": "Long",
-        "short": "Short",
+        "long": "ロング",
+        "short": "ショート",
         "noOpenPositions": "未決済ポジションなし",
         "noOpenPositionsForMarket": "{{symbol}}の未決済ポジションなし",
         "noOpenLongPositions": "ロングの未決済ポジションなし",
@@ -591,6 +598,7 @@
         "withdrawInput": "出金入力欄",
         "scrollTabsLeft": "タブを左にスクロール",
         "scrollTabsRight": "タブを右にスクロール",
+        "mobileActionMenu": "モバイルアクションメニューを切り替え",
         "leverageValue": "レバレッジ値",
         "leverageAmount": "レバレッジ金額",
         "setLeverageTo": "{{value}}倍にレバレッジを設定",
@@ -679,6 +687,8 @@
         "accountValue": "アカウント価値",
         "collateral": "証拠金",
         "pnl": "損益",
+        "realizedPnl": "実現損益",
+        "unrealizedPnl": "未実現損益",
         "volume": "出来高",
         "maxDrawdown": "最大ドローダウン",
         "totalEquity": "総資産",
@@ -701,7 +711,9 @@
         "amountGreaterThanZero": "金額は0より大きく設定してください",
         "minDepositAmount": "最低入金額は {{amount}} です",
         "exceedsAvailableBalance": "金額が利用可能残高 {{balance}} を超えています",
-        "transactionTimedOut": "取引は15秒後にタイムアウトしました"
+        "transactionTimedOut": "取引は15秒後にタイムアウトしました",
+        "connectToViewPortfolio": "ポートフォリオを表示するには接続してください",
+        "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。"
     },
     "pageTitles": {
         "portfolio": "ポートフォリオ",

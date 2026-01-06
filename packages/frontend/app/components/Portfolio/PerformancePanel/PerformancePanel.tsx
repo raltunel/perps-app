@@ -1,11 +1,6 @@
-import React, {
-    useEffect,
-    useMemo,
-    useState,
-    useCallback,
-    useRef,
-} from 'react';
+import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
 import CollateralPieChart from './CollateralChart/CollateralPieChart';
@@ -19,7 +14,11 @@ interface PerformancePanelProps {
     isMobile: boolean;
 }
 
-const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
+const AVAILABLE_TABS = [
+    { id: 'performance', label: 'portfolio.performance' },
+    { id: 'accountValue', label: 'portfolio.accountValue' },
+    { id: 'collateral', label: 'portfolio.collateral' },
+];
 
 const animationConfig = {
     initial: { opacity: 0 },
@@ -33,47 +32,64 @@ export default function PerformancePanel({
     panelHeight,
     isMobile,
 }: PerformancePanelProps) {
-    const [activeTab, setActiveTab] = useState('Performance');
+    const { t } = useTranslation();
+    const [activeTab, setActiveTab] = useState('performance');
     const chartStageRef = useRef<HTMLDivElement>(null);
 
     const { formatNum } = useNumFormatter();
 
-    const pnlFormatted = userData?.data?.leaderboard[0]?.pnl
-        ? formatNum(userData?.data?.leaderboard[0]?.pnl, 2, true, true)
-        : '$0.00';
-    const volumeFormatted = userData?.data?.leaderboard[0]?.volume
-        ? formatNum(userData?.data?.leaderboard[0]?.volume, 2, true, true)
-        : '$0.00';
-    const maxDrawdownFormatted = userData?.data?.leaderboard[0]?.maxDrawdown
-        ? formatNum(userData?.data?.leaderboard[0]?.maxDrawdown, 2)
-        : '0.00%';
-    const totalEquityFormatted = userData?.data?.leaderboard[0]?.account_value
-        ? formatNum(
-              userData?.data?.leaderboard[0]?.account_value,
-              2,
-              true,
-              true,
-          )
-        : '$0.00';
-    const accountEquityFormatted = userData?.data?.leaderboard[0]?.account_value
-        ? formatNum(
-              userData?.data?.leaderboard[0]?.account_value,
-              2,
-              true,
-              true,
-          )
-        : '$0.00';
-    const vaultEquityFormatted = userData?.data?.leaderboard[0]?.vaultEquity
-        ? formatNum(userData?.data?.leaderboard[0]?.vaultEquity)
-        : '$0.00';
+    const DASH_PLACEHOLDER = '-';
+
+    const pnlFormatted =
+        typeof userData?.pnl === 'number'
+            ? formatNum(userData.pnl, 2, true, true)
+            : DASH_PLACEHOLDER;
+
+    const realizedPnlFormatted =
+        typeof userData?.realized_pnl === 'number'
+            ? formatNum(userData.realized_pnl, 2, true, true)
+            : DASH_PLACEHOLDER;
+
+    const unrealizedPnlFormatted =
+        typeof userData?.unrealized_pnl === 'number'
+            ? formatNum(userData.unrealized_pnl, 2, true, true)
+            : DASH_PLACEHOLDER;
+
+    const volumeFormatted =
+        typeof userData?.total_volume === 'number'
+            ? formatNum(userData.total_volume, 2, true, true)
+            : DASH_PLACEHOLDER;
+    const maxDrawdownFormatted =
+        typeof userData?.max_drawdown === 'number'
+            ? `${formatNum(userData.max_drawdown, 2)}%`
+            : DASH_PLACEHOLDER;
+    const totalEquityFormatted =
+        typeof userData?.account_value === 'number'
+            ? formatNum(userData.account_value, 2, true, true)
+            : DASH_PLACEHOLDER;
+    const accountEquityFormatted =
+        typeof userData?.account_value === 'number'
+            ? formatNum(userData.account_value, 2, true, true)
+            : DASH_PLACEHOLDER;
+    const vaultEquityFormatted =
+        typeof userData?.vaultEquity === 'number'
+            ? formatNum(userData.vaultEquity)
+            : DASH_PLACEHOLDER;
+
+    const collateralFormatted =
+        typeof userData?.collateral === 'number'
+            ? formatNum(userData.collateral)
+            : DASH_PLACEHOLDER;
 
     const PERFORMANCE_METRICS = [
-        { label: 'PNL', value: pnlFormatted },
-        { label: 'Volume', value: volumeFormatted },
-        { label: 'Max Drawdown', value: maxDrawdownFormatted },
-        { label: 'Total Equity', value: totalEquityFormatted },
-        { label: 'Account Equity', value: accountEquityFormatted },
-        { label: 'Vault Equity', value: vaultEquityFormatted },
+        { label: t('portfolio.pnl'), value: pnlFormatted },
+        { label: t('portfolio.realizedPnl'), value: realizedPnlFormatted },
+        { label: t('portfolio.unrealizedPnl'), value: unrealizedPnlFormatted },
+        { label: t('portfolio.volume'), value: volumeFormatted },
+        // { label: 'Max Drawdown', value: maxDrawdownFormatted },
+        // { label: 'Total Equity', value: totalEquityFormatted },
+        { label: t('portfolio.accountEquity'), value: accountEquityFormatted },
+        // { label: 'Vault Equity', value: vaultEquityFormatted },
     ];
 
     const MetricsDisplay = React.memo(() => (
@@ -99,15 +115,6 @@ export default function PerformancePanel({
 
     const [userProfileLineData, setUserProfileLineData] = useState<any>();
 
-    useEffect(() => {
-        // Initialize tab as empty, then change to Performance after 2 seconds
-        const timer = setTimeout(() => {
-            setActiveTab('Performance');
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
     const handleTabChange = useCallback((tab: string) => {
         setActiveTab(tab);
     }, []);
@@ -129,12 +136,12 @@ export default function PerformancePanel({
     const [selectedVault, setSelectedVault] = useState<{
         label: string;
         value: string;
-    }>({ label: 'Perps', value: 'perp' });
+    }>({ label: t('portfolio.perps'), value: 'perp' });
 
     const [selectedPeriod, setSelectedPeriod] = useState<{
         label: string;
         value: string;
-    }>({ label: 'All-time', value: 'AllTime' });
+    }>({ label: t('portfolio.allTime'), value: 'AllTime' });
 
     const TabContent_ = !activeTab ? (
         LoadingContent

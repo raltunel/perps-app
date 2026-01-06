@@ -88,17 +88,16 @@ export default function PageHeader() {
         (async () => {
             try {
                 const EMBER_ENDPOINT_ALL =
-                    'https://ember-leaderboard.liquidity.tools/leaderboard';
+                    'https://ember-leaderboard-v2.liquidity.tools/user';
                 const emberEndpointForUser =
                     EMBER_ENDPOINT_ALL + '/' + affiliateAddress.toString();
 
                 const response = await fetch(emberEndpointForUser);
                 const data = await response.json();
-
                 if (data.error) {
                     referralStore.setTotVolume(0);
-                } else if (data.leaderboard && data.leaderboard.length > 0) {
-                    const volume = data.leaderboard[0].volume;
+                } else if (data.stats) {
+                    const volume = data.stats.total_volume;
                     referralStore.setTotVolume(volume);
                 }
             } catch (error) {
