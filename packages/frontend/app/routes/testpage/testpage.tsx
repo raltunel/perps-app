@@ -102,7 +102,7 @@ export default function testpage() {
 
     async function fetchWallet(name: string, address: string) {
         const EMBER_ENDPOINT_BASE =
-            'https://ember-leaderboard.liquidity.tools/leaderboard';
+            'https://ember-leaderboard-v2.liquidity.tools/user';
         const endpoint = `${EMBER_ENDPOINT_BASE}/${address}`;
 
         console.log(`Fetching for ${name}:`, endpoint);

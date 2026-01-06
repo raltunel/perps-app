@@ -45,7 +45,11 @@
         "announcements": "Ankündigungen",
         "leverage": "Hebel",
         "comingSoon": "Demnächst verfügbar",
-        "clearFilter": "Filter löschen"
+        "enter": "Eingeben",
+        "claim": "Beanspruchen",
+        "seeDocsForMore": "Weitere Informationen finden Sie in der Dokumentation.",
+        "clearFilter": "Filter löschen",
+        "activate": "Aktivieren"
     },
     "transactions": {
         "orderTypes": "Ordertypen",
@@ -315,6 +319,9 @@
         "triggerConditions": "Auslöse-Bedingungen",
         "tpsl": "TP/SL",
         "status": "Status",
+        "network": "Netzwerk",
+        "action": "Aktion",
+        "accountValueChange": "Änderung des Kontowerts",
         "order": "Order",
         "long": "Long",
         "short": "Short",
@@ -591,6 +598,7 @@
         "withdrawInput": "Auszahlungsfeld",
         "scrollTabsLeft": "Tabs nach links scrollen",
         "scrollTabsRight": "Tabs nach rechts scrollen",
+        "mobileActionMenu": "Mobiles Aktionsmenü umschalten",
         "leverageValue": "Hebelwert",
         "leverageAmount": "Hebelbetrag",
         "setLeverageTo": "Hebel auf {{value}}x setzen",
@@ -679,6 +687,8 @@
         "accountValue": "Kontowert",
         "collateral": "Sicherheit",
         "pnl": "PNL",
+        "realizedPnl": "Realisierter PnL",
+        "unrealizedPnl": "Nicht realisierter PnL",
         "volume": "Volumen",
         "maxDrawdown": "Max. Drawdown",
         "totalEquity": "Gesamtkapital",
@@ -701,7 +711,9 @@
         "amountGreaterThanZero": "Der Betrag muss größer als 0 sein",
         "minDepositAmount": "Mindesteinzahlungsbetrag ist {{amount}}",
         "exceedsAvailableBalance": "Der Betrag überschreitet das verfügbare Guthaben von {{balance}}",
-        "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten"
+        "transactionTimedOut": "Transaktion nach 15 Sekunden zeitüberschritten",
+        "connectToViewPortfolio": "Verbinden um Ihr Portfolio anzuzeigen",
+        "connectDescription": "Melden Sie sich mit Ihrer Wallet an, um Ihr Portfolio, Positionen und Handelshistorie anzuzeigen."
     },
     "pageTitles": {
         "portfolio": "Portfolio",
@@ -726,7 +738,7 @@
         "more": "Mehr",
         "termsOfService": "Nutzungsbedingungen",
         "privacyPolicy": "Datenschutzrichtlinie",
-        "affiliates": "Affiliates",
+        "affiliates": "Partnerprogramm",
         "pageNotFound": "Seite nicht gefunden"
     },
     "docs": {
