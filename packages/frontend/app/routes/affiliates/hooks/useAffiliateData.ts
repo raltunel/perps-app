@@ -302,11 +302,40 @@ export function useUserReferrer(userIdentifier: string, enabled = true) {
         setError(null);
 
         try {
-            const response = await Fuul.getUserReferrer({
-                user_identifier: userIdentifier,
-                user_identifier_type: UserIdentifierType.SolanaAddress,
-            });
+            // Disabled SDK call, using direct fetch instead
+            // const response = await Fuul.getUserReferrer({
+            //     user_identifier: userIdentifier,
+            //     user_identifier_type: UserIdentifierType.SolanaAddress,
+            // });
 
+            const apiKey =
+                'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
+            const url = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${userIdentifier}&user_identifier_type=solana_address`;
+            const headers = {
+                accept: 'application/json',
+                authorization: `Bearer ${apiKey}`,
+            };
+
+            console.log('FUUL getUserReferrer request:', { url, headers });
+
+            const res = await fetch(url, { method: 'GET', headers });
+            console.log('FUUL getUserReferrer response status:', res.status);
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setData({
+                        referrer_user_rebate_rate: null,
+                        referrer_code: null,
+                    });
+                    return;
+                }
+                const text = await res.text();
+                console.error('FUUL getUserReferrer error:', text);
+                throw new Error(text);
+            }
+
+            const response = await res.json();
+            console.log('FUUL getUserReferrer success:', response);
             setData(response);
         } catch (err) {
             if (isNotFoundError(err)) {
