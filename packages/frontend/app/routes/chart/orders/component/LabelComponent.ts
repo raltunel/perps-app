@@ -339,7 +339,7 @@ const LabelComponent = ({
 
                 const xPixel = widthAttr * line.xLoc;
 
-                const labelOptions = [
+                const baseLabelOptions = [
                     {
                         type: 'Main' as LabelType,
                         text: line.textValue
@@ -360,6 +360,10 @@ const LabelComponent = ({
                               },
                           ]
                         : []),
+                ];
+
+                const labelOptions = [
+                    ...baseLabelOptions,
                     ...(line.type === 'LIMIT'
                         ? [
                               {
@@ -398,7 +402,18 @@ const LabelComponent = ({
                                 ) > 0.001;
 
                             const mobileLabelOptions = [
-                                ...labelOptions,
+                                ...baseLabelOptions,
+                                ...(isLineSelected && line.type === 'LIMIT'
+                                    ? [
+                                          {
+                                              type: 'Cancel' as LabelType,
+                                              text: ' X ',
+                                              backgroundColor: '#D1D1D1',
+                                              textColor: '#3C91FF',
+                                              borderColor: '#3C91FF',
+                                          },
+                                      ]
+                                    : []),
                                 ...(hasChanges
                                     ? [
                                           {
