@@ -519,7 +519,7 @@ const LabelComponent = ({
                         ctx.strokeStyle = '#3b82f6';
                         ctx.lineWidth = borderWidth;
                         ctx.beginPath();
-                        ctx.roundRect(x, y, width, height, borderRadius);
+                        ctx.rect(x, y, width, height);
                         ctx.stroke();
 
                         ctx.restore();
@@ -1127,6 +1127,13 @@ const LabelComponent = ({
                 );
             } else {
                 setActiveDragLine(dragStateRef.current.tempSelectedLine);
+
+                if (isMobile && dragStateRef.current.tempSelectedLine) {
+                    setSelectedOrderLine({
+                        ...dragStateRef.current.tempSelectedLine.parentLine,
+                        originalPrice: dragStateRef.current.originalPrice,
+                    });
+                }
             }
         };
 

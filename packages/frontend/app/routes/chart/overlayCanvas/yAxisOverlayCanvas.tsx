@@ -14,6 +14,8 @@ import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
 import { useChartStore } from '~/stores/TradingviewChartStore';
 import { useOpenOrderLines } from '../orders/useOpenOrderLines';
 import { usePositionOrderLines } from '../orders/usePositionOrderLines';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -40,6 +42,9 @@ const YAxisOverlayCanvas: React.FC = () => {
 
     const openOrderLines = useOpenOrderLines();
     const positionOrderLines = usePositionOrderLines();
+
+    const { selectedOrderLine } = useChartLinesStore();
+    const isMobile = useMobile();
 
     const labelAnalysis = useMemo(() => {
         if (!orderInputPriceValue.value || !chart) return null;
@@ -561,6 +566,113 @@ const YAxisOverlayCanvas: React.FC = () => {
             };
         }
     }, [chart]);
+
+    useEffect(() => {
+        if (!canvasRef.current || !chart || !isMobile) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        if (!selectedOrderLine) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
+
+        let animationFrameId: number | null = null;
+        const zoomDomain = JSON.stringify(
+            scaleDataRef?.current?.yScale.domain(),
+        );
+        const isZooming = zoomDomain !== '[]';
+
+        const draw = () => {
+            const scaleData = scaleDataRef.current;
+            if (!scaleData) return;
+
+            const paneIndex = getMainSeriesPaneIndex(chart);
+            if (paneIndex === null) return;
+
+            const priceScalePane = chart.activeChart().getPanes()[
+                paneIndex
+            ] as IPaneApi;
+            const priceScale = priceScalePane.getMainSourcePriceScale();
+            if (!priceScale) return;
+
+            const isLogarithmic = priceScale.getMode() === 1;
+            const price = selectedOrderLine.yPrice;
+
+            const yPixel = isLogarithmic
+                ? scaleData.scaleSymlog(price)
+                : scaleData.yScale(price);
+
+            const dpr = window.devicePixelRatio || 1;
+
+            const fontSize = 10 * dpr;
+            const padding = 4 * dpr;
+            const borderWidth = 2 * dpr;
+
+            const priceText = price.toFixed(price > 10000 ? 0 : 2);
+
+            // Set font with better rendering
+            ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif`;
+            const textWidth = ctx.measureText(priceText).width;
+
+            const labelWidth = textWidth + padding * 2;
+            const labelHeight = fontSize + padding * 2 + 2;
+
+            const x = 0;
+            const y = yPixel - labelHeight / 2 - 1;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            ctx.save();
+
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = borderWidth;
+            ctx.beginPath();
+            ctx.rect(x, y, canvas.width, labelHeight);
+            ctx.stroke();
+
+            ctx.restore();
+
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(x, y, canvas.width, labelHeight);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const textX = Math.round(x + labelWidth / 2);
+            const textY = Math.round(yPixel) - 2;
+
+            ctx.fillText(priceText, textX, textY);
+        };
+
+        if (isZooming && animationFrameId === null) {
+            const animate = () => {
+                draw();
+                animationFrameId = requestAnimationFrame(animate);
+            };
+            animationFrameId = requestAnimationFrame(animate);
+        } else {
+            draw();
+        }
+
+        return () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
+    }, [
+        canvasRef.current,
+        chart,
+        isMobile,
+        selectedOrderLine,
+        JSON.stringify(scaleDataRef?.current?.yScale.domain()),
+    ]);
 
     return null;
 };
