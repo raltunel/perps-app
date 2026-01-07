@@ -764,6 +764,7 @@
         "privacy": "Chính sách bảo mật"
     },
     "keyboardShortcuts": {
+        "conflict": "Đã được dùng bởi: {{shortcut}}",
         "menuLabel": "Phím tắt",
         "title": "Phím tắt bàn phím",
         "hintPress": "Nhấn",

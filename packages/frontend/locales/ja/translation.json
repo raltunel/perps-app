@@ -748,6 +748,7 @@
         "privacy": "プライバシーポリシー"
     },
     "keyboardShortcuts": {
+        "conflict": "すでに使用されています: {{shortcut}}",
         "menuLabel": "ショートカット",
         "title": "キーボードショートカット",
         "hintPress": "",
