@@ -106,8 +106,6 @@ export const UnifiedMarginDataProvider: React.FC<
         const targetAddress =
             manualAddressEnabled && manualAddress ? manualAddress : userAddress;
 
-        console.log('>>>>> targetAddress', targetAddress);
-
         if (!targetAddress) {
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(null);
@@ -135,7 +133,6 @@ export const UnifiedMarginDataProvider: React.FC<
             lastSubscribedAddressRef.current !== targetAddress ||
             forceRestart.current
         ) {
-            console.log('>>>>> subscribing to address', targetAddress);
             if (isDebugWalletActiveRef.current) {
                 const store = useUnifiedMarginStore.getState();
                 store.setBalance(null);
