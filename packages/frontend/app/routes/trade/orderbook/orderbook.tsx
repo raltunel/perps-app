@@ -115,6 +115,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setSelectedMode,
         setOrderBookState,
     } = useOrderBookStore();
+
+    const midPriceRef = useRef<number | null>(null);
+    midPriceRef.current = midPrice;
+
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
@@ -326,15 +330,16 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
     const focusedPriceRef = useRef<number | null>(null);
-    const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) => {
-            setOrderBook(data.buys, data.sells);
-            setOrderBookState(TableState.FILLED);
-            filledResolution.current = selectedResolution;
-        },
-        [selectedResolution, setOrderBook, setOrderBookState],
-    );
+
     // code blocks were being used in sdk approach
+    // const handleOrderBookWorkerResult = useCallback(
+    //     ({ data }: { data: OrderBookOutput }) => {
+    //         setOrderBook(data.buys, data.sells);
+    //         setOrderBookState(TableState.FILLED);
+    //         filledResolution.current = selectedResolution;
+    //     },
+    //     [selectedResolution, setOrderBook, setOrderBookState],
+    // );
 
     useEffect(() => {
         if (obPreviewLine?.yPrice) {
