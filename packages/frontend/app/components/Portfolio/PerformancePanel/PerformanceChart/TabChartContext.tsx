@@ -221,7 +221,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         >
             {isChartReady && chartWidth && chartHeight && (
                 <>
-                    {activeTab === 'Performance' && pnlHistory && (
+                    {activeTab === 'performance' && pnlHistory && (
                         <LineChart
                             // key={`performance-${chartWidth}-${chartHeight}`}
                             lineData={pnlHistory}
@@ -235,7 +235,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                         />
                     )}
 
-                    {activeTab === 'Account Value' && accountValueHistory && (
+                    {activeTab === 'accountValue' && accountValueHistory && (
                         <LineChart
                             // key={`account-${chartWidth}-${chartHeight}`}
                             lineData={accountValueHistory}
@@ -249,7 +249,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                         />
                     )}
 
-                    {activeTab === 'Collateral' && (
+                    {activeTab === 'collateral' && (
                         <CollateralPieChart
                             key={`collateral-${chartWidth}-${chartHeight}`}
                             height={chartHeight}
