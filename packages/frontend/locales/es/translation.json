@@ -748,6 +748,7 @@
         "privacy": "Política de Privacidad"
     },
     "keyboardShortcuts": {
+        "conflict": "Ya utilizado por: {{shortcut}}",
         "menuLabel": "Atajos",
         "title": "Atajos de teclado",
         "hintPress": "Pulsa",
