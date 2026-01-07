@@ -434,6 +434,8 @@ const KeyboardShortcutsModal = ({
                                                                     {t(
                                                                         'keyboardShortcuts.conflict',
                                                                         {
+                                                                            shortcut:
+                                                                                conflictDescription,
                                                                             defaultValue:
                                                                                 conflictDescription
                                                                                     ? `Already used by: ${conflictDescription}`

@@ -748,6 +748,7 @@
         "privacy": "Datenschutzrichtlinie"
     },
     "keyboardShortcuts": {
+        "conflict": "Bereits verwendet von: {{shortcut}}",
         "menuLabel": "Tastenkürzel",
         "title": "Tastenkürzel",
         "hintPress": "Drücke",
