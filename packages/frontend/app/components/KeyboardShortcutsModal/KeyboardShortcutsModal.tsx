@@ -324,16 +324,73 @@ const KeyboardShortcutsModal = ({
                                                             styles.keysWrapper
                                                         }
                                                     >
-                                                        {editingId ===
-                                                        shortcut.id ? (
-                                                            <span
-                                                                className={
-                                                                    styles.keysEditing
-                                                                }
-                                                            >
-                                                                {pendingKeys.length >
-                                                                0 ? (
-                                                                    pendingKeys.map(
+                                                        <div
+                                                            className={
+                                                                styles.keysRow
+                                                            }
+                                                        >
+                                                            {editingId ===
+                                                            shortcut.id ? (
+                                                                <span
+                                                                    className={
+                                                                        styles.keysEditing
+                                                                    }
+                                                                >
+                                                                    {pendingKeys.length >
+                                                                    0 ? (
+                                                                        pendingKeys.map(
+                                                                            (
+                                                                                key,
+                                                                                keyIndex,
+                                                                            ) => (
+                                                                                <span
+                                                                                    key={
+                                                                                        keyIndex
+                                                                                    }
+                                                                                >
+                                                                                    <kbd
+                                                                                        className={
+                                                                                            styles.key
+                                                                                        }
+                                                                                    >
+                                                                                        {formatKeyboardShortcutKey(
+                                                                                            key,
+                                                                                            t,
+                                                                                        )}
+                                                                                    </kbd>
+                                                                                    {keyIndex <
+                                                                                        pendingKeys.length -
+                                                                                            1 && (
+                                                                                        <span
+                                                                                            className={
+                                                                                                styles.keySeparator
+                                                                                            }
+                                                                                        >
+                                                                                            +
+                                                                                        </span>
+                                                                                    )}
+                                                                                </span>
+                                                                            ),
+                                                                        )
+                                                                    ) : (
+                                                                        <span
+                                                                            className={
+                                                                                styles.pressKeysHint
+                                                                            }
+                                                                        >
+                                                                            {t(
+                                                                                'keyboardShortcuts.pressKeys',
+                                                                            )}
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            ) : (
+                                                                <span
+                                                                    className={
+                                                                        styles.keys
+                                                                    }
+                                                                >
+                                                                    {shortcut.keys.map(
                                                                         (
                                                                             key,
                                                                             keyIndex,
@@ -354,7 +411,9 @@ const KeyboardShortcutsModal = ({
                                                                                     )}
                                                                                 </kbd>
                                                                                 {keyIndex <
-                                                                                    pendingKeys.length -
+                                                                                    shortcut
+                                                                                        .keys
+                                                                                        .length -
                                                                                         1 && (
                                                                                     <span
                                                                                         className={
@@ -366,63 +425,37 @@ const KeyboardShortcutsModal = ({
                                                                                 )}
                                                                             </span>
                                                                         ),
-                                                                    )
-                                                                ) : (
-                                                                    <span
-                                                                        className={
-                                                                            styles.pressKeysHint
-                                                                        }
-                                                                    >
-                                                                        {t(
-                                                                            'keyboardShortcuts.pressKeys',
-                                                                        )}
-                                                                    </span>
-                                                                )}
-                                                            </span>
-                                                        ) : (
-                                                            <span
+                                                                    )}
+                                                                </span>
+                                                            )}
+                                                            <button
+                                                                type='button'
                                                                 className={
-                                                                    styles.keys
+                                                                    styles.editButton
+                                                                }
+                                                                onClick={() =>
+                                                                    editingId ===
+                                                                    shortcut.id
+                                                                        ? handleCancelEdit()
+                                                                        : handleStartEdit(
+                                                                              shortcut.id,
+                                                                          )
+                                                                }
+                                                                aria-label={t(
+                                                                    'keyboardShortcuts.editShortcut',
+                                                                )}
+                                                                data-editing={
+                                                                    editingId ===
+                                                                    shortcut.id
+                                                                        ? 'true'
+                                                                        : 'false'
                                                                 }
                                                             >
-                                                                {shortcut.keys.map(
-                                                                    (
-                                                                        key,
-                                                                        keyIndex,
-                                                                    ) => (
-                                                                        <span
-                                                                            key={
-                                                                                keyIndex
-                                                                            }
-                                                                        >
-                                                                            <kbd
-                                                                                className={
-                                                                                    styles.key
-                                                                                }
-                                                                            >
-                                                                                {formatKeyboardShortcutKey(
-                                                                                    key,
-                                                                                    t,
-                                                                                )}
-                                                                            </kbd>
-                                                                            {keyIndex <
-                                                                                shortcut
-                                                                                    .keys
-                                                                                    .length -
-                                                                                    1 && (
-                                                                                <span
-                                                                                    className={
-                                                                                        styles.keySeparator
-                                                                                    }
-                                                                                >
-                                                                                    +
-                                                                                </span>
-                                                                            )}
-                                                                        </span>
-                                                                    ),
-                                                                )}
-                                                            </span>
-                                                        )}
+                                                                <MdEdit
+                                                                    size={16}
+                                                                />
+                                                            </button>
+                                                        </div>
                                                         {editingId ===
                                                             shortcut.id &&
                                                             conflictId && (
@@ -444,31 +477,6 @@ const KeyboardShortcutsModal = ({
                                                                     )}
                                                                 </span>
                                                             )}
-                                                        <button
-                                                            type='button'
-                                                            className={
-                                                                styles.editButton
-                                                            }
-                                                            onClick={() =>
-                                                                editingId ===
-                                                                shortcut.id
-                                                                    ? handleCancelEdit()
-                                                                    : handleStartEdit(
-                                                                          shortcut.id,
-                                                                      )
-                                                            }
-                                                            aria-label={t(
-                                                                'keyboardShortcuts.editShortcut',
-                                                            )}
-                                                            data-editing={
-                                                                editingId ===
-                                                                shortcut.id
-                                                                    ? 'true'
-                                                                    : 'false'
-                                                            }
-                                                        >
-                                                            <MdEdit size={14} />
-                                                        </button>
                                                     </div>
                                                 </li>
                                             ),
