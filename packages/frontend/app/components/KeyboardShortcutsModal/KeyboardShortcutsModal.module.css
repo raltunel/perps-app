@@ -243,6 +243,14 @@
     font-style: italic;
 }
 
+.conflictError {
+    color: #ff6b6b;
+    font-size: 12px;
+    line-height: 1.2;
+    max-width: 220px;
+    text-align: right;
+}
+
 .editButton {
     display: flex;
     align-items: center;

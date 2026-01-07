@@ -8,6 +8,8 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import {
     formatKeyboardShortcutKey,
     getKeyboardShortcutCategories,
+    getKeyboardShortcutById,
+    getShortcutConflictId,
     setCustomShortcut,
     resetAllCustomShortcuts,
     hasCustomShortcuts,
@@ -54,6 +56,7 @@ const KeyboardShortcutsModal = ({
     const shortcutCategories = getKeyboardShortcutCategories(t);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [pendingKeys, setPendingKeys] = useState<ShortcutKeyToken[]>([]);
+    const [conflictId, setConflictId] = useState<string | null>(null);
     const [showApplyDefaults, setShowApplyDefaults] =
         useState(hasCustomShortcuts());
     const {
@@ -71,15 +74,18 @@ const KeyboardShortcutsModal = ({
     const handleStartEdit = useCallback((id: string) => {
         setEditingId(id);
         setPendingKeys([]);
+        setConflictId(null);
     }, []);
 
     const handleCancelEdit = useCallback(() => {
         setEditingId(null);
         setPendingKeys([]);
+        setConflictId(null);
     }, []);
 
     const handleApplyDefaults = useCallback(() => {
         resetAllCustomShortcuts();
+        setConflictId(null);
         refreshCategories();
     }, [refreshCategories]);
 
@@ -148,12 +154,24 @@ const KeyboardShortcutsModal = ({
                             ].includes(t),
                     );
                     if (hasNonModifier) {
+                        const conflict = getShortcutConflictId(
+                            editingId,
+                            tokens,
+                        );
+                        if (conflict) {
+                            setPendingKeys(tokens);
+                            setConflictId(conflict);
+                            return;
+                        }
+
                         setCustomShortcut(editingId, tokens);
                         setEditingId(null);
                         setPendingKeys([]);
+                        setConflictId(null);
                         refreshCategories();
                     } else {
                         setPendingKeys(tokens);
+                        setConflictId(null);
                     }
                 }
                 return;
@@ -170,6 +188,10 @@ const KeyboardShortcutsModal = ({
     }, [isOpen, onClose, editingId, handleCancelEdit, refreshCategories]);
 
     if (!isOpen) return null;
+
+    const conflictDescription =
+        conflictId &&
+        getKeyboardShortcutById(shortcutCategories, conflictId)?.description;
 
     return (
         <div className={styles.backdrop} onClick={onClose}>
@@ -401,6 +423,25 @@ const KeyboardShortcutsModal = ({
                                                                 )}
                                                             </span>
                                                         )}
+                                                        {editingId ===
+                                                            shortcut.id &&
+                                                            conflictId && (
+                                                                <span
+                                                                    className={
+                                                                        styles.conflictError
+                                                                    }
+                                                                >
+                                                                    {t(
+                                                                        'keyboardShortcuts.conflict',
+                                                                        {
+                                                                            defaultValue:
+                                                                                conflictDescription
+                                                                                    ? `Already used by: ${conflictDescription}`
+                                                                                    : 'Already used by another shortcut',
+                                                                        },
+                                                                    )}
+                                                                </span>
+                                                            )}
                                                         <button
                                                             type='button'
                                                             className={
