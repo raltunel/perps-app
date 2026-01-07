@@ -6,6 +6,8 @@ type AppStateStore = {
     setWsReconnecting: (wsReconnecting: boolean) => void;
     internetConnected: boolean;
     setInternetConnected: (internetConnected: boolean) => void;
+    // Timestamp of when we last came back online (for triggering refreshes)
+    lastOnlineAt: number;
     titleOverride: string;
     setTitleOverride: (titleOverride: string) => void;
     isWsStashed: boolean;
@@ -27,8 +29,16 @@ export const useAppStateStore = create<AppStateStore>()(
             setWsReconnecting: (wsReconnecting: boolean) =>
                 set({ wsReconnecting }),
             internetConnected: true,
-            setInternetConnected: (internetConnected: boolean) =>
-                set({ internetConnected }),
+            setInternetConnected: (internetConnected: boolean) => {
+                const wasOffline = !get().internetConnected;
+                // If we're coming back online, update the timestamp
+                if (internetConnected && wasOffline) {
+                    set({ internetConnected, lastOnlineAt: Date.now() });
+                } else {
+                    set({ internetConnected });
+                }
+            },
+            lastOnlineAt: 0,
             titleOverride: '',
             setTitleOverride: (titleOverride: string) => set({ titleOverride }),
             isWsStashed: false,
@@ -36,7 +46,7 @@ export const useAppStateStore = create<AppStateStore>()(
             isTabActiveDelayed: true,
             setIsTabActiveDelayed: (isTabActiveDelayed: boolean) =>
                 set({ isTabActiveDelayed }),
-            debugToolbarOpen: true,
+            debugToolbarOpen: false,
             setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
                 set({ debugToolbarOpen }),
             liquidationsActive: true,
