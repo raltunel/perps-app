@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
 
@@ -15,9 +16,13 @@ export const ChartElementControlPanel: React.FC<
     ChartElementControlPanelProps
 > = ({ chart, canvasHeight, canvasWidth }) => {
     const { selectedOrderLine, setSelectedOrderLine } = useChartLinesStore();
+    const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+    const priceDomain = useChartScaleStore((state) => state.priceDomain);
 
     const [previewPrice, setPreviewPrice] = useState<number | null>(null);
     const [originalPrice, setOriginalPrice] = useState<number | null>(null);
+    const [top, setTop] = useState<string>('0px');
+    const [left, setLeft] = useState<string>('0px');
 
     useEffect(() => {
         if (selectedOrderLine && originalPrice === null) {
@@ -65,41 +70,64 @@ export const ChartElementControlPanel: React.FC<
         setSelectedOrderLine(undefined);
     };
 
+    useEffect(() => {
+        if (!selectedOrderLine) {
+            return;
+        }
+        if (!chart || !canvasHeight || !canvasWidth || !scaleDataRef.current)
+            return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const cssCanvasWidth = canvasWidth / dpr;
+
+        const yPricePixel = scaleDataRef.current.yScale(
+            selectedOrderLine.yPrice,
+        );
+
+        const chartDiv =
+            typeof document !== 'undefined'
+                ? document.getElementById('tv_chart')
+                : null;
+        const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+        const iframeRect = iframe?.getBoundingClientRect();
+
+        const buttonHeight = 28;
+        const padding = 25;
+
+        const position = {
+            x: cssCanvasWidth / 2,
+            y: yPricePixel + buttonHeight + padding,
+        };
+
+        const newTop = iframeRect
+            ? `${iframeRect.top + position.y}px`
+            : `${position.y}px`;
+        const newLeft = iframeRect
+            ? `${iframeRect.left + position.x}px`
+            : `${position.x}px`;
+
+        setTop(newTop);
+        setLeft(newLeft);
+    }, [
+        chart,
+        canvasHeight,
+        canvasWidth,
+        selectedOrderLine?.yPrice,
+        scaleDataRef,
+        priceDomain,
+    ]);
+
     if (!isMobile || !selectedOrderLine) {
         return null;
     }
-
-    if (!chart || !canvasHeight || !canvasWidth) {
-        return null;
-    }
-
-    const dpr = window.devicePixelRatio || 1;
-    const cssCanvasHeight = canvasHeight / dpr;
-    const cssCanvasWidth = canvasWidth / dpr;
-
-    const position = {
-        x: cssCanvasWidth / 2,
-        y: cssCanvasHeight,
-    };
-
-    const chartDiv =
-        typeof document !== 'undefined'
-            ? document.getElementById('tv_chart')
-            : null;
-    const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
-    const iframeRect = iframe?.getBoundingClientRect();
 
     return (
         <div
             style={{
                 position: 'fixed',
                 display: 'flex',
-                top: iframeRect
-                    ? `${iframeRect.top + position.y}px`
-                    : `${position.y}px`,
-                left: iframeRect
-                    ? `${iframeRect.left + position.x}px`
-                    : `${position.x}px`,
+                top,
+                left,
                 zIndex: 10000,
                 pointerEvents: 'auto',
             }}
@@ -117,9 +145,9 @@ export const ChartElementControlPanel: React.FC<
                         width: '28px',
                         height: '28px',
                         padding: '0',
-                        backgroundColor: 'transparent',
+                        backgroundColor: '#1a1a1a',
                         color: '#999',
-                        border: '1px solid #444',
+                        border: '1px solid #3b82f6',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '12px',
@@ -138,9 +166,9 @@ export const ChartElementControlPanel: React.FC<
                         width: '28px',
                         height: '28px',
                         padding: '0',
-                        backgroundColor: 'transparent',
+                        backgroundColor: '#1a1a1a',
                         color: '#999',
-                        border: '1px solid #444',
+                        border: '1px solid #3b82f6',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '12px',
@@ -167,9 +195,9 @@ export const ChartElementControlPanel: React.FC<
                         width: '28px',
                         height: '28px',
                         padding: '0',
-                        backgroundColor: 'transparent',
+                        backgroundColor: '#1a1a1a',
                         color: '#999',
-                        border: '1px solid #444',
+                        border: '1px solid #3b82f6',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '12px',

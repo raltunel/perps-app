@@ -1176,6 +1176,13 @@ const LabelComponent = ({
                     updateYPosition(originalPrice);
                 }
 
+                if (isMobile) {
+                    setSelectedOrderLine({
+                        ...restoredLine.parentLine,
+                        originalPrice: originalPrice,
+                    });
+                }
+
                 dragStateRef.current.tempSelectedLine = undefined;
                 dragStateRef.current.originalPrice = undefined;
                 dragStateRef.current.isDragging = false;

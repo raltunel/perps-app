@@ -4,7 +4,6 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     getXandYLocationForChartDrag,
     getMainSeriesPaneIndex,
-    scaleDataRef,
     getPriceAxisContainer,
     getPaneCanvasAndIFrameDoc,
 } from './overlayCanvasUtils';
@@ -16,6 +15,7 @@ import { useOpenOrderLines } from '../orders/useOpenOrderLines';
 import { usePositionOrderLines } from '../orders/usePositionOrderLines';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
 import { useMobile } from '~/hooks/useMediaQuery';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -45,6 +45,7 @@ const YAxisOverlayCanvas: React.FC = () => {
 
     const { selectedOrderLine } = useChartLinesStore();
     const isMobile = useMobile();
+    const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
 
     const labelAnalysis = useMemo(() => {
         if (!orderInputPriceValue.value || !chart) return null;

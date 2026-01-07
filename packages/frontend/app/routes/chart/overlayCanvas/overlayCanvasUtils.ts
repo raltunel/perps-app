@@ -7,16 +7,6 @@ export type LabelLocationData = {
     parentLine: LineData;
 };
 
-type ScaleData = {
-    yScale: d3.ScaleLinear<number, number>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    scaleSymlog: any;
-};
-
-export const scaleDataRef: { current: ScaleData | null } = {
-    current: null,
-};
-
 export const mousePositionRef = { current: { x: 0, y: 0 } };
 
 export function findLimitLabelAtPosition(

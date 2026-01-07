@@ -14,6 +14,7 @@ import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 import { usePreviewOrderLines } from './usePreviewOrderLines';
 import { ChartElementControlPanel } from './component/ChartElementControlPanel';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -42,7 +43,6 @@ export default function OrderLines({
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);
 
-    const [zoomChanged, setZoomChanged] = useState(false);
     const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
 
     const animationFrameRef = useRef<number>(0);
@@ -54,6 +54,8 @@ export default function OrderLines({
         undefined | LabelLocationData
     >(undefined);
     const { setSelectedOrderLine } = useChartLinesStore();
+    const { setPriceDomain, setZoomChanged, zoomChanged } =
+        useChartScaleStore();
 
     const arePricesEqual = (a?: number, b?: number) => {
         if (a === undefined || b === undefined) return false;
@@ -161,6 +163,10 @@ export default function OrderLines({
 
                 if (hasChanged) {
                     prevRangeRef.current = currentRange;
+                    setPriceDomain({
+                        min: currentRange.min,
+                        max: currentRange.max,
+                    });
 
                     if (!isZoomingRef.current) {
                         isZoomingRef.current = true;
