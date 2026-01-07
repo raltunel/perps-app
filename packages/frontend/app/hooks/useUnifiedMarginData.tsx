@@ -106,6 +106,8 @@ export const UnifiedMarginDataProvider: React.FC<
         const targetAddress =
             manualAddressEnabled && manualAddress ? manualAddress : userAddress;
 
+        console.log('>>>>> targetAddress', targetAddress);
+
         if (!targetAddress) {
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(null);
@@ -133,9 +135,19 @@ export const UnifiedMarginDataProvider: React.FC<
             lastSubscribedAddressRef.current !== targetAddress ||
             forceRestart.current
         ) {
-            console.log('>>>>>>>>>> hellowwww');
-            if (isDebugWalletActiveRef.current) return;
+            console.log('>>>>> subscribing to address', targetAddress);
+            if (isDebugWalletActiveRef.current) {
+                const store = useUnifiedMarginStore.getState();
+                store.setBalance(null);
+                store.setPositions([]);
+                store.setError(null);
+                store.setIsLoading(true);
+                unifiedMarginPollingManager.unsubscribe();
 
+                // we are subscribing to debug wallet address in another component, so we are marking it with that ref..
+                lastSubscribedAddressRef.current = targetAddress;
+                return;
+            }
             // Skip if targetAddress is not a valid base58 address (case triggered if debug address has been saved to userDataStore)
             if (!isValidBase58(targetAddress)) return;
 
