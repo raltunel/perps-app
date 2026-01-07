@@ -2,6 +2,7 @@ import styles from './testpage.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useState, useMemo } from 'react';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { SessionButton } from '@fogo/sessions-sdk-react';
 
 // JSON syntax highlighter component
 function JsonHighlighter({ data }: { data: any }) {
@@ -197,6 +198,10 @@ export default function testpage() {
 
     return (
         <div className={styles.testpage}>
+            <div className={styles.connect_wallet_section}>
+                <SessionButton />
+            </div>
+
             <div className={styles.header}>
                 <h2>Ember Leaderboard Test</h2>
                 <SimpleButton
