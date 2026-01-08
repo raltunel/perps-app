@@ -57,7 +57,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             useDebugStore.getState();
 
         // 1. Manual Debug Address takes highest priority
-        if (manualAddressEnabled && manualAddress) {
+        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
             setUserAddress(manualAddress);
             return;
         }
@@ -99,7 +99,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         resetUserData,
         isDebugWalletActive,
         debugWallet,
+        manualAddressEnabled,
+        manualAddress,
     ]);
+
+    // useEffect(() => {
+    //     console.log('>>>>> Manual Debug Address', manualAddressEnabled, manualAddress);
+    //     if(manualAddressEnabled && manualAddress && manualAddress.length > 0) {
+    //         setUserAddress(manualAddress);
+    //     }
+    // }, [manualAddressEnabled, manualAddress]);
 
     // Initialize Pyth price service on mount
     useEffect(() => {

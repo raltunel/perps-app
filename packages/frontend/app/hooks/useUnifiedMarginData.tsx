@@ -104,7 +104,9 @@ export const UnifiedMarginDataProvider: React.FC<
 
         // Subscribe if we have a userAddress (from URL or session or debug)
         const targetAddress =
-            manualAddressEnabled && manualAddress ? manualAddress : userAddress;
+            manualAddressEnabled && manualAddress && manualAddress.length > 0
+                ? manualAddress
+                : userAddress;
 
         if (!targetAddress) {
             const store = useUnifiedMarginStore.getState();

@@ -164,8 +164,8 @@ export default function GenericTable<
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
     const isSessionEstablished = useMemo(() => {
-        if (manualAddressEnabled) {
-            return manualAddress && manualAddress.length > 0;
+        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
+            return true;
         }
         if (isDebugWalletActive) {
             return true;
