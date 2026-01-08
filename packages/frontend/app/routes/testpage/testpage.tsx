@@ -1,54 +1,77 @@
-import { useUserDataStore } from '~/stores/UserDataStore';
-
-const TEMP_FUUL_API_KEY =
-    'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
-
-async function sendFuulConnectWallet(walletAddress: string): Promise<void> {
-    const trackingId = localStorage.getItem('fuul.tracking_id') || '';
-    const ENDPOINT = 'https://api.fuul.xyz/api/v1/events';
-
-    const payload = {
-        metadata: {
-            tracking_id: trackingId,
-        },
-        name: 'connect_wallet',
-        user: {
-            identifier: walletAddress,
-            identifier_type: 'solana_address',
-        },
-    };
-
-    const headers = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${TEMP_FUUL_API_KEY}`,
-    };
-
-    console.log('FUUL connect_wallet request:', {
-        url: ENDPOINT,
-        payload,
-        headers,
-    });
-
-    const response = await fetch(ENDPOINT, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload),
-    });
-
-    console.log('FUUL connect_wallet response:', response);
-}
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import { useReferralStore } from '~/stores/ReferralStore';
 
 export default function testpage() {
-    const userDataStore = useUserDataStore();
-    const userAddress = userDataStore.userAddress;
+    const sessionState = useSession();
+    const referralStore = useReferralStore();
 
-    const handleClick = () => {
-        if (!userAddress) {
-            console.warn('No wallet connected');
+    const handleClick = async () => {
+        if (!isEstablished(sessionState)) {
+            console.warn('Session not established');
             return;
         }
-        sendFuulConnectWallet(userAddress.toString());
+
+        const userWalletKey =
+            sessionState.walletPublicKey || sessionState.sessionPublicKey;
+
+        if (!userWalletKey) {
+            console.warn('No wallet key available');
+            return;
+        }
+
+        try {
+            // Create a dynamic message with current date
+            const currentDate = new Date().toISOString().split('T')[0];
+            const message = `Accept affiliate code ${referralStore.cached} on ${currentDate}`;
+
+            // Convert message to Uint8Array
+            const messageBytes = new TextEncoder().encode(message);
+
+            // Get the signature from the session
+            const signatureBytes =
+                await sessionState.solanaWallet.signMessage(messageBytes);
+
+            // Convert the signature to base64
+            const signatureArray = Array.from(new Uint8Array(signatureBytes));
+            const binaryString = String.fromCharCode.apply(
+                null,
+                signatureArray,
+            );
+            const signature = btoa(binaryString);
+
+            // Call the Fuul SDK to identify the user
+            try {
+                const response = await Fuul.identifyUser({
+                    identifier: userWalletKey.toString(),
+                    identifierType: UserIdentifierType.SolanaAddress,
+                    signature,
+                    signaturePublicKey: userWalletKey.toString(),
+                    message,
+                });
+                console.log('Fuul.identifyUser successful:', response);
+            } catch (error: any) {
+                console.error('Detailed error in identifyUser:', {
+                    message: error.message,
+                    status: error.response?.status,
+                    statusText: error.response?.statusText,
+                    data: error.response?.data,
+                    config: {
+                        url: error.config?.url,
+                        method: error.config?.method,
+                        headers: error.config?.headers,
+                    },
+                });
+                throw error;
+            }
+        } catch (error) {
+            console.error('Error in identifyUser:', error);
+        }
     };
+
+    const userWalletKey = isEstablished(sessionState)
+        ? sessionState.walletPublicKey || sessionState.sessionPublicKey
+        : null;
 
     return (
         <div style={{ padding: '2rem' }}>
@@ -64,10 +87,13 @@ export default function testpage() {
                     fontSize: '16px',
                 }}
             >
-                Send FUUL Connect Wallet Event
+                Send FUUL Identify User Event
             </button>
             <p style={{ marginTop: '1rem', color: '#888' }}>
-                Connected wallet: {userAddress?.toString() || 'None'}
+                Connected wallet: {userWalletKey?.toString() || 'None'}
+            </p>
+            <p style={{ color: '#888' }}>
+                Referral code: {referralStore.cached || 'None'}
             </p>
         </div>
     );
