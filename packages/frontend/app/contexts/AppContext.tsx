@@ -103,13 +103,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         manualAddress,
     ]);
 
-    // useEffect(() => {
-    //     console.log('>>>>> Manual Debug Address', manualAddressEnabled, manualAddress);
-    //     if(manualAddressEnabled && manualAddress && manualAddress.length > 0) {
-    //         setUserAddress(manualAddress);
-    //     }
-    // }, [manualAddressEnabled, manualAddress]);
-
     // Initialize Pyth price service on mount
     useEffect(() => {
         initializePythPriceService();
