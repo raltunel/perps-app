@@ -78,7 +78,7 @@
 }
 
 .detailsContent h6 {
-    color: var(--base-text1, #f0f0f8);
+    color: var(--text2);
     font-size: var(--font-size-m, 18px);
 }
 
@@ -120,10 +120,28 @@
     align-items: center;
 }
 
-.totalNetDisplay h6 span {
+.totalNetDisplay span {
     color: var(--text2);
 }
 
+.totalNetDisplayNonUser {
+    display: flex;
+    flex-direction: column !important;
+
+    align-items: flex-end;
+    gap: 0;
+}
+.totalNetDisplayNonUser span {
+    color: var(--text2, #f0f0f8);
+    font-size: var(--font-size-m, 18px);
+}
+.totalNetDisplayNonUser h6 {
+    text-align: end;
+    justify-content: end;
+    align-items: end;
+    color: var(--base-text1, #f0f0f8);
+    font-size: var(--font-size-xl, 36px);
+}
 .rowButton {
     width: 100%;
     display: flex;
