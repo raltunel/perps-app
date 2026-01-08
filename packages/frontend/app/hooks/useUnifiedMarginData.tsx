@@ -108,7 +108,7 @@ export const UnifiedMarginDataProvider: React.FC<
                 ? manualAddress
                 : userAddress;
 
-        if (!targetAddress) {
+        if (!targetAddress || isDebugWalletActiveRef.current) {
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(null);
             // Only unsubscribe if we were actually subscribed

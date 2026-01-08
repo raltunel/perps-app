@@ -57,7 +57,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             useDebugStore.getState();
 
         // 1. Manual Debug Address takes highest priority
-        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
+        if (
+            !isDebugWalletActive &&
+            manualAddressEnabled &&
+            manualAddress &&
+            manualAddress.length > 0
+        ) {
             setUserAddress(manualAddress);
             return;
         }
