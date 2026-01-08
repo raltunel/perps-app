@@ -5,7 +5,6 @@ import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradin
 import LiquidationOverlayCanvas from '~/routes/chart/overlayCanvas/LiqudationOverlayCanvas';
 import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
-import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
 import LiquidationChartOptions from '~/routes/trade/liquidationsChart/LiquidationChartOptions';
 import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
