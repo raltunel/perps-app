@@ -1124,13 +1124,13 @@ const LabelComponent = ({
                 );
             } else {
                 setActiveDragLine(dragStateRef.current.tempSelectedLine);
+            }
 
-                if (isMobile && dragStateRef.current.tempSelectedLine) {
-                    setSelectedOrderLine({
-                        ...dragStateRef.current.tempSelectedLine.parentLine,
-                        originalPrice: dragStateRef.current.originalPrice,
-                    });
-                }
+            if (isMobile && dragStateRef.current.tempSelectedLine) {
+                setSelectedOrderLine({
+                    ...dragStateRef.current.tempSelectedLine.parentLine,
+                    originalPrice: dragStateRef.current.originalPrice,
+                });
             }
         };
 

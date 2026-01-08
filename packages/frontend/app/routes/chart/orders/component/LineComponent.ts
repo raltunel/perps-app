@@ -16,7 +16,7 @@ export type LineData = {
     color: string;
     type: ChartLineType;
     labelLocations?: LabelLocation[];
-    oid?: number;
+    oid?: number | string;
     lineStyle: number;
     lineWidth: number;
     side?: 'buy' | 'sell';
