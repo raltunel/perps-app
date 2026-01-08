@@ -101,6 +101,8 @@ export const TradingViewProvider: React.FC<{
 
     const { symbol, addToFetchedChannels, userFills } = useTradeDataStore();
 
+    const previousSymbolRef = useRef<string | null>(null);
+
     const { showLiqOptions, setShowLiqOptions } = useLiqChartStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();

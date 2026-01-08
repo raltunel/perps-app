@@ -520,6 +520,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [symbol, symbolInfo?.coin, usualResolutionKey]);
 
     const subKey = useMemo(() => {
+        console.log('>>>>> selectedResolution', selectedResolution);
+        console.log('>>>>> symbol', symbol);
         if (!selectedResolution) return undefined;
         return {
             type: 'l2Book' as const,
@@ -552,6 +554,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     );
 
     useEffect(() => {
+        console.log('>>>>> subKey', subKey);
         if (!subKey) return;
         setOrderBookState(TableState.LOADING);
         if (subKey) {
