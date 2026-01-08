@@ -748,6 +748,7 @@
         "privacy": "Gizlilik Politikası"
     },
     "keyboardShortcuts": {
+        "conflict": "Zaten kullanılıyor: {{shortcut}}",
         "menuLabel": "Kısayollar",
         "title": "Klavye Kısayolları",
         "hintPress": "",
