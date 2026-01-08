@@ -1,6 +1,9 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
 import { useReferralStore } from '~/stores/ReferralStore';
+
+// Custom API key for this specific event
+const TEMP_FUUL_API_KEY =
+    'e472ee00174179050d1ca77c82c55eb368bab7c8de360cc5362072bb5ccbaf42';
 
 export default function testpage() {
     const sessionState = useSession();
@@ -40,30 +43,48 @@ export default function testpage() {
             );
             const signature = btoa(binaryString);
 
-            // Call the Fuul SDK to identify the user
-            try {
-                const response = await Fuul.identifyUser({
+            // Direct fetch to Fuul API with custom API key
+            const ENDPOINT = 'https://api.fuul.xyz/api/v1/events';
+            const trackingId = localStorage.getItem('fuul.tracking_id') || '';
+
+            const payload = {
+                name: 'connect_wallet',
+                user: {
                     identifier: userWalletKey.toString(),
-                    identifierType: UserIdentifierType.SolanaAddress,
-                    signature,
-                    signaturePublicKey: userWalletKey.toString(),
-                    message,
-                });
-                console.log('Fuul.identifyUser successful:', response);
-            } catch (error: any) {
-                console.error('Detailed error in identifyUser:', {
-                    message: error.message,
-                    status: error.response?.status,
-                    statusText: error.response?.statusText,
-                    data: error.response?.data,
-                    config: {
-                        url: error.config?.url,
-                        method: error.config?.method,
-                        headers: error.config?.headers,
-                    },
-                });
-                throw error;
-            }
+                    identifier_type: 'solana_address',
+                },
+                args: {
+                    page: document.location.pathname,
+                    locationOrigin: document.location.origin,
+                },
+                metadata: {
+                    tracking_id: trackingId,
+                },
+                signature,
+                signature_message: message,
+                signature_public_key: userWalletKey.toString(),
+            };
+
+            const headers = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${TEMP_FUUL_API_KEY}`,
+            };
+
+            console.log('FUUL identifyUser request:', {
+                url: ENDPOINT,
+                payload,
+                headers,
+            });
+
+            const response = await fetch(ENDPOINT, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload),
+            });
+
+            console.log('FUUL identifyUser response status:', response.status);
+            const text = await response.text();
+            console.log('FUUL identifyUser response body:', text || '(empty)');
         } catch (error) {
             console.error('Error in identifyUser:', error);
         }
