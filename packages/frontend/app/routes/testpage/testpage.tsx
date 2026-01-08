@@ -113,9 +113,6 @@ export default function testpage() {
             <p style={{ marginTop: '1rem', color: '#888' }}>
                 Connected wallet: {userWalletKey?.toString() || 'None'}
             </p>
-            <p style={{ color: '#888' }}>
-                Referral code: {referralStore.cached || 'None'}
-            </p>
         </div>
     );
 }
