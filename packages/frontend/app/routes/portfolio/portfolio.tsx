@@ -430,7 +430,7 @@ function Portfolio() {
 
                 <div className={styles.column}>
                     {/* Mobile Hero Section */}
-                    {mobileTop}
+                    {!isTransactionsView && mobileTop}
 
                     {/* Desktop Details Container */}
                     <div className={styles.detailsContainer}>
@@ -586,7 +586,7 @@ function Portfolio() {
                                             'common.tradeHistory',
                                             'common.orderHistory',
                                         ]}
-                                        stackedTableHeight={250}
+                                        isTransactionsView
                                         urlAddress={urlAddress}
                                     />
                                 </section>
