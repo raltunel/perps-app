@@ -18,6 +18,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { RPC_ENDPOINT } from '~/utils/Constants';
+import { isValidBase58 } from '~/utils/functions/makeAddress';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
 
@@ -103,9 +104,11 @@ export const UnifiedMarginDataProvider: React.FC<
 
         // Subscribe if we have a userAddress (from URL or session or debug)
         const targetAddress =
-            manualAddressEnabled && manualAddress ? manualAddress : userAddress;
+            manualAddressEnabled && manualAddress && manualAddress.length > 0
+                ? manualAddress
+                : userAddress;
 
-        if (!targetAddress) {
+        if (!targetAddress || isDebugWalletActiveRef.current) {
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(null);
             // Only unsubscribe if we were actually subscribed
@@ -132,6 +135,21 @@ export const UnifiedMarginDataProvider: React.FC<
             lastSubscribedAddressRef.current !== targetAddress ||
             forceRestart.current
         ) {
+            if (isDebugWalletActiveRef.current) {
+                const store = useUnifiedMarginStore.getState();
+                store.setBalance(null);
+                store.setPositions([]);
+                store.setError(null);
+                store.setIsLoading(true);
+                unifiedMarginPollingManager.unsubscribe();
+
+                // we are subscribing to debug wallet address in another component, so we are marking it with that ref..
+                lastSubscribedAddressRef.current = targetAddress;
+                return;
+            }
+            // Skip if targetAddress is not a valid base58 address (case triggered if debug address has been saved to userDataStore)
+            if (!isValidBase58(targetAddress)) return;
+
             hasSubscribedRef.current = true;
             unifiedMarginPollingManager.unsubscribe(); // Clean up previous if any
             unifiedMarginPollingManager.subscribe(
@@ -146,7 +164,7 @@ export const UnifiedMarginDataProvider: React.FC<
         return () => {
             // Only cleanup if the entire provider is unmounting or we explicitly want to stop
         };
-    }, [isSessionEstablished, isDebugWalletActive, userAddress, manualAddress]);
+    }, [isSessionEstablished, userAddress, manualAddress]);
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished && !userAddress) {
