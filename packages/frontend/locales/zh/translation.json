@@ -748,6 +748,7 @@
         "privacy": "隐私政策"
     },
     "keyboardShortcuts": {
+        "conflict": "已被使用：{{shortcut}}",
         "menuLabel": "快捷键",
         "title": "键盘快捷键",
         "hintPress": "按",
