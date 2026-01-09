@@ -198,7 +198,9 @@ export default function Referrals() {
                         </a>
                     </p>
                 </div>
-                <SimpleButton bg={'dark2'}>Register as Affiliate</SimpleButton>
+                <SimpleButton bg={'dark2'}>
+                    Register for the Referral Program
+                </SimpleButton>
             </header>
             <div className={styles.detailsContainer}>
                 <div className={styles.detailsContent}>

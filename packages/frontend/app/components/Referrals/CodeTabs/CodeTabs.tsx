@@ -126,7 +126,7 @@ export default function CodeTabs(props: PropsIF) {
         if (refCodeToConsume === undefined || !refCodeToConsume.length) {
             setIsRefCodeClaimed(undefined);
         } else {
-            isAffiliateCodeFree(refCodeToConsume)
+            isRefCodeFree(refCodeToConsume)
                 .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
                 .catch((err) => {
                     setIsRefCodeClaimed(undefined);
@@ -181,7 +181,7 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     // run the FUUL context
-    const { isAffiliateCodeFree, getAffiliateCode } = useFuul();
+    const { isRefCodeFree, getRefCode } = useFuul();
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
@@ -208,7 +208,7 @@ export default function CodeTabs(props: PropsIF) {
         }
 
         // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await isAffiliateCodeFree(r);
+        const codeIsFree: boolean = await isRefCodeFree(r);
 
         // Always cache the code and set URL param
         handleReferralURLParam.set(r);
@@ -308,7 +308,7 @@ export default function CodeTabs(props: PropsIF) {
                 try {
                     // check with FUUL to determine if ref code is claimed
                     const isCodeFree: boolean =
-                        await isAffiliateCodeFree(userInputRefCode);
+                        await isRefCodeFree(userInputRefCode);
                     // normally `isCodeFree === true` means the code is available
                     // right now the API is returning `false` when the code is available
                     setIsUserRefCodeClaimed(isCodeFree);
@@ -349,7 +349,7 @@ export default function CodeTabs(props: PropsIF) {
             const codeToValidate = referralStore.cached;
             try {
                 const isCachedCodeFree: boolean =
-                    await isAffiliateCodeFree(codeToValidate);
+                    await isRefCodeFree(codeToValidate);
                 console.log('isCodeFree: ', isCachedCodeFree);
 
                 if (isCachedCodeFree) {
@@ -385,7 +385,7 @@ export default function CodeTabs(props: PropsIF) {
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
-                const affiliateData = await getAffiliateCode(
+                const affiliateData = await getRefCode(
                     userWalletKey.toString(),
                     UserIdentifierType.SolanaAddress,
                 );
@@ -401,7 +401,7 @@ export default function CodeTabs(props: PropsIF) {
                         userWalletKey.toString(),
                     );
                     if (referrer?.referrer_identifier) {
-                        const affiliateData = await getAffiliateCode(
+                        const affiliateData = await getRefCode(
                             referrer.referrer_identifier as string,
                             UserIdentifierType.SolanaAddress,
                         );
@@ -445,9 +445,7 @@ export default function CodeTabs(props: PropsIF) {
         const timer = setTimeout(async () => {
             console.log('Starting validation for code:', temporaryReferrerCode);
             try {
-                const codeIsFree = await isAffiliateCodeFree(
-                    temporaryReferrerCode,
-                );
+                const codeIsFree = await isRefCodeFree(temporaryReferrerCode);
                 console.log('codeIsFree: ', codeIsFree);
                 const options = {
                     method: 'GET',
