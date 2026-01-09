@@ -131,7 +131,7 @@ export default function EnterCode(props: PropsIF) {
                     <p>
                         <Trans
                             i18nKey='referrals.doNotSelfRefer'
-                            values={{ affiliateCode: userInputRefCode }}
+                            values={{ refCode: userInputRefCode }}
                             components={[
                                 <span style={{ color: 'var(--accent2)' }} />,
                             ]}
