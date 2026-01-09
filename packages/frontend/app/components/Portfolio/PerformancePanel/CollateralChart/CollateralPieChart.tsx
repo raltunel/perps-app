@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import React, { useEffect, useMemo } from 'react';
 import Button from '~/components/Button/Button';
 import styles from './CollateralPieChart.module.css';
+import useMediaQuery from '~/hooks/useMediaQuery';
 
 type PieData = { label: string; value: number };
 
@@ -14,6 +15,7 @@ type PieChartProps = {
 const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     const { t } = useTranslation();
     const { height, width } = props;
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     const chartHeight = height || 150;
 
@@ -103,7 +105,11 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
                 <div className={styles.dataLabel}>
                     <canvas
                         id='pie-canvas'
-                        width={Math.max(Math.min(chartHeight, 250), 100)}
+                        width={
+                            isMobile
+                                ? '200px'
+                                : Math.max(Math.min(chartHeight, 250), 100)
+                        }
                         height={Math.max(Math.min(chartHeight, 250), 100)}
                     ></canvas>
                 </div>
