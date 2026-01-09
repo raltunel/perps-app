@@ -41,23 +41,23 @@ export default function EnterCode(props: PropsIF) {
 
     const { t } = useTranslation();
 
-    const spinner = (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-            }}
-        >
-            <FaSpinner
-                style={{
-                    color: 'var(--accent1)',
-                    animation: 'spin 0.6s linear infinite',
-                }}
-            />
-        </div>
-    );
+    // const spinner = (
+    //     <div
+    //         style={{
+    //             display: 'flex',
+    //             justifyContent: 'center',
+    //             alignItems: 'center',
+    //             height: '100%',
+    //         }}
+    //     >
+    //         <FaSpinner
+    //             style={{
+    //                 color: 'var(--accent1)',
+    //                 animation: 'spin 0.6s linear infinite',
+    //             }}
+    //         />
+    //     </div>
+    // );
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -71,8 +71,8 @@ export default function EnterCode(props: PropsIF) {
                         <p className={styles.ref_code_blurb}>
                             Associating a code with your wallet address will
                             register you to earn rewards on your transactions.
-                            Rewards will also be paid to the affiliate who
-                            created the code.
+                            Rewards will also be paid to the user who created
+                            the code.
                         </p>
                         {isCachedValueValid === false && (
                             <p>

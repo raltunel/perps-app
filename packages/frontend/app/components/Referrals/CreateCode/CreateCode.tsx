@@ -15,7 +15,7 @@ interface PropsIF {
     temporaryReferrerCode: string;
     setTemporaryReferrerCode: (value: string) => void;
     isTemporaryReferrerCodeValid: boolean | undefined;
-    tempAffiliateCodeCharsValidate: boolean;
+    tempRefCodeCharsValidate: boolean;
     canEditReferrerCode: boolean;
     defaultReferrerCode: string;
     trackingLink: string;
@@ -24,11 +24,11 @@ interface PropsIF {
     copy: (text: string) => void;
     totVolume: number | undefined;
     totVolumeFormatted: string;
-    affiliateEditVolumeThreshold: number;
+    referrerEditVolumeThreshold: number;
     referrerPercent: string;
     inviteePercent: string;
-    createAffiliateCode: () => Promise<void>;
-    updateAffiliateCode: () => Promise<void>;
+    createRefCode: () => Promise<void>;
+    updateRefCode: () => Promise<void>;
 }
 
 export default function CreateCode(props: PropsIF) {
@@ -40,7 +40,7 @@ export default function CreateCode(props: PropsIF) {
         temporaryReferrerCode,
         setTemporaryReferrerCode,
         isTemporaryReferrerCodeValid,
-        tempAffiliateCodeCharsValidate,
+        tempRefCodeCharsValidate,
         canEditReferrerCode,
         defaultReferrerCode,
         trackingLink,
@@ -49,11 +49,11 @@ export default function CreateCode(props: PropsIF) {
         copy,
         totVolume,
         totVolumeFormatted,
-        affiliateEditVolumeThreshold,
+        referrerEditVolumeThreshold,
         referrerPercent,
         inviteePercent,
-        createAffiliateCode,
-        updateAffiliateCode,
+        createRefCode,
+        updateRefCode,
     } = props;
 
     const { t } = useTranslation();
@@ -130,7 +130,7 @@ export default function CreateCode(props: PropsIF) {
                     <VolumeProgressBar
                         volume={totVolume ?? 0}
                         volumeFormatted={totVolumeFormatted}
-                        barWidth={affiliateEditVolumeThreshold}
+                        barWidth={referrerEditVolumeThreshold}
                     />
                     <p className={styles.trackingLinkExplanation}>
                         {t('common.seeDocsForMore')}
@@ -162,7 +162,7 @@ export default function CreateCode(props: PropsIF) {
                             value={temporaryReferrerCode}
                             onChange={(e) => {
                                 console.log(
-                                    'Affiliate code input changed:',
+                                    'Referral code input changed:',
                                     e.target.value,
                                 );
                                 setTemporaryReferrerCode(e.target.value);
@@ -173,8 +173,8 @@ export default function CreateCode(props: PropsIF) {
                                     temporaryReferrerCode.trim()
                                 ) {
                                     editModeReferrer
-                                        ? updateAffiliateCode()
-                                        : createAffiliateCode();
+                                        ? updateRefCode()
+                                        : createRefCode();
                                 }
                             }}
                         />
@@ -182,7 +182,7 @@ export default function CreateCode(props: PropsIF) {
                             {temporaryReferrerCode.length > 0 ? (
                                 temporaryReferrerCode.length >= 2 &&
                                 temporaryReferrerCode.length <= 30 &&
-                                tempAffiliateCodeCharsValidate ? (
+                                tempRefCodeCharsValidate ? (
                                     <FaCheck size={10} color='var(--green)' />
                                 ) : (
                                     <GiCancel size={10} color='var(--red)' />
@@ -233,7 +233,7 @@ export default function CreateCode(props: PropsIF) {
                 <VolumeProgressBar
                     volume={totVolume ?? 0}
                     volumeFormatted={totVolumeFormatted}
-                    barWidth={affiliateEditVolumeThreshold}
+                    barWidth={referrerEditVolumeThreshold}
                 />
             </div>
             <div className={styles.refferal_code_buttons}>
@@ -241,9 +241,9 @@ export default function CreateCode(props: PropsIF) {
                     bg='accent1'
                     onClick={() => {
                         if (editModeReferrer && canEditReferrerCode) {
-                            void updateAffiliateCode();
+                            void updateRefCode();
                         } else {
-                            void createAffiliateCode();
+                            void createRefCode();
                         }
                     }}
                 >

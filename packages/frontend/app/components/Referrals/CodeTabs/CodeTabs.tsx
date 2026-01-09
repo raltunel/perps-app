@@ -263,19 +263,19 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [narrowScreenForCopy]);
 
-    const prevAffiliateAddress = useRef<string | undefined>(undefined);
+    const prevReferrerAddress = useRef<string | undefined>(undefined);
 
-    // reset temporary affiliate code when changing wallets
+    // reset temporary ref code when changing wallets
     useEffect(() => {
         // Only clear when switching between different wallets, not on initial connect
         if (
-            prevAffiliateAddress.current &&
-            prevAffiliateAddress.current !== referrerAddress?.toString()
+            prevReferrerAddress.current &&
+            prevReferrerAddress.current !== referrerAddress?.toString()
         ) {
             setTemporaryReferrerCode('');
             referralStore.clear();
         }
-        prevAffiliateAddress.current = referrerAddress?.toString();
+        prevReferrerAddress.current = referrerAddress?.toString();
     }, [referrerAddress]);
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
@@ -374,7 +374,7 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
 
-    const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
+    const tempRefCodeCharsValidate = useMemo<boolean>(() => {
         return checkForPermittedCharacters(temporaryReferrerCode);
     }, [temporaryReferrerCode]);
 
@@ -385,13 +385,13 @@ export default function CodeTabs(props: PropsIF) {
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
-                const affiliateData = await getRefCode(
+                const referrerData = await getRefCode(
                     userWalletKey.toString(),
                     UserIdentifierType.SolanaAddress,
                 );
 
-                if (affiliateData?.code) {
-                    setReferrerCode(affiliateData.code);
+                if (referrerData?.code) {
+                    setReferrerCode(referrerData.code);
                 }
 
                 // Only fetch and apply on-chain referrer if no URL parameter is present
@@ -401,12 +401,12 @@ export default function CodeTabs(props: PropsIF) {
                         userWalletKey.toString(),
                     );
                     if (referrer?.referrer_identifier) {
-                        const affiliateData = await getRefCode(
+                        const referrerData = await getRefCode(
                             referrer.referrer_identifier as string,
                             UserIdentifierType.SolanaAddress,
                         );
-                        if (affiliateData?.code) {
-                            handleUpdateReferralCode(affiliateData.code);
+                        if (referrerData?.code) {
+                            handleUpdateReferralCode(referrerData.code);
                         }
                     }
                 }
@@ -436,7 +436,7 @@ export default function CodeTabs(props: PropsIF) {
         }
 
         // Don't check API if characters are invalid
-        if (!tempAffiliateCodeCharsValidate) {
+        if (!tempRefCodeCharsValidate) {
             setIsTemporaryReferrerCodeValid(undefined);
             return;
         }
@@ -472,14 +472,10 @@ export default function CodeTabs(props: PropsIF) {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [
-        temporaryReferrerCode,
-        tempAffiliateCodeCharsValidate,
-        canEditReferrerCode,
-    ]);
+    }, [temporaryReferrerCode, tempRefCodeCharsValidate, canEditReferrerCode]);
 
-    // fn to create an affiliate code for the wallet
-    const createAffiliateCode = async () => {
+    // fn to create a referral code for the wallet
+    const createRefCode = async () => {
         try {
             // Get the user's wallet address from the session
             // @ts-ignore - The session type might not be fully typed
@@ -525,7 +521,7 @@ export default function CodeTabs(props: PropsIF) {
                     );
                     const signature = btoa(binaryString);
 
-                    // Call the Fuul SDK to create the affiliate code
+                    // Call the Fuul SDK to create the referral code
                     await Fuul.createAffiliateCode({
                         userIdentifier: userWalletKey.toString(),
                         identifierType: UserIdentifierType.SolanaAddress,
@@ -541,13 +537,13 @@ export default function CodeTabs(props: PropsIF) {
                 }
             }
         } catch (error) {
-            console.error('Error creating affiliate code:', error);
+            console.error('Error creating referral code:', error);
             // Handle error (e.g., show error message to user)
         }
     };
 
-    // fn to update the existing affiliate code for the wallet
-    const updateAffiliateCode = async () => {
+    // fn to update the existing referral code for the wallet
+    const updateRefCode = async () => {
         try {
             if (!canEditReferrerCode) {
                 return;
@@ -601,14 +597,14 @@ export default function CodeTabs(props: PropsIF) {
                 setEditModeReferrer(false);
             }
         } catch (error) {
-            console.error('Error updating affiliate code:', error);
+            console.error('Error updating referral code:', error);
         }
     };
 
-    // tracking link URL for the wallet's affiliate code
+    // tracking link URL for the wallet's referral code
     const [trackingLink, setTrackingLink] = useState('');
 
-    // reset affiliate address input when user changes wallet
+    // reset referrer address input when user changes wallet
     useEffect(() => setTemporaryReferrerCode(''), [referrerAddress]);
 
     useEffect(() => {
@@ -688,7 +684,7 @@ export default function CodeTabs(props: PropsIF) {
                         setInvalidCode={setInvalidCode}
                     />
                 );
-            // handlers for creating an affiliate code
+            // handlers for creating a referral code
             case 'referrals.createCode':
             case 'common.create':
                 // Show spinner while fetching (undefined or true)
@@ -709,9 +705,7 @@ export default function CodeTabs(props: PropsIF) {
                         isTemporaryReferrerCodeValid={
                             isTemporaryReferrerCodeValid
                         }
-                        tempAffiliateCodeCharsValidate={
-                            tempAffiliateCodeCharsValidate
-                        }
+                        tempRefCodeCharsValidate={tempRefCodeCharsValidate}
                         canEditReferrerCode={canEditReferrerCode}
                         defaultReferrerCode={defaultReferrerCode}
                         trackingLink={trackingLink}
@@ -725,13 +719,13 @@ export default function CodeTabs(props: PropsIF) {
                             true,
                             true,
                         )}
-                        affiliateEditVolumeThreshold={
+                        referrerEditVolumeThreshold={
                             REFERRER_EDIT_VOLUME_THRESHOLD
                         }
                         referrerPercent={REFERRER_PERCENT}
                         inviteePercent={INVITEE_PERCENT}
-                        createAffiliateCode={createAffiliateCode}
-                        updateAffiliateCode={updateAffiliateCode}
+                        createRefCode={createRefCode}
+                        updateRefCode={updateRefCode}
                     />
                 );
             // handlers for claiming rewards
