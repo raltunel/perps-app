@@ -12,6 +12,10 @@ import { TableState } from '~/utils/CommonIFs';
 interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
+    setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => void;
+    setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) => void;
+    selectedResolution: OrderRowResolutionIF | null;
+    selectedMode: OrderBookMode;
     orderBook: OrderBookRowIF[];
     setOrderBook: (
         buys: OrderBookRowIF[],

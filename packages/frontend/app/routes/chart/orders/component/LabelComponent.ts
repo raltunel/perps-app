@@ -1129,7 +1129,10 @@ const LabelComponent = ({
 
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
+                    // dev branch
                     overlayCanvasRef.current.style.cursor = cursorText;
+
+                    // liq overlay branch
                     overlayCanvasRef.current.style.cursor = 'pointer';
 
                     overlayCanvasRef.current.style.pointerEvents = 'none';

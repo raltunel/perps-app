@@ -180,6 +180,7 @@ export default function Trade() {
     // after your hydrated state
     const [layoutMeasured, setLayoutMeasured] = useState(false);
     const [panelReady, setPanelReady] = useState(false);
+
     const { debugToolbarOpen, setDebugToolbarOpen, liquidationsActive } =
         useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);

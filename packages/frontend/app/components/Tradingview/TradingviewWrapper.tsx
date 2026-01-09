@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
-import { useAppStateStore } from '~/stores/AppStateStore';
 import LiquidationOverlayCanvas from '~/routes/chart/overlayCanvas/LiqudationOverlayCanvas';
 import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
-import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
 import LiquidationChartOptions from '~/routes/trade/liquidationsChart/LiquidationChartOptions';
+import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
 
 const TradingViewWrapper: React.FC = () => {
     const { liquidationsActive } = useAppStateStore();

@@ -39,7 +39,6 @@ export const useAppStateStore = create<AppStateStore>()(
                 }
             },
             lastOnlineAt: 0,
-            titleOverride: '',
             setTitleOverride: (titleOverride: string) => set({ titleOverride }),
             isWsStashed: false,
             setIsWsStashed: (isWsStashed: boolean) => set({ isWsStashed }),
@@ -49,17 +48,17 @@ export const useAppStateStore = create<AppStateStore>()(
             debugToolbarOpen: false,
             setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
                 set({ debugToolbarOpen }),
-            isTabActive: true,
-            setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
             liquidationsActive: true,
             setLiquidationsActive: (liquidationsActive: boolean) =>
                 set({ liquidationsActive }),
+            isTabActive: true,
+            setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
         }),
         {
             name: 'APP_STATE',
             storage: createJSONStorage(() => localStorage),
             version: 1,
-            partialize: (state) => ({
+            partialize: (state: AppStateStore) => ({
                 debugToolbarOpen: state.debugToolbarOpen,
             }),
         },
