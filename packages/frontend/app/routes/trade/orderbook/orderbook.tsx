@@ -328,14 +328,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
     const focusedPriceRef = useRef<number | null>(null);
-    const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) => {
-            setOrderBook(data.buys, data.sells);
-            setOrderBookState(TableState.FILLED);
-            filledResolution.current = selectedResolution;
-        },
-        [selectedResolution, setOrderBook, setOrderBookState],
-    );
     // code blocks were being used in sdk approach
 
     useEffect(() => {

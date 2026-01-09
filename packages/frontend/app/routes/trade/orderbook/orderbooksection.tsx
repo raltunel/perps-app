@@ -32,6 +32,8 @@ export default function OrderBookSection(props: propsIF) {
     const { orderBookMode, setOrderBookMode } = useAppSettings();
     const { orderCount, setOrderCount, setActiveOrderTab } =
         useOrderBookStore();
+    const orderCountRef = useRef(orderCount);
+    orderCountRef.current = orderCount;
     const orderBookModeRef = useRef(orderBookMode);
 
     const { liquidationsActive } = useAppStateStore();
@@ -186,10 +188,9 @@ export default function OrderBookSection(props: propsIF) {
 
         // Only update if we have a valid positive count
         if (calculatedOrderCount > 0) {
-            setOrderCount((prev) => {
-                if (prev !== calculatedOrderCount) return calculatedOrderCount;
-                return prev;
-            });
+            if (orderCountRef.current !== calculatedOrderCount) {
+                setOrderCount(calculatedOrderCount);
+            }
         }
     }, [orderBookMode, activeTab]);
 

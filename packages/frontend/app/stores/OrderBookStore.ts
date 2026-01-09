@@ -22,10 +22,6 @@ interface OrderBookStore {
         sells: OrderBookRowIF[],
         setMid?: boolean,
     ) => void;
-    setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => void;
-    setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) => void;
-    selectedResolution: OrderRowResolutionIF | null;
-    selectedMode: OrderBookMode;
     orderBookState: TableState;
     setSelectedResolution: (resolution: OrderRowResolutionIF | null) => void;
     setSelectedMode: (mode: OrderBookMode) => void;

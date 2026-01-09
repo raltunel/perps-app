@@ -24,7 +24,7 @@ type AppStateStore = {
 
 export const useAppStateStore = create<AppStateStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             wsReconnecting: false,
             setWsReconnecting: (wsReconnecting: boolean) =>
                 set({ wsReconnecting }),
@@ -39,6 +39,7 @@ export const useAppStateStore = create<AppStateStore>()(
                 }
             },
             lastOnlineAt: 0,
+            titleOverride: '',
             setTitleOverride: (titleOverride: string) => set({ titleOverride }),
             isWsStashed: false,
             setIsWsStashed: (isWsStashed: boolean) => set({ isWsStashed }),
