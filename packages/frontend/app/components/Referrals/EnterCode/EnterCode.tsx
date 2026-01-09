@@ -11,8 +11,8 @@ interface PropsIF {
     cached: string;
     isCachedValueValid: boolean | undefined;
     refCodeToConsume: string | undefined;
-    editModeReferral: boolean;
-    setEditModeReferral: (value: boolean) => void;
+    editModeInvitee: boolean;
+    setEditModeInvitee: (value: boolean) => void;
     userInputRefCode: string;
     setUserInputRefCode: (value: string) => void;
     isUserRefCodeClaimed: boolean | undefined;
@@ -29,8 +29,8 @@ export default function EnterCode(props: PropsIF) {
         cached,
         isCachedValueValid,
         refCodeToConsume,
-        editModeReferral,
-        setEditModeReferral,
+        editModeInvitee,
+        setEditModeInvitee,
         userInputRefCode,
         setUserInputRefCode,
         isUserRefCodeClaimed,
@@ -89,7 +89,7 @@ export default function EnterCode(props: PropsIF) {
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
                         bg='accent1'
-                        onClick={() => setEditModeReferral(true)}
+                        onClick={() => setEditModeInvitee(true)}
                     >
                         {t('common.edit')}
                     </SimpleButton>
@@ -159,7 +159,7 @@ export default function EnterCode(props: PropsIF) {
                         bg='dark3'
                         hoverBg='accent1'
                         onClick={() => {
-                            setEditModeReferral(false);
+                            setEditModeInvitee(false);
                             setInvalidCode('');
                         }}
                     >
@@ -210,7 +210,7 @@ export default function EnterCode(props: PropsIF) {
     }
 
     const shouldShowInput =
-        (editModeReferral || !cached || isCachedValueValid === false) &&
+        (editModeInvitee || !cached || isCachedValueValid === false) &&
         totVolume !== undefined &&
         totVolume < 10000;
 

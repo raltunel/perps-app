@@ -43,45 +43,45 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
-const AFFILIATE_EDIT_VOLUME_THRESHOLD = 1_000_000;
-const DEFAULT_AFFILIATE_CODE_LENGTH = 6;
+const REFERRER_EDIT_VOLUME_THRESHOLD = 1_000_000;
+const DEFAULT_REFERRER_CODE_LENGTH = 6;
 
-// fee amounts for affiliate and the referred user
-const AFFILIATE_PERCENT = '10%';
-const USER_PERCENT = '4%';
+// fee amounts for referrer and the invitee
+const REFERRER_PERCENT = '10%';
+const INVITEE_PERCENT = '4%';
 
 export default function CodeTabs(props: PropsIF) {
     // tab which should be open by default on page load
     const { initialTab = 'referrals.enterCode' } = props;
     // tab which is currently open
     const [activeTab, setActiveTab] = useState(initialTab);
-    // this holds a value for a new affiliate code as the user types
-    const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
-    // determines the validity of the temporary affiliate code
-    const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
+    // this holds a value for a new referrer code as the user types
+    const [temporaryReferrerCode, setTemporaryReferrerCode] = useState('');
+    // determines the validity of the temporary referrer code
+    const [isTemporaryReferrerCodeValid, setIsTemporaryReferrerCodeValid] =
         useState<boolean | undefined>();
-    // affiliate code for use (not temporary during edit mode)
-    const [affiliateCode, setAffiliateCode] = useState('');
+    // referrer code for use (not temporary during edit mode)
+    const [referrerCode, setReferrerCode] = useState('');
     // we need this for FOGO sessions
     const sessionState = useSession();
     // data on the current user (mainly wallet address)
     const userDataStore = useUserDataStore();
-    const affiliateAddress = userDataStore.userAddress;
+    const referrerAddress = userDataStore.userAddress;
     // data on the current referral state (mainly total volume)
     const referralStore = useReferralStore();
-    // default affiliate code is the first 6 characters of the wallet address
-    const defaultAffiliateCode = useMemo(() => {
-        if (!affiliateAddress) return '';
-        return affiliateAddress
+    // default referrer code is the first 6 characters of the wallet address
+    const defaultReferrerCode = useMemo(() => {
+        if (!referrerAddress) return '';
+        return referrerAddress
             .toString()
-            .slice(0, DEFAULT_AFFILIATE_CODE_LENGTH);
-    }, [affiliateAddress]);
+            .slice(0, DEFAULT_REFERRER_CODE_LENGTH);
+    }, [referrerAddress]);
 
-    // boolean representing whether affiliate code has enough volume to be changed
-    const canEditAffiliateCode = useMemo<boolean>(() => {
+    // boolean representing whether referrer code has enough volume to be changed
+    const canEditReferrerCode = useMemo<boolean>(() => {
         return (
             referralStore.totVolume !== undefined &&
-            referralStore.totVolume >= AFFILIATE_EDIT_VOLUME_THRESHOLD
+            referralStore.totVolume >= REFERRER_EDIT_VOLUME_THRESHOLD
         );
     }, [referralStore.totVolume]);
 
@@ -89,9 +89,9 @@ export default function CodeTabs(props: PropsIF) {
     const { t } = useTranslation();
 
     // boolean controlling whether the `enter code` workflow is in edit mode
-    const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
-    // boolean controlling whether the `affiliate code` workflow is in edit mode
-    const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
+    const [editModeInvitee, setEditModeInvitee] = useState<boolean>(false);
+    // boolean controlling whether the `referrer code` workflow is in edit mode
+    const [editModeReferrer, setEditModeReferrer] = useState<boolean>(false);
 
     // boolean representing whether the user has just copied a code, needed to
     // ... prevent multiple copy actions
@@ -104,12 +104,12 @@ export default function CodeTabs(props: PropsIF) {
 
     // update refCodeToConsume whenever the cached value changes
     useEffect(() => {
-        if (referralStore.cached && affiliateAddress) {
+        if (referralStore.cached && referrerAddress) {
             (async () => {
                 const isOwnedByUser: boolean | undefined =
                     await checkIfOwnRefCode(
                         referralStore.cached,
-                        affiliateAddress,
+                        referrerAddress,
                     );
                 isOwnedByUser === false &&
                     setRefCodeToConsume(referralStore.cached);
@@ -117,7 +117,7 @@ export default function CodeTabs(props: PropsIF) {
         } else if (!referralStore.cached) {
             setRefCodeToConsume(undefined);
         }
-    }, [referralStore.cached, affiliateAddress]);
+    }, [referralStore.cached, referrerAddress]);
 
     const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
         boolean | undefined
@@ -162,7 +162,7 @@ export default function CodeTabs(props: PropsIF) {
             referralStore.totVolume !== undefined &&
             referralStore.totVolume < 10000
         ) {
-            setEditModeReferral(true);
+            setEditModeInvitee(true);
         }
     }, [referralStore.cached, referralStore.totVolume]);
 
@@ -218,13 +218,13 @@ export default function CodeTabs(props: PropsIF) {
         if (!codeIsFree) {
             setInvalidCode(r);
             setIsCachedValueValid(false);
-            setEditModeReferral(true);
+            setEditModeInvitee(true);
             setUserInputRefCode(r);
         } else {
             // code is valid and claimed
             invalidCode && setInvalidCode('');
             setIsCachedValueValid(true);
-            setEditModeReferral(false);
+            setEditModeInvitee(false);
         }
         // Update lastValidatedCode to prevent the useEffect from re-validating
         setLastValidatedCode(r);
@@ -270,13 +270,13 @@ export default function CodeTabs(props: PropsIF) {
         // Only clear when switching between different wallets, not on initial connect
         if (
             prevAffiliateAddress.current &&
-            prevAffiliateAddress.current !== affiliateAddress?.toString()
+            prevAffiliateAddress.current !== referrerAddress?.toString()
         ) {
-            setTemporaryAffiliateCode('');
+            setTemporaryReferrerCode('');
             referralStore.clear();
         }
-        prevAffiliateAddress.current = affiliateAddress?.toString();
-    }, [affiliateAddress]);
+        prevAffiliateAddress.current = referrerAddress?.toString();
+    }, [referrerAddress]);
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
@@ -287,8 +287,8 @@ export default function CodeTabs(props: PropsIF) {
 
     // when the user manually enters a refCode, check if the code is owned by their wallet
     useEffect(() => {
-        if (userInputRefCode && affiliateAddress) {
-            checkIfOwnRefCode(userInputRefCode, affiliateAddress.toString())
+        if (userInputRefCode && referrerAddress) {
+            checkIfOwnRefCode(userInputRefCode, referrerAddress.toString())
                 .then((isSelfOwned: boolean | undefined) =>
                     setIsUserInputRefCodeSelfOwned(isSelfOwned),
                 )
@@ -299,7 +299,7 @@ export default function CodeTabs(props: PropsIF) {
         } else {
             setIsUserInputRefCodeSelfOwned(undefined);
         }
-    }, [userInputRefCode, affiliateAddress]);
+    }, [userInputRefCode, referrerAddress]);
 
     // when the user manually enters a refCode, make sure it exists
     useEffect(() => {
@@ -356,18 +356,18 @@ export default function CodeTabs(props: PropsIF) {
                     // Code is not claimed - show in edit mode with error
                     setInvalidCode(codeToValidate);
                     setIsCachedValueValid(false);
-                    setEditModeReferral(true);
+                    setEditModeInvitee(true);
                     setUserInputRefCode(codeToValidate);
                 } else {
                     // Code is valid and claimed
                     setIsCachedValueValid(true);
-                    setEditModeReferral(false);
+                    setEditModeInvitee(false);
                 }
                 setLastValidatedCode(codeToValidate);
             } catch (error) {
                 // On error, assume invalid to be safe
                 setIsCachedValueValid(false);
-                setEditModeReferral(true);
+                setEditModeInvitee(true);
                 setUserInputRefCode(codeToValidate);
                 setLastValidatedCode(codeToValidate);
             }
@@ -375,8 +375,8 @@ export default function CodeTabs(props: PropsIF) {
     }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
 
     const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
-        return checkForPermittedCharacters(temporaryAffiliateCode);
-    }, [temporaryAffiliateCode]);
+        return checkForPermittedCharacters(temporaryReferrerCode);
+    }, [temporaryReferrerCode]);
 
     useEffect(() => {
         (async () => {
@@ -391,7 +391,7 @@ export default function CodeTabs(props: PropsIF) {
                 );
 
                 if (affiliateData?.code) {
-                    setAffiliateCode(affiliateData.code);
+                    setReferrerCode(affiliateData.code);
                 }
 
                 // Only fetch and apply on-chain referrer if no URL parameter is present
@@ -411,45 +411,42 @@ export default function CodeTabs(props: PropsIF) {
                     }
                 }
             } else {
-                setAffiliateCode('');
+                setReferrerCode('');
             }
         })();
     }, [sessionState]);
 
     useEffect(() => {
-        if (!canEditAffiliateCode) {
-            setTemporaryAffiliateCode(defaultAffiliateCode);
+        if (!canEditReferrerCode) {
+            setTemporaryReferrerCode(defaultReferrerCode);
         }
-    }, [canEditAffiliateCode, defaultAffiliateCode]);
+    }, [canEditReferrerCode, defaultReferrerCode]);
 
     useEffect(() => {
-        if (!canEditAffiliateCode && editModeAffiliate) {
-            setEditModeAffiliate(false);
+        if (!canEditReferrerCode && editModeReferrer) {
+            setEditModeReferrer(false);
         }
-    }, [canEditAffiliateCode, editModeAffiliate]);
+    }, [canEditReferrerCode, editModeReferrer]);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
-        if (!temporaryAffiliateCode) {
-            setIsTemporaryAffiliateCodeValid(undefined);
+        if (!temporaryReferrerCode) {
+            setIsTemporaryReferrerCodeValid(undefined);
             return;
         }
 
         // Don't check API if characters are invalid
         if (!tempAffiliateCodeCharsValidate) {
-            setIsTemporaryAffiliateCodeValid(undefined);
+            setIsTemporaryReferrerCodeValid(undefined);
             return;
         }
 
         // Set up debounced validation
         const timer = setTimeout(async () => {
-            console.log(
-                'Starting validation for code:',
-                temporaryAffiliateCode,
-            );
+            console.log('Starting validation for code:', temporaryReferrerCode);
             try {
                 const codeIsFree = await isAffiliateCodeFree(
-                    temporaryAffiliateCode,
+                    temporaryReferrerCode,
                 );
                 console.log('codeIsFree: ', codeIsFree);
                 const options = {
@@ -463,24 +460,24 @@ export default function CodeTabs(props: PropsIF) {
 
                 fetch(
                     'https://api.fuul.xyz/api/v1/referral_codes/' +
-                        temporaryAffiliateCode,
+                        temporaryReferrerCode,
                     options,
                 )
                     .then((res) => res.json())
                     .then((res) => console.log(res))
                     .catch((err) => console.error(err));
-                setIsTemporaryAffiliateCodeValid(!codeIsFree);
+                setIsTemporaryReferrerCodeValid(!codeIsFree);
             } catch (error) {
                 console.log('Validation error:', error);
-                setIsTemporaryAffiliateCodeValid(false);
+                setIsTemporaryReferrerCodeValid(false);
             }
         }, 500);
 
         return () => clearTimeout(timer);
     }, [
-        temporaryAffiliateCode,
+        temporaryReferrerCode,
         tempAffiliateCodeCharsValidate,
-        canEditAffiliateCode,
+        canEditReferrerCode,
     ]);
 
     // fn to create an affiliate code for the wallet
@@ -497,9 +494,9 @@ export default function CodeTabs(props: PropsIF) {
                     return;
                 }
 
-                const codeToCreate = canEditAffiliateCode
-                    ? temporaryAffiliateCode.trim()
-                    : defaultAffiliateCode;
+                const codeToCreate = canEditReferrerCode
+                    ? temporaryReferrerCode.trim()
+                    : defaultReferrerCode;
 
                 if (!codeToCreate) {
                     return;
@@ -539,8 +536,8 @@ export default function CodeTabs(props: PropsIF) {
                         code: codeToCreate,
                     });
 
-                    setTemporaryAffiliateCode('');
-                    setAffiliateCode(codeToCreate);
+                    setTemporaryReferrerCode('');
+                    setReferrerCode(codeToCreate);
                 } catch (error) {
                     throw error;
                 }
@@ -554,7 +551,7 @@ export default function CodeTabs(props: PropsIF) {
     // fn to update the existing affiliate code for the wallet
     const updateAffiliateCode = async () => {
         try {
-            if (!canEditAffiliateCode) {
+            if (!canEditReferrerCode) {
                 return;
             }
 
@@ -567,7 +564,7 @@ export default function CodeTabs(props: PropsIF) {
                     return;
                 }
 
-                const codeToUpdate = temporaryAffiliateCode.trim();
+                const codeToUpdate = temporaryReferrerCode.trim();
 
                 if (!codeToUpdate) {
                     return;
@@ -601,9 +598,9 @@ export default function CodeTabs(props: PropsIF) {
                     code: codeToUpdate,
                 });
 
-                setAffiliateCode(codeToUpdate);
-                setTemporaryAffiliateCode('');
-                setEditModeAffiliate(false);
+                setReferrerCode(codeToUpdate);
+                setTemporaryReferrerCode('');
+                setEditModeReferrer(false);
             }
         } catch (error) {
             console.error('Error updating affiliate code:', error);
@@ -614,19 +611,19 @@ export default function CodeTabs(props: PropsIF) {
     const [trackingLink, setTrackingLink] = useState('');
 
     // reset affiliate address input when user changes wallet
-    useEffect(() => setTemporaryAffiliateCode(''), [affiliateAddress]);
+    useEffect(() => setTemporaryReferrerCode(''), [referrerAddress]);
 
     useEffect(() => {
         (async () => {
-            if (!affiliateCode || !affiliateAddress) return '';
+            if (!referrerCode || !referrerAddress) return '';
             const trackingLinkUrl = await Fuul.generateTrackingLink(
                 window.location.hostname,
-                affiliateAddress.toString(),
+                referrerAddress.toString(),
                 UserIdentifierType.SolanaAddress,
             );
             setTrackingLink(trackingLinkUrl);
         })();
-    }, [affiliateCode]);
+    }, [referrerCode]);
 
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
@@ -681,8 +678,8 @@ export default function CodeTabs(props: PropsIF) {
                         cached={referralStore.cached}
                         isCachedValueValid={isCachedValueValid}
                         refCodeToConsume={refCodeToConsume}
-                        editModeReferral={editModeReferral}
-                        setEditModeReferral={setEditModeReferral}
+                        editModeInvitee={editModeInvitee}
+                        setEditModeInvitee={setEditModeInvitee}
                         userInputRefCode={userInputRefCode}
                         setUserInputRefCode={setUserInputRefCode}
                         isUserRefCodeClaimed={isUserRefCodeClaimed}
@@ -706,19 +703,19 @@ export default function CodeTabs(props: PropsIF) {
                 return (
                     <CreateCode
                         isSessionEstablished={isSessionEstablished}
-                        affiliateCode={affiliateCode}
-                        editModeAffiliate={editModeAffiliate}
-                        setEditModeAffiliate={setEditModeAffiliate}
-                        temporaryAffiliateCode={temporaryAffiliateCode}
-                        setTemporaryAffiliateCode={setTemporaryAffiliateCode}
-                        isTemporaryAffiliateCodeValid={
-                            isTemporaryAffiliateCodeValid
+                        referrerCode={referrerCode}
+                        editModeReferrer={editModeReferrer}
+                        setEditModeReferrer={setEditModeReferrer}
+                        temporaryReferrerCode={temporaryReferrerCode}
+                        setTemporaryReferrerCode={setTemporaryReferrerCode}
+                        isTemporaryReferrerCodeValid={
+                            isTemporaryReferrerCodeValid
                         }
                         tempAffiliateCodeCharsValidate={
                             tempAffiliateCodeCharsValidate
                         }
-                        canEditAffiliateCode={canEditAffiliateCode}
-                        defaultAffiliateCode={defaultAffiliateCode}
+                        canEditReferrerCode={canEditReferrerCode}
+                        defaultReferrerCode={defaultReferrerCode}
                         trackingLink={trackingLink}
                         justCopied={justCopied}
                         setJustCopied={setJustCopied}
@@ -731,10 +728,10 @@ export default function CodeTabs(props: PropsIF) {
                             true,
                         )}
                         affiliateEditVolumeThreshold={
-                            AFFILIATE_EDIT_VOLUME_THRESHOLD
+                            REFERRER_EDIT_VOLUME_THRESHOLD
                         }
-                        affiliatePercent={AFFILIATE_PERCENT}
-                        userPercent={USER_PERCENT}
+                        referrerPercent={REFERRER_PERCENT}
+                        inviteePercent={INVITEE_PERCENT}
                         createAffiliateCode={createAffiliateCode}
                         updateAffiliateCode={updateAffiliateCode}
                     />
@@ -758,10 +755,10 @@ export default function CodeTabs(props: PropsIF) {
                 tabs={avTabs}
                 defaultTab={activeTab}
                 onTabChange={(tab: string) => {
-                    if (affiliateCode) {
-                        setEditModeAffiliate(false);
+                    if (referrerCode) {
+                        setEditModeReferrer(false);
                     }
-                    setTemporaryAffiliateCode('');
+                    setTemporaryReferrerCode('');
                     setActiveTab(tab);
                 }}
                 wrapperId='codeTabs'
