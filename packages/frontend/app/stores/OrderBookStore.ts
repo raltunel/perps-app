@@ -12,12 +12,17 @@ import { TableState } from '~/utils/CommonIFs';
 interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
+    orderBook: OrderBookRowIF[];
+    setOrderBook: (
+        buys: OrderBookRowIF[],
+        sells: OrderBookRowIF[],
+        setMid?: boolean,
+    ) => void;
     setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => void;
     setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) => void;
     selectedResolution: OrderRowResolutionIF | null;
     selectedMode: OrderBookMode;
     orderBookState: TableState;
-    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => void;
     setSelectedResolution: (resolution: OrderRowResolutionIF | null) => void;
     setSelectedMode: (mode: OrderBookMode) => void;
     setOrderBookState: (state: TableState) => void;
@@ -34,6 +39,10 @@ interface OrderBookStore {
         symbol: string,
         resolutionPair: OrderRowResolutionIF,
     ) => void;
+    midPrice: number | null;
+    setMidPrice: (midPrice: number) => void;
+    usualResolution: OrderRowResolutionIF | null;
+    setUsualResolution: (resolution: OrderRowResolutionIF) => void;
 
     hrBuys: OrderBookRowIF[];
     hrSells: OrderBookRowIF[];
@@ -59,12 +68,23 @@ export const useOrderBookStore = create<OrderBookStore>()(
             selectedMode: 'symbol',
             orderBookState: TableState.LOADING,
             trades: [],
-            setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => {
-                // const highResBuys = interpolateOrderBookData(buys);
-                // const highResSells = interpolateOrderBookData(sells);
-                // const { liqBuys, liqSells } = createRandomOrderBookLiq(buys, sells);
-                // set({ buys, sells, highResBuys, highResSells, liqBuys, liqSells });
-                set({ buys, sells });
+            setOrderBook: (
+                buys: OrderBookRowIF[],
+                sells: OrderBookRowIF[],
+                setMid?: boolean,
+            ) => {
+                if (setMid) {
+                    set({
+                        buys: buys,
+                        sells: sells,
+                        midPrice: (buys[0].px + sells[0].px) / 2,
+                    });
+                } else {
+                    set({
+                        buys,
+                        sells,
+                    });
+                }
             },
             setSelectedResolution: (
                 selectedResolution: OrderRowResolutionIF | null,
@@ -90,6 +110,11 @@ export const useOrderBookStore = create<OrderBookStore>()(
                     },
                 })),
             resolutionPairs: {},
+            midPrice: null,
+            setMidPrice: (midPrice: number) => set({ midPrice }),
+            usualResolution: null,
+            setUsualResolution: (resolution: OrderRowResolutionIF) =>
+                set({ usualResolution: resolution }),
             hrBuys: [],
             hrSells: [],
             setHrBuys: (hrBuys: OrderBookRowIF[]) => set({ hrBuys }),
