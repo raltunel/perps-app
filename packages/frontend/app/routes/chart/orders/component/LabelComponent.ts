@@ -1028,7 +1028,6 @@ const LabelComponent = ({
                 isValidMatchType &&
                 isLabel.label?.type !== 'Cancel' &&
                 (isLabel.parentLine.type === 'LIMIT' ||
-                    isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                     (isLabel.parentLine.type === 'LIQ' &&
                         isLiqPriceLineDraggable));
 
@@ -1122,9 +1121,8 @@ const LabelComponent = ({
                 updateYPosition(
                     dragStateRef.current.tempSelectedLine.parentLine.yPrice,
                 );
-            } else {
-                setActiveDragLine(dragStateRef.current.tempSelectedLine);
             }
+            setActiveDragLine(dragStateRef.current.tempSelectedLine);
 
             if (isMobile && dragStateRef.current.tempSelectedLine) {
                 setSelectedOrderLine({

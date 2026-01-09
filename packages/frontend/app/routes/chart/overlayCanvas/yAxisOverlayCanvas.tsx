@@ -43,12 +43,19 @@ const YAxisOverlayCanvas: React.FC = () => {
     const openOrderLines = useOpenOrderLines();
     const positionOrderLines = usePositionOrderLines();
 
-    const { selectedOrderLine } = useChartLinesStore();
+    const { selectedOrderLine, setSelectedOrderLine } = useChartLinesStore();
+    const localSelectedOrderLineRef = useRef(selectedOrderLine);
     const isMobile = useMobile();
     const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
 
+    const draggablePrice = useMemo(() => {
+        return isMobile && selectedOrderLine
+            ? selectedOrderLine.yPrice
+            : orderInputPriceValue.value;
+    }, [isMobile, selectedOrderLine, orderInputPriceValue.value]);
+
     const labelAnalysis = useMemo(() => {
-        if (!orderInputPriceValue.value || !chart) return null;
+        if (!draggablePrice || !chart) return null;
 
         const closePrice = lastCandle?.close || markPx;
         const scaleData = scaleDataRef.current;
@@ -73,8 +80,8 @@ const YAxisOverlayCanvas: React.FC = () => {
         ].filter((price) => price > 0);
 
         const orderPricePixel = isLogarithmic
-            ? scaleData.scaleSymlog(orderInputPriceValue.value)
-            : scaleData.yScale(orderInputPriceValue.value);
+            ? scaleData.scaleSymlog(draggablePrice)
+            : scaleData.yScale(draggablePrice);
 
         type LabelInfo = {
             price: number;
@@ -93,7 +100,7 @@ const YAxisOverlayCanvas: React.FC = () => {
                 isClosePrice: price === closePrice,
             })),
             {
-                price: orderInputPriceValue.value,
+                price: draggablePrice,
                 pixel: orderPricePixel,
                 isOrderLabel: true,
                 isClosePrice: false,
@@ -171,7 +178,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             closePrice,
         };
     }, [
-        orderInputPriceValue.value,
+        draggablePrice,
         lastCandle?.close,
         markPx,
         openOrderLines,
@@ -179,6 +186,10 @@ const YAxisOverlayCanvas: React.FC = () => {
         chart,
         JSON.stringify(scaleDataRef?.current?.yScale.domain()),
     ]);
+
+    useEffect(() => {
+        localSelectedOrderLineRef.current = selectedOrderLine;
+    }, [selectedOrderLine]);
 
     useEffect(() => {
         if (!chart) return;
@@ -371,7 +382,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             !canvasRef.current ||
             !chart ||
             isDrag ||
-            !orderInputPriceValue.value ||
+            !draggablePrice ||
             !labelAnalysis
         )
             return;
@@ -382,10 +393,11 @@ const YAxisOverlayCanvas: React.FC = () => {
         const originalPixel = orderLabel.pixel;
         const originalPrice = orderLabel.price;
         const tolerance = 10;
-        const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
+        const pixelToCheck = isMobile ? originalPixel : adjustedPixel;
+        const isNearOrderPrice = Math.abs(mouseY - pixelToCheck) <= tolerance;
 
-        let isNearClosePrice = false;
         const closePriceLabel = allLabels.find((l) => l.isClosePrice);
+        let isNearClosePrice = false;
 
         const localIsMidModeActivePixel = closePriceLabel
             ? Math.abs(originalPixel - closePriceLabel.adjustedPixel) <=
@@ -397,23 +409,27 @@ const YAxisOverlayCanvas: React.FC = () => {
             Math.abs(closePrice - originalPrice) / closePrice <=
             PRICE_TOLERANCE_RATIO;
 
-        if (
-            isMidModeActive ||
-            (localIsMidModeActive && localIsMidModeActivePixel)
-        ) {
-            if (closePriceLabel) {
-                isNearClosePrice =
-                    Math.abs(mouseY - closePriceLabel.adjustedPixel) <=
-                    tolerance;
+        if (!isMobile) {
+            if (
+                isMidModeActive ||
+                (localIsMidModeActive && localIsMidModeActivePixel)
+            ) {
+                if (closePriceLabel) {
+                    isNearClosePrice =
+                        Math.abs(mouseY - closePriceLabel.adjustedPixel) <=
+                        tolerance;
+                }
             }
         }
 
         const isDraggable = isNearOrderPrice || isNearClosePrice;
         isNearOrderPriceRef.current = isDraggable;
 
-        useTradeDataStore.getState().setIsPreviewOrderHovered(isDraggable);
+        if (!isMobile) {
+            useTradeDataStore.getState().setIsPreviewOrderHovered(isDraggable);
+        }
 
-        if (isDraggable) {
+        if (isDraggable || (isMobile && draggablePrice)) {
             canvas.style.cursor = 'grab';
             canvas.style.pointerEvents = 'auto';
         } else {
@@ -422,7 +438,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         }
     }, [
         mouseY,
-        orderInputPriceValue.value,
+        draggablePrice,
         chart,
         isDrag,
         symbol,
@@ -437,8 +453,13 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
-            dragPriceRef.current = orderInputPriceValue.value;
-            dragStartPriceRef.current = orderInputPriceValue.value;
+            const initialPrice =
+                isMobile && localSelectedOrderLineRef.current
+                    ? localSelectedOrderLineRef.current.yPrice
+                    : orderInputPriceValue.value;
+
+            dragPriceRef.current = initialPrice;
+            dragStartPriceRef.current = initialPrice;
             isDraggingRef.current = true;
             setIsDrag(true);
             canvas.style.cursor = 'grabbing';
@@ -477,7 +498,19 @@ const YAxisOverlayCanvas: React.FC = () => {
 
             if (newPrice !== undefined) {
                 // console.log('>>>>> updateYPosition', draggedPrice);
-                updateYPosition(newPrice);
+
+                if (
+                    !isMobile ||
+                    localSelectedOrderLineRef.current?.oid === 'previewOrder'
+                )
+                    updateYPosition(newPrice);
+
+                if (isMobile && localSelectedOrderLineRef.current) {
+                    setSelectedOrderLine({
+                        ...localSelectedOrderLineRef.current,
+                        yPrice: newPrice,
+                    });
+                }
             }
         };
 
@@ -499,11 +532,23 @@ const YAxisOverlayCanvas: React.FC = () => {
                 dragPriceRef.current = dragStartPriceRef.current;
             }
 
-            useTradeDataStore.getState().setOrderInputPriceValue({
-                value: dragPriceRef.current,
-                changeType: 'dragEnd',
-            });
-            updateYPosition(dragPriceRef.current);
+            if (
+                !isMobile ||
+                localSelectedOrderLineRef.current?.oid === 'previewOrder'
+            ) {
+                useTradeDataStore.getState().setOrderInputPriceValue({
+                    value: dragPriceRef.current,
+                    changeType: 'dragEnd',
+                });
+                updateYPosition(dragPriceRef.current);
+            }
+
+            if (isMobile && localSelectedOrderLineRef.current) {
+                setSelectedOrderLine({
+                    ...localSelectedOrderLineRef.current,
+                    yPrice: dragPriceRef.current,
+                });
+            }
 
             isDraggingRef.current = false;
             dragPriceRef.current = undefined;
@@ -528,7 +573,31 @@ const YAxisOverlayCanvas: React.FC = () => {
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [canvasRef.current, chart, orderInputPriceValue.value, updateYPosition]);
+    }, [canvasRef.current, chart, isMobile]);
+
+    useEffect(() => {
+        if (!canvasRef.current || !isMobile) return;
+        if (!chart) return;
+
+        const canvas = canvasRef.current;
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        if (!iframeDoc) return;
+        const iframeBody = iframeDoc?.body;
+        if (!iframeBody) return;
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            const y = event.clientY - rect.top;
+
+            setMouseY(y);
+        };
+
+        iframeBody.addEventListener('pointerdown', handlePointerDown);
+
+        return () => {
+            iframeBody.removeEventListener('pointerdown', handlePointerDown);
+        };
+    }, [canvasRef.current, chart, isMobile]);
 
     useEffect(() => {
         if (!chart) return;
