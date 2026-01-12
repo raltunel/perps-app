@@ -1152,7 +1152,11 @@ const LabelComponent = ({
                                   ? {
                                         ...dragStateRef.current.tempSelectedLine
                                             .parentLine.textValue,
-                                        price: advancedValue,
+                                        price: isMobile
+                                            ? advancedValue
+                                            : dragStateRef.current
+                                                  .tempSelectedLine.parentLine
+                                                  .textValue.price,
                                     }
                                   : dragStateRef.current.tempSelectedLine
                                         .parentLine.textValue,
