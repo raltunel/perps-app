@@ -1072,6 +1072,19 @@ const LabelComponent = ({
                               ...dragStateRef.current.tempSelectedLine
                                   .parentLine,
                               yPrice: frozenPrice,
+                              textValue:
+                                  dragStateRef.current.tempSelectedLine
+                                      .parentLine.textValue &&
+                                  dragStateRef.current.tempSelectedLine
+                                      .parentLine.textValue.type === 'Limit'
+                                      ? {
+                                            ...dragStateRef.current
+                                                .tempSelectedLine.parentLine
+                                                .textValue,
+                                            price: frozenPrice,
+                                        }
+                                      : dragStateRef.current.tempSelectedLine
+                                            .parentLine.textValue,
                           },
                       }
                     : undefined;
@@ -1110,6 +1123,18 @@ const LabelComponent = ({
                       parentLine: {
                           ...dragStateRef.current.tempSelectedLine.parentLine,
                           yPrice: advancedValue,
+                          textValue:
+                              dragStateRef.current.tempSelectedLine.parentLine
+                                  .textValue &&
+                              dragStateRef.current.tempSelectedLine.parentLine
+                                  .textValue.type === 'Limit'
+                                  ? {
+                                        ...dragStateRef.current.tempSelectedLine
+                                            .parentLine.textValue,
+                                        price: advancedValue,
+                                    }
+                                  : dragStateRef.current.tempSelectedLine
+                                        .parentLine.textValue,
                       },
                   }
                 : undefined;
@@ -1166,6 +1191,15 @@ const LabelComponent = ({
                     parentLine: {
                         ...tempSelectedLine.parentLine,
                         yPrice: originalPrice,
+                        textValue:
+                            tempSelectedLine.parentLine.textValue &&
+                            tempSelectedLine.parentLine.textValue.type ===
+                                'Limit'
+                                ? {
+                                      ...tempSelectedLine.parentLine.textValue,
+                                      price: originalPrice,
+                                  }
+                                : tempSelectedLine.parentLine.textValue,
                     },
                 };
                 setActiveDragLine(restoredLine);
@@ -1214,6 +1248,15 @@ const LabelComponent = ({
                     parentLine: {
                         ...tempSelectedLine.parentLine,
                         yPrice: originalPrice,
+                        textValue:
+                            tempSelectedLine.parentLine.textValue &&
+                            tempSelectedLine.parentLine.textValue.type ===
+                                'Limit'
+                                ? {
+                                      ...tempSelectedLine.parentLine.textValue,
+                                      price: originalPrice,
+                                  }
+                                : tempSelectedLine.parentLine.textValue,
                     },
                 };
                 setActiveDragLine(restoredLine);
@@ -1325,6 +1368,16 @@ const LabelComponent = ({
                         parentLine: {
                             ...tempSelectedLine.parentLine,
                             yPrice: originalPrice,
+                            textValue:
+                                tempSelectedLine.parentLine.textValue &&
+                                tempSelectedLine.parentLine.textValue.type ===
+                                    'Limit'
+                                    ? {
+                                          ...tempSelectedLine.parentLine
+                                              .textValue,
+                                          price: originalPrice,
+                                      }
+                                    : tempSelectedLine.parentLine.textValue,
                         },
                     };
                     setActiveDragLine(restoredLine);

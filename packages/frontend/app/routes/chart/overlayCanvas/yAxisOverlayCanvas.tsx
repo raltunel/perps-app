@@ -509,6 +509,16 @@ const YAxisOverlayCanvas: React.FC = () => {
                     setSelectedOrderLine({
                         ...localSelectedOrderLineRef.current,
                         yPrice: newPrice,
+                        textValue:
+                            localSelectedOrderLineRef.current.textValue &&
+                            localSelectedOrderLineRef.current.textValue.type ===
+                                'Limit'
+                                ? {
+                                      ...localSelectedOrderLineRef.current
+                                          .textValue,
+                                      price: newPrice,
+                                  }
+                                : localSelectedOrderLineRef.current.textValue,
                     });
                 }
             }
@@ -547,6 +557,16 @@ const YAxisOverlayCanvas: React.FC = () => {
                 setSelectedOrderLine({
                     ...localSelectedOrderLineRef.current,
                     yPrice: dragPriceRef.current,
+                    textValue:
+                        localSelectedOrderLineRef.current.textValue &&
+                        localSelectedOrderLineRef.current.textValue.type ===
+                            'Limit'
+                            ? {
+                                  ...localSelectedOrderLineRef.current
+                                      .textValue,
+                                  price: dragPriceRef.current,
+                              }
+                            : localSelectedOrderLineRef.current.textValue,
                 });
             }
 

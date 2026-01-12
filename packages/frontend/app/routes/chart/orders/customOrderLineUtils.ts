@@ -321,14 +321,30 @@ function getTriggerConditionText(rawText: string, orderType: string): string {
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
 
+function formatPrice(price: number): string {
+    if (price >= 10000) {
+        return price.toFixed(0);
+    } else if (price >= 1) {
+        return price.toFixed(2);
+    } else if (price >= 0.01) {
+        return price.toFixed(4);
+    } else if (price >= 0.0001) {
+        return price.toFixed(6);
+    } else {
+        return price.toFixed(8);
+    }
+}
+
 export function formatLineLabel(label: LineLabel): string {
     switch (label.type) {
         case 'PNL': {
             const pnl = quantityTextFormatWithComma(Math.abs(label.pnl));
             return ' PnL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl} `);
         }
-        case 'Limit':
-            return ` ${t('transactions.limit')} ${label.price}  ${label.triggerCondition} `;
+        case 'Limit': {
+            const formattedPrice = formatPrice(label.price);
+            return ` ${t('transactions.limit')} ${formattedPrice}  ${label.triggerCondition} `;
+        }
         case 'Take Profit Market':
             return getTriggerConditionText(
                 label.triggerCondition,

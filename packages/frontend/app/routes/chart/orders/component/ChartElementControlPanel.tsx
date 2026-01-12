@@ -60,7 +60,18 @@ export const ChartElementControlPanel: React.FC<
         const newPrice =
             direction === 'up' ? previewPrice + step : previewPrice - step;
 
-        setSelectedOrderLine({ ...selectedOrderLine, yPrice: newPrice });
+        setSelectedOrderLine({
+            ...selectedOrderLine,
+            yPrice: newPrice,
+            textValue:
+                selectedOrderLine.textValue &&
+                selectedOrderLine.textValue.type === 'Limit'
+                    ? {
+                          ...selectedOrderLine.textValue,
+                          price: newPrice,
+                      }
+                    : selectedOrderLine.textValue,
+        });
     };
 
     const cancelChanges = () => {
