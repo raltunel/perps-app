@@ -19,7 +19,7 @@ export type LineData = {
     lineStyle: number;
     lineWidth: number;
     side?: 'buy' | 'sell';
-    dash: number[];
+    dash?: number[];
 };
 
 interface LineProps {

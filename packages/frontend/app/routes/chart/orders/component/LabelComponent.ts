@@ -106,77 +106,78 @@ const LabelComponent = ({
     const isLiqPriceLineDraggable = false;
     const { d3, d3fc } = useLazyD3() ?? {};
 
-    useEffect(() => {
-        const dpr = Math.round(window.devicePixelRatio) || 1;
+    // TODO: This useEffect was duplicating obPreviewLine
+    // useEffect(() => {
+    //     const dpr = Math.round(window.devicePixelRatio) || 1;
 
-        if (
-            scaleData !== undefined &&
-            canvasSize &&
-            isChartReady &&
-            d3 &&
-            d3fc
-        ) {
-            const dummyXScale = d3
-                .scaleLinear()
-                .domain([0, 1])
-                .range([0, canvasSize.width]);
+    //     if (
+    //         scaleData !== undefined &&
+    //         canvasSize &&
+    //         isChartReady &&
+    //         d3 &&
+    //         d3fc
+    //     ) {
+    //         const dummyXScale = d3
+    //             .scaleLinear()
+    //             .domain([0, 1])
+    //             .range([0, canvasSize.width]);
 
-            const horizontalLine = d3fc
-                .annotationCanvasLine()
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .value((d: any) => d.yPrice)
-                .yScale(scaleData?.yScale)
-                .xScale(dummyXScale)
-                .orient('horizontal')
-                .label('');
-            horizontalLine.decorate(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (context: CanvasRenderingContext2D, d: any) => {
-                    context.strokeStyle = d.color;
-                    context.fillStyle = d.color;
-                    context.lineWidth = d.lineWidth * dpr;
-                    if (d.dash) {
-                        const scaledDash = d.dash.map(
-                            (val: number) => val * dpr,
-                        );
-                        context.setLineDash(scaledDash);
-                    }
-                },
-            );
+    //         const horizontalLine = d3fc
+    //             .annotationCanvasLine()
+    //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //             .value((d: any) => d.yPrice)
+    //             .yScale(scaleData?.yScale)
+    //             .xScale(dummyXScale)
+    //             .orient('horizontal')
+    //             .label('');
+    //         horizontalLine.decorate(
+    //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //             (context: CanvasRenderingContext2D, d: any) => {
+    //                 context.strokeStyle = d.color;
+    //                 context.fillStyle = d.color;
+    //                 context.lineWidth = d.lineWidth * dpr;
+    //                 if (d.dash) {
+    //                     const scaledDash = d.dash.map(
+    //                         (val: number) => val * dpr,
+    //                     );
+    //                     context.setLineDash(scaledDash);
+    //                 }
+    //             },
+    //         );
 
-            const horizontalLineLogScale = d3fc
-                .annotationCanvasLine()
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .value((d: any) => d.yPrice)
-                .yScale(scaleData?.scaleSymlog)
-                .xScale(dummyXScale)
-                .orient('horizontal')
-                .label('');
+    //         const horizontalLineLogScale = d3fc
+    //             .annotationCanvasLine()
+    //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //             .value((d: any) => d.yPrice)
+    //             .yScale(scaleData?.scaleSymlog)
+    //             .xScale(dummyXScale)
+    //             .orient('horizontal')
+    //             .label('');
 
-            horizontalLineLogScale.decorate(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (context: CanvasRenderingContext2D, d: any) => {
-                    context.strokeStyle = d.color;
-                    context.fillStyle = d.color;
-                    context.lineWidth = d.lineWidth * dpr;
-                    if (d.dash) {
-                        const scaledDash = d.dash.map(
-                            (val: number) => val * dpr,
-                        );
-                        context.setLineDash(scaledDash);
-                    }
-                },
-            );
+    //         horizontalLineLogScale.decorate(
+    //             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //             (context: CanvasRenderingContext2D, d: any) => {
+    //                 context.strokeStyle = d.color;
+    //                 context.fillStyle = d.color;
+    //                 context.lineWidth = d.lineWidth * dpr;
+    //                 if (d.dash) {
+    //                     const scaledDash = d.dash.map(
+    //                         (val: number) => val * dpr,
+    //                     );
+    //                     context.setLineDash(scaledDash);
+    //                 }
+    //             },
+    //         );
 
-            setHorizontalLine(() => {
-                return horizontalLine;
-            });
+    //         setHorizontalLine(() => {
+    //             return horizontalLine;
+    //         });
 
-            setHorizontalLineLogScale(() => {
-                return horizontalLineLogScale;
-            });
-        }
-    }, [scaleData, canvasSize === undefined, isChartReady]);
+    //         setHorizontalLineLogScale(() => {
+    //             return horizontalLineLogScale;
+    //         });
+    //     }
+    // }, [scaleData, canvasSize === undefined, isChartReady]);
 
     useEffect(() => {
         if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
