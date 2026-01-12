@@ -61,6 +61,17 @@ export const ChartElementControlPanel: React.FC<
         const newPrice =
             direction === 'up' ? previewPrice + step : previewPrice - step;
 
+        // Track mobile order adjustment usage
+        if (typeof plausible === 'function') {
+            plausible('Mobile Order Adjustment', {
+                props: {
+                    method: 'Button',
+                    action: direction === 'up' ? 'Increase' : 'Decrease',
+                    orderType: selectedOrderLine.type,
+                },
+            });
+        }
+
         setSelectedOrderLine({
             ...selectedOrderLine,
             yPrice: newPrice,

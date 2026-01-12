@@ -1064,6 +1064,17 @@ const LabelComponent = ({
                 dragStateRef.current.isDragging = true;
                 setActiveDragLine(isLabel);
                 setIsDrag(true);
+
+                // Track mobile order adjustment usage
+                if (isMobile && typeof plausible === 'function') {
+                    plausible('Mobile Order Adjustment', {
+                        props: {
+                            method: 'Drag',
+                            action: 'Start',
+                            orderType: isLabel.parentLine.type,
+                        },
+                    });
+                }
             }
 
             if (
@@ -1320,6 +1331,17 @@ const LabelComponent = ({
             let cursorText = 'pointer';
 
             if (isMobile) {
+                // Track drag completion
+                if (typeof plausible === 'function') {
+                    plausible('Mobile Order Adjustment', {
+                        props: {
+                            method: 'Drag',
+                            action: 'Complete',
+                            orderType: tempSelectedLine.parentLine.type,
+                        },
+                    });
+                }
+
                 setSelectedOrderLine({
                     ...tempSelectedLine.parentLine,
                     originalPrice: originalPrice,

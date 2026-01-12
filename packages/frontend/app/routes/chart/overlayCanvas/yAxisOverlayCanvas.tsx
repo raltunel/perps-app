@@ -464,6 +464,19 @@ const YAxisOverlayCanvas: React.FC = () => {
             setIsDrag(true);
             canvas.style.cursor = 'grabbing';
             useTradeDataStore.getState().setIsMidModeActive(false);
+
+            // Track mobile y-axis drag start
+            if (isMobile && typeof plausible === 'function') {
+                plausible('Mobile Order Adjustment', {
+                    props: {
+                        method: 'Y-Axis Drag',
+                        action: 'Start',
+                        orderType:
+                            localSelectedOrderLineRef.current?.type ||
+                            'PREVIEW_ORDER',
+                    },
+                });
+            }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
@@ -554,6 +567,17 @@ const YAxisOverlayCanvas: React.FC = () => {
             }
 
             if (isMobile && localSelectedOrderLineRef.current) {
+                // Track y-axis drag completion
+                if (typeof plausible === 'function') {
+                    plausible('Mobile Order Adjustment', {
+                        props: {
+                            method: 'Y-Axis Drag',
+                            action: 'Complete',
+                            orderType: localSelectedOrderLineRef.current.type,
+                        },
+                    });
+                }
+
                 setSelectedOrderLine({
                     ...localSelectedOrderLineRef.current,
                     yPrice: dragPriceRef.current,
