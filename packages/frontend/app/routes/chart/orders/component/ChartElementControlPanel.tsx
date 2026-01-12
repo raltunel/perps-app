@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import useMediaQuery from '~/hooks/useMediaQuery';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
 import { useChartScaleStore } from '~/stores/ChartScaleStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
+import { getPaneCanvasAndIFrameDoc } from '../../overlayCanvas/overlayCanvasUtils';
 
 interface ChartElementControlPanelProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,6 +103,9 @@ export const ChartElementControlPanel: React.FC<
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
         const iframeRect = iframe?.getBoundingClientRect();
 
+        const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+        const canvasRect = paneCanvas?.getBoundingClientRect();
+
         const buttonHeight = 28;
         const padding = 25;
 
@@ -110,15 +114,29 @@ export const ChartElementControlPanel: React.FC<
             y: yPricePixel + buttonHeight + padding,
         };
 
-        const newTop = iframeRect
-            ? `${iframeRect.top + position.y}px`
-            : `${position.y}px`;
-        const newLeft = iframeRect
-            ? `${iframeRect.left + position.x}px`
-            : `${position.x}px`;
+        const absoluteTop = iframeRect
+            ? iframeRect.top + position.y
+            : position.y;
+        const absoluteLeft = iframeRect
+            ? iframeRect.left + position.x
+            : position.x;
 
-        setTop(newTop);
-        setLeft(newLeft);
+        if (canvasRect) {
+            // Check if panel is outside canvas bounds (iframe-relative coordinates)
+            const isOutOfBounds =
+                absoluteTop < iframeRect.top + canvasRect.top ||
+                absoluteTop >
+                    canvasRect.height + iframeRect.top + canvasRect.top;
+
+            if (isOutOfBounds) {
+                setTop('0px');
+                setLeft('0px');
+                return;
+            }
+        }
+
+        setTop(`${absoluteTop}px`);
+        setLeft(`${absoluteLeft}px`);
     }, [
         chart,
         canvasHeight,
@@ -128,7 +146,7 @@ export const ChartElementControlPanel: React.FC<
         priceDomain,
     ]);
 
-    if (!isMobile || !selectedOrderLine) {
+    if (!isMobile || !selectedOrderLine || (top === '0px' && left === '0px')) {
         return null;
     }
 
