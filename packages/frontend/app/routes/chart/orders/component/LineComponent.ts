@@ -11,6 +11,7 @@ export type LineData = {
     xLoc: number;
     yPrice: number;
     textValue?: LineLabel;
+    priceColor?: string;
     quantityTextValue?: number;
     quantityText?: string;
     color: string;

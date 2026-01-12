@@ -336,6 +336,26 @@ const LabelComponent = ({
 
                 const xPixel = widthAttr * line.xLoc;
 
+                const isLineSelected =
+                    isMobile && selectedOrderLine?.oid === line.oid;
+                const currentPrice =
+                    isLineSelected &&
+                    activeDragLine &&
+                    activeDragLine.parentLine.oid === line.oid
+                        ? activeDragLine.parentLine.yPrice
+                        : line.yPrice;
+                const hasChanges =
+                    isLineSelected &&
+                    selectedOrderLine &&
+                    selectedOrderLine.originalPrice !== undefined &&
+                    Math.abs(currentPrice - selectedOrderLine.originalPrice) >
+                        0.001;
+
+                const priceColor =
+                    hasChanges && line.textValue?.type === 'Limit'
+                        ? '#F97316'
+                        : line.priceColor;
+
                 const baseLabelOptions = [
                     {
                         type: 'Main' as LabelType,
@@ -345,6 +365,7 @@ const LabelComponent = ({
                         backgroundColor: '#D1D1D1',
                         textColor: '#3C91FF',
                         borderColor: line.color,
+                        priceColor: priceColor,
                     },
                     ...(line.quantityText
                         ? [

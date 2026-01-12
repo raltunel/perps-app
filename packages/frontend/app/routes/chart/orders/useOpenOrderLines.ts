@@ -68,12 +68,16 @@ export const useOpenOrderLines = (): LineData[] => {
                 };
                 const type = 'LIMIT';
 
+                let priceColor: string | undefined;
+
                 if (orderType === 'Limit') {
                     label = {
                         type: 'Limit',
                         price: limitPx,
                         triggerCondition: tempTriggerCondition,
                     };
+
+                    priceColor = '#3b82f6';
                 } else {
                     if (orderType === 'Stop Limit') {
                         label = {
@@ -104,6 +108,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     xLoc,
                     yPrice,
                     textValue: label,
+                    priceColor,
                     quantityTextValue,
                     quantityText:
                         quantityTextFormatWithComma(quantityTextValue),

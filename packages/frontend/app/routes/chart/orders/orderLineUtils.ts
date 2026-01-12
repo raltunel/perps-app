@@ -10,6 +10,7 @@ type LabelOptions = {
     backgroundColor: string;
     textColor: string;
     borderColor: string;
+    priceColor?: string;
 };
 
 type DrawSegmentedRectOptions = {
@@ -171,8 +172,35 @@ export function drawLabelMobile(
             );
         }
 
-        ctx.fillStyle = option.textColor;
-        ctx.fillText(text, cursorX + segmentWidth / 2, labelCenterY);
+        if (option.priceColor && isMain) {
+            const parts = text.split(' ').filter((p) => p);
+            if (parts.length >= 2) {
+                let textX = cursorX + (isMain && isDragable ? padding * 2 : 0);
+                ctx.textAlign = 'left';
+
+                ctx.fillStyle = option.textColor;
+                ctx.fillText(' ' + parts[0] + ' ', textX, labelCenterY);
+                textX += ctx.measureText(' ' + parts[0] + ' ').width;
+
+                ctx.fillStyle = option.priceColor;
+                ctx.fillText(parts[1] + ' ', textX, labelCenterY);
+                textX += ctx.measureText(parts[1] + ' ').width;
+
+                if (parts.length > 2) {
+                    ctx.fillStyle = option.textColor;
+                    const remaining = ' ' + parts.slice(2).join(' ') + ' ';
+                    ctx.fillText(remaining, textX, labelCenterY);
+                }
+
+                ctx.textAlign = 'center';
+            } else {
+                ctx.fillStyle = option.textColor;
+                ctx.fillText(text, cursorX + segmentWidth / 2, labelCenterY);
+            }
+        } else {
+            ctx.fillStyle = option.textColor;
+            ctx.fillText(text, cursorX + segmentWidth / 2, labelCenterY);
+        }
 
         labelLocations.push({
             type: option.type,
