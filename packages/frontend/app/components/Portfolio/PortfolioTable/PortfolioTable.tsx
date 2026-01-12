@@ -40,6 +40,8 @@ interface PortfolioTablesProps {
 
     /** Optional address to view portfolio for (overrides session) */
     urlAddress?: string;
+
+    isTransactionsView?: boolean;
 }
 
 // Section labels for stacked mode headers
@@ -80,6 +82,7 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
         visibleSections,
         stackedTableHeight = 300,
         urlAddress,
+        isTransactionsView,
     } = props;
 
     const filterOptions: FilterOption[] = [
@@ -302,7 +305,9 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
     // ═══════════════════════════════════════════════════════════════════════
     if (layout === 'stacked') {
         return (
-            <div className={styles.stackedWrapper}>
+            <div
+                className={`${styles.stackedWrapper} ${isTransactionsView && styles.stackedWrapperTransactions}`}
+            >
                 {stackedSections.map((sectionKey) => {
                     const sectionInfo = SECTION_LABELS[sectionKey] || {
                         title: sectionKey,
@@ -331,7 +336,11 @@ export default function PortfolioTables(props: PortfolioTablesProps) {
                             </div>
                             <div
                                 className={styles.stackedSectionContent}
-                                style={{ height: stackedTableHeight }}
+                                style={{
+                                    height: isTransactionsView
+                                        ? '100%'
+                                        : stackedTableHeight,
+                                }}
                             >
                                 {renderTableByKey(sectionKey)}
                             </div>

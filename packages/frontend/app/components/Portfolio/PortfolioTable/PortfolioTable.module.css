@@ -83,7 +83,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    height: 250px;
     background: var(--bg-dark2);
 }
 
@@ -143,6 +142,20 @@
 
     .stackedWrapper {
         gap: var(--gap-s);
+    }
+    .stackedWrapperTransactions {
+        /* 56px (header high) 56px (breadcrumb height)  56px (footer height)*/
+        /* 95svh instead of 100 for unaccounted padding, gap, and margins */
+        height: calc(
+            95svh -
+                calc(
+                    var(--header-h, 56px) + var(--breadcrumb-h, 56px) +
+                        var(--footer-h, 56px)
+                )
+        );
+        display: grid;
+        grid-template-rows: repeat(2, 1fr);
+        gap: var(--gap-l);
     }
 
     .stackedSection {
