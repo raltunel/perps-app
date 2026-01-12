@@ -79,8 +79,8 @@ const TradingViewWrapper: React.FC = () => {
                     setChartLoadingStatus={setChartLoadingStatus}
                 >
                     <TradingViewChart />
-                    <YaxisOverlayCanvas />
                     {liquidationsActive && <LiquidationOverlayCanvas />}
+                    <YaxisOverlayCanvas />
                     <OrderLinesOverlayCanvas />
                     <LiquidationChartOptions />
                 </TradingViewProvider>
