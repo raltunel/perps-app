@@ -30,6 +30,7 @@ import {
 import type { LineData } from './LineComponent';
 import { t } from 'i18next';
 import { usePreviewOrderLines } from '../usePreviewOrderLines';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 
 interface LabelProps {
     lines: LineData[];
@@ -75,6 +76,9 @@ const LabelComponent = ({
     const { executeLimitOrder } = useLimitOrderService();
     const { updateYPosition } = usePreviewOrderLines();
     const ctx = overlayCanvasRef.current?.getContext('2d');
+
+    const sessionState = useSession();
+    const isSessionEstablished = isEstablished(sessionState);
 
     const isMobile = useMobile();
     const {
@@ -1389,7 +1393,7 @@ const LabelComponent = ({
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [overlayCanvasRef.current, chart]);
+    }, [overlayCanvasRef.current, chart, isSessionEstablished]);
 
     // Handle ESC key press to cancel drag
     useEffect(() => {
