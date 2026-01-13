@@ -5,6 +5,8 @@ import { useChartScaleStore } from '~/stores/ChartScaleStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
 import { getPaneCanvasAndIFrameDoc } from '../../overlayCanvas/overlayCanvasUtils';
+import { useTradingView } from '~/contexts/TradingviewContext';
+import type { TabType } from '~/routes/trade';
 
 interface ChartElementControlPanelProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +22,8 @@ export const ChartElementControlPanel: React.FC<
         useChartLinesStore();
     const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
     const priceDomain = useChartScaleStore((state) => state.priceDomain);
+    const { setObChosenPrice } = useTradeDataStore();
+    const { switchTab } = useTradingView();
 
     const [previewPrice, setPreviewPrice] = useState<number | null>(null);
     const [originalPrice, setOriginalPrice] = useState<number | null>(null);
@@ -100,7 +104,33 @@ export const ChartElementControlPanel: React.FC<
     };
 
     const confirmChanges = () => {
-        // Trigger confirm in LabelComponent
+        if (!selectedOrderLine) return;
+
+        if (selectedOrderLine.type === 'PREVIEW_ORDER') {
+            const newPrice = selectedOrderLine.yPrice;
+
+            setObChosenPrice(newPrice);
+
+            // Navigate to trade page (order tab) and focus on size input
+            if (switchTab) {
+                switchTab('order' as TabType);
+
+                requestAnimationFrame(() => {
+                    // Wait for navigation and then focus
+                    setTimeout(() => {
+                        const sizeInput = document.getElementById(
+                            'trade-module-size-input',
+                        ) as HTMLInputElement;
+                        if (sizeInput) {
+                            sizeInput.focus();
+                        }
+                    }, 100);
+                });
+            }
+            return;
+        }
+
+        // For open  orders, trigger confirm in LabelComponent
         setShouldConfirmOrder(true);
     };
 
