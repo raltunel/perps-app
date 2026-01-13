@@ -434,12 +434,12 @@ export default function PageHeader() {
     const invalidRefCodeModal = useModal('closed');
 
     // run the FUUL context
-    const { isAffiliateCodeFree } = useFuul();
+    const { isRefCodeFree } = useFuul();
 
     useEffect(() => {
         const checkRefCode = async (): Promise<void> => {
             if (referralCodeFromURL.value) {
-                const isCodeClaimed: boolean = await isAffiliateCodeFree(
+                const isCodeClaimed: boolean = await isRefCodeFree(
                     referralCodeFromURL.value,
                 );
                 isCodeClaimed
@@ -448,7 +448,7 @@ export default function PageHeader() {
             }
         };
         checkRefCode();
-    }, [referralCodeFromURL.value, isAffiliateCodeFree]);
+    }, [referralCodeFromURL.value, isRefCodeFree]);
 
     return (
         <>
