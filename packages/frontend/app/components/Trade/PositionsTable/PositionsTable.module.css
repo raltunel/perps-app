@@ -4,12 +4,34 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    /* Better sizing: use minmax() to prevent wrapping and fill space */
+    grid-template-columns:
+        minmax(70px, 0.8fr) /* Coin */
+        minmax(80px, 0.8fr) /* Size */
+        minmax(90px, 0.8fr) /* Position Value */
+        minmax(80px, 0.8fr) /* Entry Price */
+        minmax(80px, 0.8fr) /* Mark Price */
+        minmax(100px, 1fr) /* PnL - main flex */
+        minmax(70px, 0.8fr) /* Liq Price */
+        minmax(70px, 0.8fr) /* Margin */
+        minmax(70px, 0.8fr) /* Funding */
+        minmax(70px, 0.8fr) /* TP/SL */
+        minmax(120px, 1.2fr); /* Close */
     align-items: center;
 }
 
 .rowContainer.noTpSl {
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns:
+        minmax(70px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(90px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(100px, 1fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(120px, 1.2fr);
 }
 
 .headerContainer {
@@ -19,17 +41,36 @@
     padding-left: var(--padding-s);
     gap: var(--gap-s);
     display: grid;
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns:
+        minmax(70px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(90px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(100px, 1fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(120px, 1.2fr);
     align-items: center;
-
     position: sticky;
     top: 0;
-
     z-index: 10;
 }
 
 .headerContainer.noTpSl {
-    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    grid-template-columns:
+        minmax(70px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(90px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(80px, 0.8fr)
+        minmax(100px, 1fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(70px, 0.8fr)
+        minmax(120px, 1.2fr);
 }
 
 .cell {
@@ -43,7 +84,6 @@
 
 .headerCell {
     width: 100%;
-
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs);
     display: flex;
@@ -89,6 +129,7 @@
 .actionContainer {
     display: flex;
 }
+
 .closeOptionsContainer {
     display: flex;
     flex-direction: column;
@@ -136,6 +177,7 @@
     color: var(--text2);
     font-size: 12px;
 }
+
 /* Specific cell classes */
 .coinCell {
     display: flex;
@@ -157,12 +199,14 @@
     align-items: center;
     gap: var(--gap-s);
 }
+
 .tpslCell button {
     background-color: transparent;
     outline: none;
     border: none;
     cursor: pointer;
 }
+
 .closeCell {
     width: 70%;
     display: flex;
@@ -174,7 +218,6 @@
 .headerContainer .closeCell {
     text-align: end;
     justify-self: end;
-    /* padding-right: var(--padding-s); */
 }
 
 .sizeCell,
@@ -190,6 +233,7 @@
     display: flex;
     justify-content: flex-end;
 }
+
 .tpslCell {
     display: flex;
     justify-content: center;
@@ -199,12 +243,31 @@
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .fundingCell {
@@ -215,12 +278,29 @@
 @media (max-width: 1200px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .markPriceCell {
@@ -231,12 +311,27 @@
 @media (max-width: 1000px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .entryPriceCell {
@@ -247,12 +342,23 @@
 @media (max-width: 800px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .sizeCell,
@@ -264,12 +370,19 @@
 @media (max-width: 650px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 1fr 0.8fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 1fr 1.2fr;
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(120px, 1.2fr);
     }
 
     .tpslCell,
@@ -281,13 +394,19 @@
 @media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
-        grid-template-columns: 0.8fr 1fr 1.2fr;
+        grid-template-columns:
+            minmax(60px, 0.8fr)
+            minmax(90px, 1fr)
+            minmax(100px, 1.2fr);
         padding: 0 var(--padding-xs);
     }
 
     .rowContainer.noTpSl,
     .headerContainer.noTpSl {
-        grid-template-columns: 0.8fr 1fr 1.2fr;
+        grid-template-columns:
+            minmax(60px, 0.8fr)
+            minmax(90px, 1fr)
+            minmax(100px, 1.2fr);
     }
 
     .positionValueCell {
@@ -306,6 +425,7 @@
         font-size: var(--font-size-s);
         margin-right: 0;
     }
+
     .closeCell {
         width: 100%;
         justify-content: flex-end;
