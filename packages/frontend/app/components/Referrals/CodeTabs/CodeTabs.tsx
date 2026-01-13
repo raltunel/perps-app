@@ -273,7 +273,7 @@ export default function CodeTabs(props: PropsIF) {
             prevReferrerAddress.current !== referrerAddress?.toString()
         ) {
             setTemporaryReferrerCode('');
-            referralStore.clear();
+            // referralStore.clear();
         }
         prevReferrerAddress.current = referrerAddress?.toString();
     }, [referrerAddress]);
