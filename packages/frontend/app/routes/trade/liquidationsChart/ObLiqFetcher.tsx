@@ -1,7 +1,13 @@
-import type { L2BookData } from '@perps-app/sdk/src/utils/types';
+import type {
+    L2BookData,
+    LiqLevelMessage,
+} from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useWs } from '~/contexts/WsContext';
 import { useRestPoller } from '~/hooks/useRestPoller';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { useLiqChartStore } from '~/stores/LiqChartStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
     OrderBookRowIF,
@@ -12,14 +18,13 @@ import {
     getResolutionListForSymbol,
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
-import { useOrderBookStore } from '~/stores/OrderBookStore';
-import { useLiqChartStore } from '~/stores/LiqChartStore';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 interface OBLiqFetcherProps {}
 
 const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    const { subscribe, unsubscribe } = useWs();
 
     const { maxLiqValue, minLiqValue, setMaxLiqValue, setMinLiqValue } =
         useLiqChartStore();
@@ -37,6 +42,25 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
 
     const [maxResolution, setMaxResolution] =
         useState<OrderRowResolutionIF | null>(null);
+
+    // Subscribe to liquidationLevels from ember2 endpoint
+    useEffect(() => {
+        const config = {
+            handler: handleLiquidationLevels,
+            payload: { marketId: 64 },
+        };
+
+        subscribe('liquidationLevels', config);
+
+        return () => {
+            unsubscribe('liquidationLevels', config);
+        };
+    }, [subscribe, unsubscribe]);
+
+    const handleLiquidationLevels = useCallback((data: LiqLevelMessage) => {
+        const levels = data.market.aggregated.levels;
+        console.log('>>>>> liquidationLevels levels:', levels);
+    }, []);
 
     useEffect(() => {
         if (!symbol || !symbolInfo?.markPx) return;
