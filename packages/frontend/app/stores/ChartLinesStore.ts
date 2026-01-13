@@ -13,6 +13,9 @@ interface ChartLinesStore {
 
     selectedOrderLine: SelectedOrderLine | undefined;
     setSelectedOrderLine: (line: SelectedOrderLine | undefined) => void;
+
+    shouldConfirmOrder: boolean;
+    setShouldConfirmOrder: (should: boolean) => void;
 }
 
 export const useChartLinesStore = create<ChartLinesStore>((set) => ({
@@ -23,4 +26,8 @@ export const useChartLinesStore = create<ChartLinesStore>((set) => ({
     selectedOrderLine: undefined,
     setSelectedOrderLine: (line: SelectedOrderLine | undefined) =>
         set({ selectedOrderLine: line ?? undefined }),
+
+    shouldConfirmOrder: false,
+    setShouldConfirmOrder: (should: boolean) =>
+        set({ shouldConfirmOrder: should }),
 }));

@@ -77,7 +77,12 @@ const LabelComponent = ({
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const isMobile = useMobile();
-    const { setSelectedOrderLine, selectedOrderLine } = useChartLinesStore();
+    const {
+        setSelectedOrderLine,
+        selectedOrderLine,
+        shouldConfirmOrder,
+        setShouldConfirmOrder,
+    } = useChartLinesStore();
 
     const [isDrag, setIsDrag] = useState(false);
 
@@ -105,6 +110,19 @@ const LabelComponent = ({
             overlayCanvasRef.current.style.pointerEvents = 'none';
         }
     }, [selectedOrderLine]);
+
+    // Handle confirm from control panel
+    useEffect(() => {
+        if (shouldConfirmOrder && selectedOrderLine && isMobile) {
+            if (selectedOrderLine.type === 'LIMIT') {
+                const labelData = {
+                    parentLine: selectedOrderLine,
+                } as LabelLocationData;
+                limitOrderDragEnd(labelData);
+            }
+            setShouldConfirmOrder(false);
+        }
+    }, [shouldConfirmOrder, selectedOrderLine, isMobile]);
     const dragStateRef = useRef<{
         tempSelectedLine: LabelLocationData | undefined;
         originalPrice: number | undefined;
@@ -403,22 +421,6 @@ const LabelComponent = ({
                             const isLineSelected =
                                 selectedOrderLine?.oid === line.oid;
 
-                            const currentPrice =
-                                isLineSelected &&
-                                activeDragLine &&
-                                activeDragLine.parentLine.oid === line.oid
-                                    ? activeDragLine.parentLine.yPrice
-                                    : line.yPrice;
-
-                            const hasChanges =
-                                isLineSelected &&
-                                selectedOrderLine &&
-                                selectedOrderLine.originalPrice !== undefined &&
-                                Math.abs(
-                                    currentPrice -
-                                        selectedOrderLine.originalPrice,
-                                ) > 0.001;
-
                             const mobileLabelOptions = [
                                 ...baseLabelOptions,
                                 ...(isLineSelected && line.type === 'LIMIT'
@@ -429,17 +431,6 @@ const LabelComponent = ({
                                               backgroundColor: '#D1D1D1',
                                               textColor: '#3C91FF',
                                               borderColor: '#3C91FF',
-                                          },
-                                      ]
-                                    : []),
-                                ...(hasChanges
-                                    ? [
-                                          {
-                                              type: 'Confirm' as LabelType,
-                                              text: '✓',
-                                              backgroundColor: '#3b82f6',
-                                              textColor: '#FFFFFF',
-                                              borderColor: '#3b82f6',
                                           },
                                       ]
                                     : []),

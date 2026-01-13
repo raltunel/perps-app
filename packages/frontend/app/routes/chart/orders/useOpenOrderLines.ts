@@ -53,7 +53,7 @@ export const useOpenOrderLines = (): LineData[] => {
 
                 const color =
                     side === 'buy' ? getBsColor().buy : getBsColor().sell;
-                const xLoc = isMobile ? 0.2 : 0.4;
+                const xLoc = isMobile ? 0.3 : 0.4;
                 const tempTriggerCondition =
                     triggerCondition && triggerCondition !== 'N/A'
                         ? triggerCondition

@@ -16,7 +16,8 @@ interface ChartElementControlPanelProps {
 export const ChartElementControlPanel: React.FC<
     ChartElementControlPanelProps
 > = ({ chart, canvasHeight, canvasWidth }) => {
-    const { selectedOrderLine, setSelectedOrderLine } = useChartLinesStore();
+    const { selectedOrderLine, setSelectedOrderLine, setShouldConfirmOrder } =
+        useChartLinesStore();
     const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
     const priceDomain = useChartScaleStore((state) => state.priceDomain);
 
@@ -45,6 +46,11 @@ export const ChartElementControlPanel: React.FC<
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     const symbolInfo = useTradeDataStore((state) => state.symbolInfo);
+
+    const hasChanges =
+        selectedOrderLine &&
+        originalPrice !== null &&
+        Math.abs(selectedOrderLine.yPrice - originalPrice) > 0.001;
 
     const calculateStep = () => {
         if (!symbolInfo) return 0.01;
@@ -91,6 +97,11 @@ export const ChartElementControlPanel: React.FC<
             setPreviewPrice(originalPrice);
         }
         setSelectedOrderLine(undefined);
+    };
+
+    const confirmChanges = () => {
+        // Trigger confirm in LabelComponent
+        setShouldConfirmOrder(true);
     };
 
     useEffect(() => {
@@ -250,6 +261,29 @@ export const ChartElementControlPanel: React.FC<
                 >
                     ✕
                 </button>
+                {hasChanges && (
+                    <button
+                        onClick={confirmChanges}
+                        style={{
+                            width: '28px',
+                            height: '28px',
+                            padding: '0',
+                            backgroundColor: '#1a1a1a',
+                            color: '#999',
+                            border: '1px solid #3b82f6',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: 400,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                        title='Confirm'
+                    >
+                        ✓
+                    </button>
+                )}
             </div>
         </div>
     );
