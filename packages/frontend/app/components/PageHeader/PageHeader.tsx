@@ -439,16 +439,21 @@ export default function PageHeader() {
     useEffect(() => {
         const checkRefCode = async (): Promise<void> => {
             if (referralCodeFromURL.value) {
-                const isCodeClaimed: boolean = await isAffiliateCodeFree(
-                    referralCodeFromURL.value,
-                );
-                isCodeClaimed
-                    ? referralStore.cache(referralCodeFromURL.value)
-                    : invalidRefCodeModal.open();
+                // const isCodeClaimed: boolean = await isAffiliateCodeFree(
+                //     referralCodeFromURL.value,
+                // );
+                // isCodeClaimed
+                //     ? referralStore.cache(referralCodeFromURL.value)
+                //     : invalidRefCodeModal.open();
+                // Cache the code immediately from URL - validation happens in CodeTabs
+                referralStore.cache(referralCodeFromURL.value);
             }
         };
         checkRefCode();
-    }, [referralCodeFromURL.value, isAffiliateCodeFree]);
+    }, [
+        referralCodeFromURL.value,
+        // isAffiliateCodeFree,
+    ]);
 
     return (
         <>
