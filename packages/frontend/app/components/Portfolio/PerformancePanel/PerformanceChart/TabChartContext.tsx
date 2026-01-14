@@ -8,8 +8,6 @@ export interface TabChartContext {
     activeTab: string;
     selectedVault: { label: string; value: string };
     selectedPeriod: { label: string; value: string };
-    isLineDataFetched: boolean;
-    handleLineDataFetched: (isDataFetched: boolean) => void;
     pnlHistory: { time: number; value: number }[] | undefined;
     setPnlHistory: React.Dispatch<
         React.SetStateAction<{ time: number; value: number }[] | undefined>
@@ -33,8 +31,6 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         activeTab,
         selectedVault,
         selectedPeriod,
-        isLineDataFetched,
-        handleLineDataFetched,
         pnlHistory,
         setPnlHistory,
         accountValueHistory,
@@ -55,30 +51,61 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
     const { fetchUserHistory } = useInfoApi();
 
-    const [isLoading, setIsLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const [chartWidth, setChartWidth] = useState<number | null>(null);
     const [chartHeight, setChartHeight] = useState<number | null>(null);
     const [isChartReady, setIsChartReady] = useState(false);
 
+    const fetchUserHistoryRef = useRef(fetchUserHistory);
     useEffect(() => {
-        if (userAddress && !isLineDataFetched && !isLoading) {
-            setIsLoading(true);
-            fetchUserHistory(userAddress)
-                .then((data) => {
-                    setPnlHistory(data.pnlHistory);
-                    setAccountValueHistory(data.accountValueHistory);
-                    setUserProfileLineData(data);
-                    handleLineDataFetched(true);
-                })
-                .catch((error) => {
-                    console.error('Failed to fetch user history:', error);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
+        fetchUserHistoryRef.current = fetchUserHistory;
+    }, [fetchUserHistory]);
+
+    const setPnlHistoryRef = useRef(setPnlHistory);
+    useEffect(() => {
+        setPnlHistoryRef.current = setPnlHistory;
+    }, [setPnlHistory]);
+
+    const setAccountValueHistoryRef = useRef(setAccountValueHistory);
+    useEffect(() => {
+        setAccountValueHistoryRef.current = setAccountValueHistory;
+    }, [setAccountValueHistory]);
+
+    const setUserProfileLineDataRef = useRef(setUserProfileLineData);
+    useEffect(() => {
+        setUserProfileLineDataRef.current = setUserProfileLineData;
+    }, [setUserProfileLineData]);
+
+    useEffect(() => {
+        if (!userAddress) {
+            return;
         }
-    }, [userAddress, isLineDataFetched, isLoading]);
+
+        let isCancelled = false;
+
+        const doFetch = async () => {
+            try {
+                const data = await fetchUserHistoryRef.current(userAddress);
+                if (isCancelled) return;
+                setPnlHistoryRef.current(data.pnlHistory);
+                setAccountValueHistoryRef.current(data.accountValueHistory);
+                setUserProfileLineDataRef.current(data);
+            } catch (error) {
+                if (!isCancelled) {
+                    console.error('Failed to fetch user history:', error);
+                }
+            }
+        };
+
+        doFetch();
+
+        const intervalId = setInterval(doFetch, 30_000);
+
+        return () => {
+            isCancelled = true;
+            clearInterval(intervalId);
+        };
+    }, [userAddress]);
 
     useEffect(() => {
         window.addEventListener('resize', calculatePanelHeight);

@@ -45,6 +45,7 @@
         "announcements": "Anuncios",
         "leverage": "Apalancamiento",
         "comingSoon": "Próximamente",
+        "or": "o",
         "enter": "Ingresar",
         "claim": "Reclamar",
         "seeDocsForMore": "Consulta la documentación para más información.",
@@ -713,7 +714,9 @@
         "exceedsAvailableBalance": "El monto excede el saldo disponible de {{balance}}",
         "transactionTimedOut": "La transacción expiró después de 15 segundos",
         "connectToViewPortfolio": "Conectar para Ver Tu Portafolio",
-        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones."
+        "connectDescription": "Inicia sesión con tu billetera para ver tu portafolio, posiciones e historial de operaciones.",
+        "pasteWalletAddress": "Pegar dirección de billetera",
+        "viewOtherAccount": "Ver otra cuenta"
     },
     "pageTitles": {
         "portfolio": "Portafolio",
