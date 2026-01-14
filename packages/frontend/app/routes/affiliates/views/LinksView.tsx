@@ -63,7 +63,7 @@ export function LinksView() {
         : [];
 
     const copyToClipboard = (code: string) => {
-        const referralUrl = `https://perps.ambient.finance?ref=${code}`;
+        const referralUrl = `https://perps.ambient.finance?af=${code}`;
         navigator.clipboard.writeText(referralUrl);
         setDropdownOpen(null);
     };
