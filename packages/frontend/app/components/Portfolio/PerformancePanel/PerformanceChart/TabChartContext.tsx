@@ -87,6 +87,16 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             try {
                 const data = await fetchUserHistoryRef.current(userAddress);
                 if (isCancelled) return;
+                if (
+                    data.pnlHistory.length === 0 &&
+                    data.accountValueHistory.length === 0
+                ) {
+                    setPnlHistoryRef.current([]);
+                    setAccountValueHistoryRef.current([]);
+                    setUserProfileLineDataRef.current(data);
+                    return;
+                }
+
                 setPnlHistoryRef.current(data.pnlHistory);
                 setAccountValueHistoryRef.current(data.accountValueHistory);
                 setUserProfileLineDataRef.current(data);
@@ -192,31 +202,67 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             {isChartReady && chartWidth && chartHeight && (
                 <>
                     {activeTab === 'performance' && pnlHistory && (
-                        <LineChart
-                            // key={`performance-${chartWidth}-${chartHeight}`}
-                            lineData={pnlHistory}
-                            curve={'basic'}
-                            chartName={
-                                selectedVault.value + selectedPeriod.value
-                            }
-                            height={chartHeight}
-                            width={chartWidth}
-                            isMobile={isMobile}
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <LineChart
+                                // key={`performance-${chartWidth}-${chartHeight}`}
+                                lineData={pnlHistory}
+                                curve={'basic'}
+                                chartName={
+                                    selectedVault.value + selectedPeriod.value
+                                }
+                                height={chartHeight}
+                                width={chartWidth}
+                                isMobile={isMobile}
+                            />
+                            {pnlHistory.length === 0 && (
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'var(--text2)',
+                                        fontSize: 'var(--font-size-s)',
+                                        pointerEvents: 'none',
+                                    }}
+                                >
+                                    No history yet
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {activeTab === 'accountValue' && accountValueHistory && (
-                        <LineChart
-                            // key={`account-${chartWidth}-${chartHeight}`}
-                            lineData={accountValueHistory}
-                            curve={'basic'}
-                            chartName={
-                                selectedVault.value + selectedPeriod.value
-                            }
-                            height={chartHeight}
-                            width={chartWidth}
-                            isMobile={isMobile}
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <LineChart
+                                // key={`account-${chartWidth}-${chartHeight}`}
+                                lineData={accountValueHistory}
+                                curve={'basic'}
+                                chartName={
+                                    selectedVault.value + selectedPeriod.value
+                                }
+                                height={chartHeight}
+                                width={chartWidth}
+                                isMobile={isMobile}
+                            />
+                            {accountValueHistory.length === 0 && (
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'var(--text2)',
+                                        fontSize: 'var(--font-size-s)',
+                                        pointerEvents: 'none',
+                                    }}
+                                >
+                                    No history yet
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {activeTab === 'collateral' && (
