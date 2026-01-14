@@ -117,21 +117,27 @@ export default function OrderLines({
             ...(obPreviewLine && !hidePreviewLine ? [obPreviewLine] : []),
         ];
 
-        const updatedLines = linesData.map((line) => {
+        let draggedLine: LineData | null = null;
+        const otherLines = linesData.filter((line) => {
             //handle lines with undefined oid
-            if (!line.oid) return line;
+            if (!line.oid) return true;
             if (
                 line.type !== 'PNL' &&
                 activeDragLine &&
                 line.oid === activeDragLine.parentLine.oid
             ) {
                 matchFound = true;
-                return activeDragLine.parentLine;
+                draggedLine = activeDragLine.parentLine;
+                return false;
             }
-            return line;
+            return true;
         });
 
-        if (activeDragLine && !matchFound && linesData.length > 0) {
+        const updatedLines = draggedLine
+            ? [...otherLines, draggedLine]
+            : otherLines;
+
+        if (activeDragLine && !matchFound) {
             setActiveDragLine(undefined);
             setSelectedOrderLine(undefined);
         }
