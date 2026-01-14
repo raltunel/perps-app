@@ -9,6 +9,7 @@ import type { LimitOrderParams } from '~/services/limitOrderService';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
@@ -88,10 +89,12 @@ const LabelComponent = ({
         setShouldConfirmOrder,
     } = useChartLinesStore();
 
+    const priceDomain = useChartScaleStore((state) => state.priceDomain);
+
     const [isDrag, setIsDrag] = useState(false);
 
     useEffect(() => {
-        if (!isMobile) return;
+        if (!isMobile || !overlayCanvasRef.current) return;
         if (selectedOrderLine) {
             if (activeDragLine?.parentLine !== selectedOrderLine) {
                 setActiveDragLine(
@@ -99,6 +102,16 @@ const LabelComponent = ({
                         ? { ...activeDragLine, parentLine: selectedOrderLine }
                         : undefined,
                 );
+            }
+
+            const price = selectedOrderLine.yPrice;
+            if (priceDomain) {
+                const isOutOfDomain =
+                    price < priceDomain.min || price > priceDomain.max;
+
+                if (!isDrag && !isOutOfDomain) {
+                    overlayCanvasRef.current.style.pointerEvents = 'auto';
+                }
             }
         } else if (!selectedOrderLine && activeDragLine) {
             setActiveDragLine(undefined);
@@ -108,12 +121,6 @@ const LabelComponent = ({
             overlayCanvasRef.current.style.pointerEvents = 'none';
         }
     }, [selectedOrderLine, isMobile, isDrag]);
-
-    useEffect(() => {
-        if (!selectedOrderLine && overlayCanvasRef.current) {
-            overlayCanvasRef.current.style.pointerEvents = 'none';
-        }
-    }, [selectedOrderLine]);
 
     // Handle confirm from control panel
     useEffect(() => {
