@@ -50,18 +50,10 @@ export default function OrderLines({
     const isZoomingRef = useRef(false);
     const [localChartReady, setLocalChartReady] = useState(true);
     const drawnLabelsRef = useRef<LineData[]>([]);
-    const { setSelectedOrderLine, selectedOrderLine } = useChartLinesStore();
+    const { setSelectedOrderLine } = useChartLinesStore();
     const [activeDragLine, setActiveDragLine] = useState<
         undefined | LabelLocationData
-    >(() => {
-        if (selectedOrderLine) {
-            return {
-                parentLine: selectedOrderLine,
-                label: undefined,
-            };
-        }
-        return undefined;
-    });
+    >(undefined);
     const { setPriceDomain, setZoomChanged, zoomChanged } =
         useChartScaleStore();
 

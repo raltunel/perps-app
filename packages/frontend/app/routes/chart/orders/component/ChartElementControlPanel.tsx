@@ -53,8 +53,9 @@ export const ChartElementControlPanel: React.FC<
 
     const hasChanges =
         selectedOrderLine &&
-        originalPrice !== null &&
-        Math.abs(selectedOrderLine.yPrice - originalPrice) > 0.001;
+        selectedOrderLine.originalPrice &&
+        Math.abs(selectedOrderLine.yPrice - selectedOrderLine.originalPrice) >
+            0.001;
 
     const calculateStep = () => {
         if (!symbolInfo) return 0.01;

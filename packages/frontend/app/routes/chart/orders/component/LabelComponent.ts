@@ -367,19 +367,22 @@ const LabelComponent = ({
 
                 const isLineSelected =
                     isMobile && selectedOrderLine?.oid === line.oid;
-                const currentPrice =
-                    isLineSelected &&
-                    activeDragLine &&
-                    activeDragLine.parentLine.oid === line.oid
-                        ? activeDragLine.parentLine.yPrice
-                        : line.yPrice;
+
                 const hasChanges =
                     isLineSelected &&
                     selectedOrderLine &&
                     selectedOrderLine.originalPrice !== undefined &&
-                    Math.abs(currentPrice - selectedOrderLine.originalPrice) >
-                        0.001;
+                    Math.abs(
+                        selectedOrderLine.yPrice -
+                            selectedOrderLine.originalPrice,
+                    ) > 0.001;
 
+                if (hasChanges && !activeDragLine) {
+                    setActiveDragLine({
+                        label: undefined,
+                        parentLine: selectedOrderLine,
+                    });
+                }
                 const priceColor =
                     hasChanges && line.textValue?.type === 'Limit'
                         ? '#F97316'
@@ -447,11 +450,22 @@ const LabelComponent = ({
                                     : []),
                             ];
 
+                            const mobileLabelYPixel =
+                                isLineSelected && selectedOrderLine
+                                    ? getPricetoPixel(
+                                          chart,
+                                          selectedOrderLine.yPrice,
+                                          line.type,
+                                          heightAttr,
+                                          scaleData,
+                                      ).pixel
+                                    : yPricePixel;
+
                             labelLocations = drawLabelMobile(
                                 ctx,
                                 {
                                     x: xPixel,
-                                    y: yPricePixel,
+                                    y: mobileLabelYPixel,
                                     labelOptions: mobileLabelOptions,
                                     color: line.color,
                                 },
