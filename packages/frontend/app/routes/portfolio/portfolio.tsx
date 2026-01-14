@@ -184,6 +184,22 @@ function Portfolio() {
         }
     }, [isAddressInputMode]);
 
+    // Escape key cancels input mode
+    useEffect(() => {
+        if (!isAddressInputMode) return;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsAddressInputMode(false);
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [isAddressInputMode]);
+
     // Reset input mode when URL address changes
     useEffect(() => {
         setIsAddressInputMode(false);
