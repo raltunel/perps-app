@@ -60,6 +60,9 @@
 }
 
 .headerCurrentAddress {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     font-family: monospace;
     font-size: var(--font-size-s);
     color: var(--text2);
@@ -67,6 +70,18 @@
     padding: var(--padding-xs) var(--padding-s);
     border-radius: var(--radius-s);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.headerCurrentAddress:hover {
+    color: var(--accent1);
+}
+
+.headerCopyIcon {
+    flex: 0 0 auto;
+    font-size: 14px;
+    opacity: 0.9;
 }
 
 .headerViewOther,

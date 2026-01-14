@@ -25,11 +25,13 @@ import {
     IoArrowDown,
     IoChevronForward,
     IoChevronBack,
+    IoCopyOutline,
 } from 'react-icons/io5';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import { Resizable, type NumberSize } from 're-resizable';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import useClipboard from '~/hooks/useClipboard';
 import {
     isEstablished,
     SessionButton,
@@ -159,6 +161,19 @@ function Portfolio() {
     // State for toggling between address display and input mode in header
     const [isAddressInputMode, setIsAddressInputMode] = useState(false);
     const addressInputRef = useRef<HTMLInputElement>(null);
+
+    // Clipboard copy for address
+    const [, copyToClipboard] = useClipboard();
+    const [showCopied, setShowCopied] = useState(false);
+
+    const handleCopyAddress = useCallback(async () => {
+        if (!urlAddress) return;
+        const success = await copyToClipboard(urlAddress);
+        if (success) {
+            setShowCopied(true);
+            setTimeout(() => setShowCopied(false), 1500);
+        }
+    }, [copyToClipboard, urlAddress]);
 
     // Handler for wallet address input - navigates immediately on valid address
     const handleAddressInput = useCallback(
@@ -522,13 +537,22 @@ function Portfolio() {
                                 </>
                             ) : (
                                 <>
-                                    <span
+                                    <button
+                                        type='button'
                                         className={styles.headerCurrentAddress}
+                                        onClick={handleCopyAddress}
                                     >
-                                        {urlAddress
-                                            ? `${urlAddress.slice(0, 6)}...${urlAddress.slice(-4)}`
-                                            : ''}
-                                    </span>
+                                        <span>
+                                            {showCopied
+                                                ? '✓ Copied!'
+                                                : urlAddress
+                                                  ? `${urlAddress.slice(0, 6)}...${urlAddress.slice(-4)}`
+                                                  : ''}
+                                        </span>
+                                        <IoCopyOutline
+                                            className={styles.headerCopyIcon}
+                                        />
+                                    </button>
                                     <button
                                         type='button'
                                         className={styles.headerViewOther}
