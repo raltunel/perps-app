@@ -123,16 +123,17 @@ export function drawLabelMobile(
     const cancelOption = labelOptions.find((o) => o.type === 'Cancel');
 
     if (cancelOption) {
-        const size = height + yPadding;
+        const size = height + padding * 2;
+        const trashY = top - padding + yPadding;
 
-        drawTrashIcon(ctx, 0, top, size, cancelOption);
+        drawTrashIcon(ctx, 2, trashY, size, cancelOption);
 
         labelLocations.push({
             type: cancelOption.type,
             x: 0,
             y: top,
             width: size,
-            height: size,
+            height: height + yPadding,
         });
     }
 
@@ -228,7 +229,7 @@ function drawTrashIcon(
         'M4 7h16M9 7V5h6v2m-1 4v7m-4-7v7M6 7l1 13h10l1-13',
     );
 
-    const padding = size * 0.1;
+    const padding = size * 0.15;
     const iconSize = size - padding * 2;
 
     ctx.save();
