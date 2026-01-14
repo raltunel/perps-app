@@ -50,7 +50,8 @@
         "claim": "受け取る",
         "seeDocsForMore": "詳細はドキュメントをご覧ください。",
         "clearFilter": "フィルターをクリア",
-        "activate": "有効化"
+        "activate": "有効化",
+        "copied": "コピーしました！"
     },
     "transactions": {
         "orderTypes": "注文タイプ",

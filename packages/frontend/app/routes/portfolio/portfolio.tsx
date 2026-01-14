@@ -544,7 +544,7 @@ function Portfolio() {
                                     >
                                         <span>
                                             {showCopied
-                                                ? '✓ Copied!'
+                                                ? `✓ ${t('common.copied')}`
                                                 : urlAddress
                                                   ? `${urlAddress.slice(0, 6)}...${urlAddress.slice(-4)}`
                                                   : ''}

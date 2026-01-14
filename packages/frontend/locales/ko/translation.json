@@ -50,7 +50,8 @@
         "claim": "받기",
         "seeDocsForMore": "자세한 내용은 문서를 확인하세요.",
         "clearFilter": "필터 지우기",
-        "activate": "활성화"
+        "activate": "활성화",
+        "copied": "복사됨!"
     },
     "transactions": {
         "orderTypes": "주문 유형",

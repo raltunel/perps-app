@@ -50,7 +50,8 @@
         "claim": "Talep Et",
         "seeDocsForMore": "Daha fazlası için dokümanlara bakın.",
         "clearFilter": "Filtreyi temizle",
-        "activate": "Etkinleştir"
+        "activate": "Etkinleştir",
+        "copied": "Kopyalandı!"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",

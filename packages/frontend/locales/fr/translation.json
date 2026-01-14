@@ -50,7 +50,8 @@
         "claim": "Réclamer",
         "seeDocsForMore": "Voir la documentation pour en savoir plus.",
         "clearFilter": "Effacer le filtre",
-        "activate": "Activer"
+        "activate": "Activer",
+        "copied": "Copié !"
     },
     "transactions": {
         "orderTypes": "Types d'ordre",

@@ -50,7 +50,8 @@
         "claim": "Nhận",
         "seeDocsForMore": "Xem tài liệu để biết thêm chi tiết.",
         "clearFilter": "Xóa bộ lọc",
-        "activate": "Kích hoạt"
+        "activate": "Kích hoạt",
+        "copied": "Đã sao chép!"
     },
     "transactions": {
         "orderTypes": "Loại lệnh",

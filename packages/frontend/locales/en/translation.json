@@ -50,7 +50,8 @@
         "claim": "Claim",
         "seeDocsForMore": "See the docs for more.",
         "clearFilter": "Clear filter",
-        "activate": "Activate"
+        "activate": "Activate",
+        "copied": "Copied!"
     },
     "transactions": {
         "orderTypes": "Order Types",
