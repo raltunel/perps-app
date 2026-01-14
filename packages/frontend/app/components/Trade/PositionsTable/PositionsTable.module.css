@@ -80,6 +80,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .headerCell {
@@ -208,11 +209,12 @@
 }
 
 .closeCell {
-    width: 70%;
+    width: 100%;
     display: flex;
     text-align: end;
     justify-self: end;
     align-items: end;
+    justify-content: flex-end;
 }
 
 .headerContainer .closeCell {
@@ -240,7 +242,10 @@
     align-items: center;
 }
 
-@media (max-width: 1400px) {
+/* ✅ only change below: @media -> @container */
+/* If you named it: use "@container positionsTable (max-width: 1400px)" instead */
+
+@container (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns:
@@ -275,7 +280,7 @@
     }
 }
 
-@media (max-width: 1200px) {
+@container (max-width: 1200px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns:
@@ -299,47 +304,48 @@
             minmax(80px, 0.8fr)
             minmax(100px, 1fr)
             minmax(70px, 0.8fr)
+            minmax(70px, 0.8.fr)
+            minmax(120px, 1.2fr);
+    }
+
+    /* .markPriceCell {
+        display: none;
+    } */
+}
+
+@container (max-width: 1000px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
             minmax(70px, 0.8fr)
             minmax(120px, 1.2fr);
     }
 
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns:
+            minmax(70px, 0.8fr)
+            minmax(80px, 0.8fr)
+            minmax(90px, 0.8fr)
+            minmax(100px, 1fr)
+            minmax(70px, 0.8fr)
+            minmax(70px, 0.8fr)
+            minmax(120px, 1.2fr);
+    }
+
+    .entryPriceCell,
     .markPriceCell {
         display: none;
     }
 }
 
-@media (max-width: 1000px) {
-    .rowContainer,
-    .headerContainer {
-        grid-template-columns:
-            minmax(70px, 0.8fr)
-            minmax(80px, 0.8fr)
-            minmax(90px, 0.8fr)
-            minmax(100px, 1fr)
-            minmax(70px, 0.8fr)
-            minmax(70px, 0.8fr)
-            minmax(70px, 0.8fr)
-            minmax(120px, 1.2fr);
-    }
-
-    .rowContainer.noTpSl,
-    .headerContainer.noTpSl {
-        grid-template-columns:
-            minmax(70px, 0.8fr)
-            minmax(80px, 0.8fr)
-            minmax(90px, 0.8fr)
-            minmax(100px, 1fr)
-            minmax(70px, 0.8fr)
-            minmax(70px, 0.8fr)
-            minmax(120px, 1.2fr);
-    }
-
-    .entryPriceCell {
-        display: none;
-    }
-}
-
-@media (max-width: 800px) {
+@container (max-width: 800px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns:
@@ -367,7 +373,7 @@
     }
 }
 
-@media (max-width: 650px) {
+@container (max-width: 650px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns:
@@ -382,6 +388,7 @@
         grid-template-columns:
             minmax(70px, 0.8fr)
             minmax(100px, 1fr)
+            minmax(120px, 1.2fr)
             minmax(120px, 1.2fr);
     }
 
@@ -391,7 +398,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@container (max-width: 480px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns:
