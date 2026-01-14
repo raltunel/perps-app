@@ -2,9 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import type { UserPositionIF } from '~/utils/UserDataIFs';
 import CollateralPieChart from '../CollateralChart/CollateralPieChart';
-import { positionDataMap } from './LineChartData';
 
 export interface TabChartContext {
     activeTab: string;
@@ -55,87 +53,32 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
     const { userAddress } = useUserDataStore();
 
-    const { fetchUserPortfolio } = useInfoApi();
+    const { fetchUserHistory } = useInfoApi();
 
-    const [parsedKey, setParsedKey] = useState<string>();
+    const [isLoading, setIsLoading] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const [chartWidth, setChartWidth] = useState<number | null>(null);
     const [chartHeight, setChartHeight] = useState<number | null>(null);
     const [isChartReady, setIsChartReady] = useState(false);
 
-    const parseFakeUserData = (key: string) => {
-        const userPositionData = positionDataMap.get(key);
-
-        if (userPositionData !== undefined) {
-            setAccountValueHistory(() => userPositionData.accountValueHistory);
-            setPnlHistory(() => userPositionData.pnlHistory);
-
-            setParsedKey(() => key);
-        }
-    };
-
-    const parseUserProfileData = (data: any, key: string) => {
-        const userPositionData = data.get(key) as UserPositionIF;
-
-        if (userPositionData.accountValueHistory) {
-            const accountValueHistory =
-                userPositionData.accountValueHistory.map((accountValue) => {
-                    return {
-                        time: accountValue[0],
-                        value: Number(accountValue[1]),
-                    };
+    useEffect(() => {
+        if (userAddress && !isLineDataFetched && !isLoading) {
+            setIsLoading(true);
+            fetchUserHistory(userAddress)
+                .then((data) => {
+                    setPnlHistory(data.pnlHistory);
+                    setAccountValueHistory(data.accountValueHistory);
+                    setUserProfileLineData(data);
+                    handleLineDataFetched(true);
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch user history:', error);
+                })
+                .finally(() => {
+                    setIsLoading(false);
                 });
-
-            setAccountValueHistory(() => accountValueHistory);
         }
-
-        if (userPositionData.pnlHistory) {
-            const pnlHistory = userPositionData.pnlHistory.map((pnlValue) => {
-                return {
-                    time: pnlValue[0],
-                    value: Number(pnlValue[1]),
-                };
-            });
-
-            setPnlHistory(() => pnlHistory);
-        }
-
-        setParsedKey(() => key);
-    };
-
-    useEffect(() => {
-        if (userAddress && !isLineDataFetched) {
-            fetchUserPortfolio(userAddress).then((data) => {
-                setUserProfileLineData(() => data);
-
-                handleLineDataFetched(true);
-            });
-        }
-    }, [userAddress, isLineDataFetched]);
-
-    useEffect(() => {
-        const key =
-            selectedVault.value === 'perp'
-                ? 'perp' + selectedPeriod.value
-                : selectedPeriod.value === 'AllTime'
-                  ? 'allTime'
-                  : selectedPeriod.value?.toLowerCase();
-
-        // if (key !== parsedKey && userProfileLineData) {
-        //     parseUserProfileData(userProfileLineData, key);
-        // }
-
-        // fake data parser
-
-        if (key !== parsedKey) {
-            parseFakeUserData(key);
-        }
-    }, [
-        userProfileLineData,
-        selectedVault.value,
-        selectedPeriod.value,
-        activeTab,
-    ]);
+    }, [userAddress, isLineDataFetched, isLoading]);
 
     useEffect(() => {
         window.addEventListener('resize', calculatePanelHeight);
