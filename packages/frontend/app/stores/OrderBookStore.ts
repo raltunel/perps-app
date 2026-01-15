@@ -56,6 +56,10 @@ interface OrderBookStore {
     liqSells: OrderBookLiqIF[];
     hrLiqBuys: OrderBookLiqIF[];
     hrLiqSells: OrderBookLiqIF[];
+    obMaxSell: number;
+    obMinBuy: number;
+    setObMaxSell: (obMaxSell: number) => void;
+    setObMinBuy: (obMinBuy: number) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>()(
@@ -132,6 +136,10 @@ export const useOrderBookStore = create<OrderBookStore>()(
             setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => set({ hrLiqBuys }),
             setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) =>
                 set({ hrLiqSells }),
+            obMaxSell: 0,
+            setObMaxSell: (obMaxSell: number) => set({ obMaxSell }),
+            obMinBuy: 0,
+            setObMinBuy: (obMinBuy: number) => set({ obMinBuy }),
         }),
         {
             name: 'ORDERBOOK',

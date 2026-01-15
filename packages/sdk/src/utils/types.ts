@@ -653,19 +653,3 @@ export interface ErrorMsg {
     channel: 'error';
     data: string;
 }
-
-export type LiqLevel = {
-    0: number;
-    1: number;
-};
-
-export interface LiqLevelMessage {
-    market: {
-        aggregated: {
-            levels: LiqLevel[];
-        };
-        marketId: number;
-        positionCount: number;
-        timestamp: number;
-    };
-}

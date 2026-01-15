@@ -1,8 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import type {
-    OrderBookLiqIF,
-    OrderBookRowIF,
-} from '~/utils/orderbook/OrderBookIFs';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -15,12 +11,12 @@ import type {
     ISubscription,
 } from '~/tv/charting_library';
 import { LiqChartTooltipType, useLiqChartStore } from '~/stores/LiqChartStore';
-
+import type { LiqLevel } from './LiquidationUtils';
 interface LiquidationsChartProps {
-    buyData: OrderBookRowIF[];
-    sellData: OrderBookRowIF[];
-    liqBuys: OrderBookLiqIF[];
-    liqSells: OrderBookLiqIF[];
+    buyData: LiqLevel[];
+    sellData: LiqLevel[];
+    liqBuys: LiqLevel[];
+    liqSells: LiqLevel[];
     width?: number;
     height?: number;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -98,10 +94,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const liqTooltipRef = useRef<any>(null);
 
-    const currentBuyDataRef = useRef<OrderBookRowIF[]>([]);
-    const currentSellDataRef = useRef<OrderBookRowIF[]>([]);
-    const currentLiqBuysRef = useRef<OrderBookLiqIF[]>([]);
-    const currentLiqSellsRef = useRef<OrderBookLiqIF[]>([]);
+    const currentBuyDataRef = useRef<LiqLevel[]>([]);
+    const currentSellDataRef = useRef<LiqLevel[]>([]);
+    const currentLiqBuysRef = useRef<LiqLevel[]>([]);
+    const currentLiqSellsRef = useRef<LiqLevel[]>([]);
     const hoverLineDataRef = useRef<LineData[]>([]);
 
     const highlightHoveredArea = useRef(false);
@@ -462,8 +458,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
-            .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .mainValue((d: LiqLevel) => d.ratio)
+            .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -484,8 +480,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 }
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
-            .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .mainValue((d: LiqLevel) => d.ratio)
+            .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -497,8 +493,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .seriesCanvasLine()
             .orient('horizontal')
             .curve(curve)
-            .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .mainValue((d: LiqLevel) => d.ratio)
+            .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -515,8 +511,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .seriesCanvasLine()
             .orient('horizontal')
             .curve(curve)
-            .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .mainValue((d: LiqLevel) => d.ratio)
+            .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -670,16 +666,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, [width, height]);
 
     const interPolateData = useCallback(
-        (
-            fromData: OrderBookRowIF[],
-            toData: OrderBookRowIF[],
-            progress: number,
-        ) => {
+        (fromData: LiqLevel[], toData: LiqLevel[], progress: number) => {
             if (progress < 0) return fromData;
             if (progress > 1) return toData;
             if (pauseLiqAnimationRef.current) return fromData;
 
-            const interpolatedData: OrderBookRowIF[] = [];
+            const interpolatedData: LiqLevel[] = [];
 
             if (fromData.length != toData.length) {
                 return toData;
@@ -711,16 +703,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     );
 
     const interPolateLiqData = useCallback(
-        (
-            fromData: OrderBookLiqIF[],
-            toData: OrderBookLiqIF[],
-            progress: number,
-        ) => {
+        (fromData: LiqLevel[], toData: LiqLevel[], progress: number) => {
             if (progress < 0) return fromData;
             if (progress > 1) return toData;
             if (pauseLiqAnimationRef.current) return fromData;
 
-            const interpolatedData: OrderBookLiqIF[] = [];
+            const interpolatedData: LiqLevel[] = [];
 
             if (fromData.length != toData.length) {
                 return toData;
@@ -753,10 +741,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const animateChart = useCallback(
         (
-            newBuyData: OrderBookRowIF[],
-            newSellData: OrderBookRowIF[],
-            newLiqBuys: OrderBookLiqIF[],
-            newLiqSells: OrderBookLiqIF[],
+            newBuyData: LiqLevel[],
+            newSellData: LiqLevel[],
+            newLiqBuys: LiqLevel[],
+            newLiqSells: LiqLevel[],
         ) => {
             if (
                 isAnimating.current &&
@@ -925,23 +913,22 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const snappedPricePoint =
                 nearest.length > 0
-                    ? nearest.reduce(
-                          (closest: OrderBookRowIF, item: OrderBookRowIF) => {
-                              if (!closest) return item;
-                              return Math.abs(item.px - priceOnMousePoint) <
-                                  Math.abs(closest.px - priceOnMousePoint)
-                                  ? item
-                                  : closest;
-                          },
-                      )
+                    ? nearest.reduce((closest: LiqLevel, item: LiqLevel) => {
+                          if (!closest) return item;
+                          return Math.abs(item.px - priceOnMousePoint) <
+                              Math.abs(closest.px - priceOnMousePoint)
+                              ? item
+                              : closest;
+                      })
                     : hoveredArray[hoveredArray.length - 1];
 
             const amount =
-                snappedPricePoint && snappedPricePoint.total
-                    ? snappedPricePoint.total
+                snappedPricePoint && snappedPricePoint.cumulativeSz
+                    ? snappedPricePoint.cumulativeSz
                     : 0;
 
-            const finalTotal = hoveredArray[hoveredArray.length - 1].total;
+            const finalTotal =
+                hoveredArray[hoveredArray.length - 1].cumulativeSz || Infinity;
 
             const percentage = (amount / finalTotal) * 100;
 
@@ -1202,8 +1189,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .decorate((context: CanvasRenderingContext2D) => {
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
-            .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .mainValue((d: LiqLevel) => d.ratio)
+            .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -1218,8 +1205,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .decorate((context: CanvasRenderingContext2D) => {
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
-            .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .mainValue((d: LiqLevel) => d.ratio)
+            .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current

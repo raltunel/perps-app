@@ -11,7 +11,7 @@ export enum LiqChartTabType {
     Feed = 'Feed',
 }
 
-export type LiqLevel = {
+export type LiqThresholdLevel = {
     id: number;
     label: string;
     color: string;
@@ -42,8 +42,8 @@ interface LiqChartStore {
     setMinLiqValue: (minLiqValue: number) => void;
     maxLiqValue: number | null;
     setMaxLiqValue: (maxLiqValue: number) => void;
-    liqLevels: LiqLevel[];
-    setLiqLevels: (liqLevels: LiqLevel[]) => void;
+    liqLevels: LiqThresholdLevel[];
+    setLiqLevels: (liqLevels: LiqThresholdLevel[]) => void;
 }
 
 export const useLiqChartStore = create<LiqChartStore>()(
@@ -72,7 +72,8 @@ export const useLiqChartStore = create<LiqChartStore>()(
             maxLiqValue: null,
             setMaxLiqValue: (maxLiqValue: number) => set({ maxLiqValue }),
             liqLevels: defaultLiqLevels,
-            setLiqLevels: (liqLevels: LiqLevel[]) => set({ liqLevels }),
+            setLiqLevels: (liqLevels: LiqThresholdLevel[]) =>
+                set({ liqLevels }),
         }),
         {
             name: 'LIQCHART',

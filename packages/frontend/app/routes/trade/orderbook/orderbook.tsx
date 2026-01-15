@@ -114,6 +114,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         midPrice,
         setMidPrice,
         setUsualResolution,
+        setObMaxSell,
+        setObMinBuy,
     } = useOrderBookStore();
     const midPriceRef = useRef<number | null>(null);
     midPriceRef.current = midPrice;
@@ -353,6 +355,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
             setFocusedSlotOutOfBounds(null);
         }
     }, [orderInputPriceValue.value]);
+
+    useEffect(() => {
+        if (buys.length > 0 && buys.length > orderCount) {
+            setObMinBuy(buys[orderCount - 1].px);
+        }
+        if (sells.length > 0 && sells.length > orderCount) {
+            setObMaxSell(sells[orderCount - 1].px);
+        }
+    }, [buys, sells, orderCount]);
 
     useEffect(() => {
         if (

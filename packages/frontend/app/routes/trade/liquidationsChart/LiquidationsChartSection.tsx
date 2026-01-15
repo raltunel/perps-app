@@ -20,6 +20,7 @@ import {
 import LiquidationsChart from './LiquidationOBChart';
 import styles from './LiquidationsChartSection.module.css';
 import OBLiqFetcher from './ObLiqFetcher';
+import { useLiquidationStore } from '~/stores/LiquidationStore';
 
 interface LiquidationsChartSectionProps {
     symbol: string;
@@ -39,7 +40,6 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         setInpSells,
         selectedResolution,
         selectedMode,
-        orderBookState,
         setSelectedResolution,
         setSelectedMode,
         liqBuys,
@@ -48,8 +48,11 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         setLiqSells,
         orderCount,
         activeOrderTab,
+        obMaxSell,
+        obMinBuy,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
+    const { loadingState } = useLiquidationStore();
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const tabContentRef = useRef<HTMLDivElement>(null);
@@ -61,6 +64,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const sellsRef = useRef<OrderBookRowIF[]>([]);
     buysRef.current = buys;
     sellsRef.current = sells;
+
+    const { buyLiqs, sellLiqs } = useLiquidationStore();
 
     const handleTabChange = useCallback(
         (tab: LiqChartTabType) => setActiveTab(tab),
@@ -140,7 +145,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         updateDimensions();
 
         return () => window.removeEventListener('resize', updateDimensions);
-    }, [orderCount, orderBookState]);
+    }, [orderCount, loadingState]);
 
     const inpOrderCount = useMemo(() => {
         if (!inpBuys.length) return 30;
@@ -163,9 +168,15 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         [inpOrderCount],
     );
 
+    useEffect(() => {
+        console.log('>>>>>>>>>>> obMaxSell', obMaxSell);
+        console.log('>>>>>>>>>>> obMinBuy', obMinBuy);
+        console.log('>>>>>>>>>>> ..........................................');
+    }, [obMaxSell, obMinBuy]);
+
     const renderTabContent = useCallback(() => {
         if (activeTab === 'Distribution') {
-            if (orderBookState === TableState.LOADING) {
+            if (loadingState === TableState.LOADING) {
                 return (
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -203,7 +214,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             }
 
             if (
-                orderBookState === TableState.FILLED &&
+                loadingState === TableState.FILLED &&
                 inpBuys.length > 0 &&
                 inpSells.length > 0
             ) {
@@ -221,10 +232,14 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         }}
                     >
                         <LiquidationsChart
-                            buyData={inpBuys}
-                            sellData={inpSells}
-                            liqBuys={liqBuys}
-                            liqSells={liqSells}
+                            buyData={buyLiqs.filter(
+                                (liq) => liq.px >= obMinBuy,
+                            )}
+                            sellData={sellLiqs.filter(
+                                (liq) => liq.px <= obMaxSell,
+                            )}
+                            liqBuys={[]}
+                            liqSells={[]}
                             width={dimensions.width}
                             height={dimensions.height}
                             location={'obBook'}
@@ -234,7 +249,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             }
         }
         return <div>Feed</div>;
-    }, [activeTab, inpBuys, inpSells, dimensions, orderBookState]);
+    }, [activeTab, inpBuys, inpSells, dimensions, loadingState]);
 
     const liqChartTabsComponent = (
         <div className={styles.liqChartTabContainer}>

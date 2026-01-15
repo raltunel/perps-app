@@ -3,7 +3,10 @@ import type { HorizontalLineData } from '../LiqudationLines';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookLiqIF } from '~/utils/orderbook/OrderBookIFs';
-import { useLiqChartStore, type LiqLevel } from '~/stores/LiqChartStore';
+import {
+    useLiqChartStore,
+    type LiqThresholdLevel,
+} from '~/stores/LiqChartStore';
 
 export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
     const { symbolInfo } = useTradeDataStore();
@@ -34,7 +37,9 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
                 }
             });
 
-            return foundLevel ? (foundLevel as LiqLevel).color : '#461668';
+            return foundLevel
+                ? (foundLevel as LiqThresholdLevel).color
+                : '#461668';
         },
         [liqLevels],
     );

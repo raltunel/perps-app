@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import styles from './LiqLevelsSlider.module.css';
-import { useLiqChartStore, type LiqLevel } from '~/stores/LiqChartStore';
+import {
+    useLiqChartStore,
+    type LiqThresholdLevel,
+} from '~/stores/LiqChartStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface LiqThreshold {

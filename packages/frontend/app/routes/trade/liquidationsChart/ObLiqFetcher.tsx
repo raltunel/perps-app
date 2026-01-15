@@ -1,7 +1,4 @@
-import type {
-    L2BookData,
-    LiqLevelMessage,
-} from '@perps-app/sdk/src/utils/types';
+import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWs } from '~/contexts/WsContext';
 import { useRestPoller } from '~/hooks/useRestPoller';
@@ -19,12 +16,21 @@ import {
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import {
+    type LiqLevelMessage,
+    type LiqLevel,
+    parseLiqLevelRaw,
+} from './LiquidationUtils';
+import { useLiquidationStore } from '~/stores/LiquidationStore';
+import { TableState } from '~/utils/CommonIFs';
 
 interface OBLiqFetcherProps {}
 
 const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
     const { subscribe, unsubscribe } = useWs();
+
+    const { setBuyLiqs, setSellLiqs, setLoadingState } = useLiquidationStore();
 
     const { maxLiqValue, minLiqValue, setMaxLiqValue, setMinLiqValue } =
         useLiqChartStore();
@@ -51,6 +57,7 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
         };
 
         subscribe('liquidationLevels', config);
+        setLoadingState(TableState.LOADING);
 
         return () => {
             unsubscribe('liquidationLevels', config);
@@ -58,8 +65,69 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     }, [subscribe, unsubscribe]);
 
     const handleLiquidationLevels = useCallback((data: LiqLevelMessage) => {
+        const markPx = symbolInfoRef.current?.markPx;
+        if (!markPx) return;
+
+        setLoadingState(TableState.FILLED);
         const levels = data.market.aggregated.levels;
-        console.log('>>>>> liquidationLevels levels:', levels);
+
+        const buys = levels
+            .filter((level) => level[0] / 1e6 <= markPx)
+            .reverse();
+
+        const buysMaxSz = buys.reduce(
+            (max, level) => Math.max(max, level[1] / 1e8),
+            0,
+        );
+        const buysTotalSz = buys.reduce(
+            (total, level) => total + level[1] / 1e8,
+            0,
+        );
+
+        const sells = levels.filter((level) => level[0] / 1e6 > markPx);
+        const sellsMaxSz = sells.reduce(
+            (max, level) => Math.max(max, level[1] / 1e8),
+            0,
+        );
+
+        const maxSz = Math.max(buysMaxSz, sellsMaxSz);
+
+        const sellsTotalSz = sells.reduce(
+            (total, level) => total + level[1] / 1e8,
+            0,
+        );
+
+        let cumulativeSz = 0;
+
+        const buyLiqs: LiqLevel[] = [];
+        const sellLiqs: LiqLevel[] = [];
+
+        buys.forEach((level) => {
+            const liq = parseLiqLevelRaw(
+                level,
+                'buy',
+                cumulativeSz,
+                maxSz,
+                buysTotalSz,
+            );
+            buyLiqs.push(liq);
+            cumulativeSz += liq.sz;
+        });
+        cumulativeSz = 0;
+        sells.forEach((level) => {
+            const liq = parseLiqLevelRaw(
+                level,
+                'sell',
+                cumulativeSz,
+                maxSz,
+                sellsTotalSz,
+            );
+            sellLiqs.push(liq);
+            cumulativeSz += liq.sz;
+        });
+
+        setBuyLiqs(buyLiqs);
+        setSellLiqs(sellLiqs);
     }, []);
 
     useEffect(() => {
