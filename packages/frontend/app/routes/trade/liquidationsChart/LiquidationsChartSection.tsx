@@ -226,11 +226,27 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 );
             }
 
-            if (
-                loadingState === TableState.FILLED &&
-                buyLiqsFilteredOB.length > 0 &&
-                buyLiqsFilteredOB.length > 0
-            ) {
+            if (loadingState === TableState.FILLED) {
+                const hasBuyData = buyLiqsFilteredOB.length > 0;
+                const hasSellData = sellLiqsFilteredOB.length > 0;
+
+                // Both empty - show full empty state
+                if (!hasBuyData && !hasSellData) {
+                    return (
+                        <motion.div
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{ duration: 0.2 }}
+                            className={styles.chartWrapper}
+                        >
+                            <div className={styles.emptyStateCenter}>
+                                <span>No liquidation data available</span>
+                            </div>
+                        </motion.div>
+                    );
+                }
+
                 return (
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}

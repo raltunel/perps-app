@@ -76,3 +76,17 @@
     border-color: var(--accent1);
     color: var(--text1);
 }
+
+.emptyStateCenter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text3);
+    font-family: var(--font-family);
+    font-size: var(--font-size-body);
+    z-index: 5;
+}
