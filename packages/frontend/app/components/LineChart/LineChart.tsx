@@ -17,6 +17,8 @@ type LineChartProps = {
 const LineChart: React.FC<LineChartProps> = (props) => {
     const { lineData, chartName, curve, height, width, isMobile } = props;
 
+    const hasData = Array.isArray(lineData) && lineData.length > 0;
+
     const chartWidth = width || 850;
     const chartHeight = height || 250;
 
@@ -38,10 +40,10 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const scaleDataRef = useRef<{
-        xScale: d3.ScaleTime<number, number> | undefined;
-        yScale: d3.ScaleLinear<number, number> | undefined;
-        svgXScale: d3.ScaleTime<number, number> | undefined;
-        svgYScale: d3.ScaleLinear<number, number> | undefined;
+        xScale: any;
+        yScale: any;
+        svgXScale: any;
+        svgYScale: any;
     }>({
         xScale: undefined,
         yScale: undefined,
@@ -64,6 +66,10 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     // Find Y axis ticks
     useEffect(() => {
         if (lineData) {
+            if (lineData.length === 0) {
+                yAxisTicksRef.current = [0, 1];
+                return;
+            }
             const minPrice = d3.min(lineData, (d: any) => d.value);
             const maxPrice = d3.max(lineData, (d: any) => d.value);
 
@@ -133,8 +139,16 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const minDate = d3.min(lineData, (d: any) => d.time);
-        const maxDate = d3.max(lineData, (d: any) => d.time);
+        const now = Date.now();
+        const defaultMinDate = now - 7 * 24 * 60 * 60 * 1000;
+        const defaultMaxDate = now;
+
+        const minDate = hasData
+            ? d3.min(lineData, (d: any) => d.time)
+            : defaultMinDate;
+        const maxDate = hasData
+            ? d3.max(lineData, (d: any) => d.time)
+            : defaultMaxDate;
 
         // Scales
         if (minDate && maxDate && lineData) {
@@ -155,8 +169,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             scaleDataRef.current.svgXScale = svgXScale;
         }
 
-        const minPrice = d3.min(lineData, (d: any) => d.value);
-        const maxPrice = d3.max(lineData, (d: any) => d.value);
+        const minPrice = hasData ? d3.min(lineData, (d: any) => d.value) : 0;
+        const maxPrice = hasData ? d3.max(lineData, (d: any) => d.value) : 1;
 
         if (minPrice !== undefined && maxPrice !== undefined) {
             const diff = maxPrice - minPrice;
@@ -324,15 +338,17 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
         if (!xScale || !yScale) return;
 
+        if (!hasData) return;
+
         const lineSeries = d3
-            .line<{ time: number; value: number }>()
+            .line()
             .x((d: any) => xScale(new Date(d.time)))
             .y((d: any) => yScale(d.value))
             .curve(curve === 'step' ? d3.curveStep : d3.curveBasis)
             .context(context);
 
         setLineSeries(() => lineSeries);
-    }, [curve, canvasInitialHeight, canvasInitialWidth, lineData]);
+    }, [curve, canvasInitialHeight, canvasInitialWidth, lineData, hasData]);
 
     useEffect(() => {
         if (
@@ -344,7 +360,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const xScale = scaleDataRef.current.xScale;
             const yScale = scaleDataRef.current.yScale;
 
-            if (!xScale || !yScale || !lineSeries) return;
+            if (!xScale || !yScale) return;
 
             const canvas = canvasRef.current;
             if (!canvas) return;
@@ -363,11 +379,13 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             context.clearRect(0, 0, width, height - xAxisHeight);
 
-            context.beginPath();
-            lineSeries(lineData);
-            context.lineWidth = 2;
-            context.strokeStyle = '#7371fc';
-            context.stroke();
+            if (hasData && lineSeries) {
+                context.beginPath();
+                lineSeries(lineData);
+                context.lineWidth = 2;
+                context.strokeStyle = '#7371fc';
+                context.stroke();
+            }
 
             yAxisTicksRef.current?.forEach((tick) => {
                 context.moveTo(xScale(xScale.domain()[0]), yScale(tick));
@@ -378,7 +396,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             context.lineWidth = 2;
             context.stroke();
         }
-    }, [lineSeries, lineData, chartHeight, chartWidth]);
+    }, [lineSeries, lineData, chartHeight, chartWidth, hasData]);
 
     return (
         <div style={{ height: '100%' }}>
