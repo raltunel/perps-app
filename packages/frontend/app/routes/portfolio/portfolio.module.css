@@ -993,13 +993,26 @@
     }
 
     .portfolioHeader {
-        padding: var(--padding-s) 0;
+        padding: var(--padding-s) var(--padding-s);
     }
 
     .walletAddressInputHeader {
-        width: clamp(200px, 52vw, 320px);
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 0;
         padding: var(--padding-xs) var(--padding-s);
         font-size: var(--font-size-xs);
+    }
+
+    .headerAddressSection {
+        flex: 1 1 auto;
+        min-width: 0;
+        justify-content: flex-end;
+    }
+
+    .headerAddressCancel {
+        flex: 0 0 auto;
+        white-space: nowrap;
     }
 
     .column {
