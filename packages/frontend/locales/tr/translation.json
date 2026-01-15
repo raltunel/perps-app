@@ -717,7 +717,8 @@
         "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
         "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın.",
         "pasteWalletAddress": "Cüzdan adresini yapıştır",
-        "viewOtherAccount": "Diğer hesabı görüntüle"
+        "viewOtherAccount": "Diğer hesabı görüntüle",
+        "returnToMyPortfolio": "Kendi portföyüme dön"
     },
     "pageTitles": {
         "portfolio": "Portföy",

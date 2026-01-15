@@ -717,7 +717,8 @@
         "connectToViewPortfolio": "ポートフォリオを表示するには接続してください",
         "connectDescription": "ウォレットでサインインして、ポートフォリオ、ポジション、取引履歴を表示します。",
         "pasteWalletAddress": "ウォレットアドレスを貼り付け",
-        "viewOtherAccount": "他のアカウントを表示"
+        "viewOtherAccount": "他のアカウントを表示",
+        "returnToMyPortfolio": "自分のポートフォリオに戻る"
     },
     "pageTitles": {
         "portfolio": "ポートフォリオ",

@@ -99,8 +99,23 @@
     transition: opacity 0.2s ease;
 }
 
+.headerReturnToMine {
+    color: var(--accent1);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    padding: var(--padding-xs) var(--padding-s);
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
 .headerViewOther:hover,
 .headerAddressCancel:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.headerReturnToMine:hover {
     opacity: 0.8;
     text-decoration: underline;
 }

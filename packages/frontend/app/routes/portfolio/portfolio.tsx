@@ -150,6 +150,10 @@ function Portfolio() {
         (!!loggedInAddress &&
             urlAddress.toLowerCase() === loggedInAddress.toLowerCase());
 
+    const myPortfolioPath = loggedInAddress
+        ? `/v2/portfolio/${loggedInAddress}`
+        : '/v2/portfolio';
+
     const showTransactButtons = hasSession && isViewingOwnPortfolio;
 
     // Determine if we should show the "connect" view
@@ -581,6 +585,20 @@ function Portfolio() {
                                             className={styles.headerCopyIcon}
                                         />
                                     </button>
+                                    {hasSession &&
+                                        loggedInAddress &&
+                                        !isViewingOwnPortfolio && (
+                                            <Link
+                                                to={myPortfolioPath}
+                                                className={
+                                                    styles.headerReturnToMine
+                                                }
+                                            >
+                                                {t(
+                                                    'portfolio.returnToMyPortfolio',
+                                                )}
+                                            </Link>
+                                        )}
                                     <button
                                         type='button'
                                         className={styles.headerViewOther}

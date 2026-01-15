@@ -717,7 +717,8 @@
         "connectToViewPortfolio": "포트폴리오를 보려면 연결하세요",
         "connectDescription": "지갑으로 로그인하여 포트폴리오, 포지션 및 거래 내역을 확인하세요.",
         "pasteWalletAddress": "지갑 주소 붙여넣기",
-        "viewOtherAccount": "다른 계정 보기"
+        "viewOtherAccount": "다른 계정 보기",
+        "returnToMyPortfolio": "내 포트폴리오로 돌아가기"
     },
     "pageTitles": {
         "portfolio": "포트폴리오",
