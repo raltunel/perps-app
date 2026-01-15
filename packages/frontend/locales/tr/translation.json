@@ -45,11 +45,13 @@
         "announcements": "Duyurular",
         "leverage": "Kaldıraç",
         "comingSoon": "Yakında",
+        "or": "veya",
         "enter": "Giriş",
         "claim": "Talep Et",
         "seeDocsForMore": "Daha fazlası için dokümanlara bakın.",
         "clearFilter": "Filtreyi temizle",
-        "activate": "Etkinleştir"
+        "activate": "Etkinleştir",
+        "copied": "Kopyalandı!"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",
@@ -713,7 +715,9 @@
         "exceedsAvailableBalance": "Tutar mevcut bakiyenizi aşmaktadır: {{balance}}",
         "transactionTimedOut": "İşlem 15 saniye sonra zaman aşımına uğradı",
         "connectToViewPortfolio": "Portföyünüzü Görüntülemek için Bağlanın",
-        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın."
+        "connectDescription": "Portföyünüzü, pozisyonlarınızı ve işlem geçmişinizi görüntülemek için cüzdanınızla giriş yapın.",
+        "pasteWalletAddress": "Cüzdan adresini yapıştır",
+        "viewOtherAccount": "Diğer hesabı görüntüle"
     },
     "pageTitles": {
         "portfolio": "Portföy",
