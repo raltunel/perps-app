@@ -717,7 +717,8 @@
         "connectToViewPortfolio": "Connect to View Your Portfolio",
         "connectDescription": "Sign in with your wallet to view your portfolio, positions, and trading history.",
         "pasteWalletAddress": "Paste wallet address",
-        "viewOtherAccount": "View other account"
+        "viewOtherAccount": "View other account",
+        "returnToMyPortfolio": "Return to my portfolio"
     },
     "pageTitles": {
         "portfolio": "Portfolio",
