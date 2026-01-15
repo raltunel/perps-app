@@ -166,6 +166,32 @@ function Portfolio() {
     const [, copyToClipboard] = useClipboard();
     const [showCopied, setShowCopied] = useState(false);
 
+    const handleWalletAddressFocus = useCallback(
+        (e: React.FocusEvent<HTMLInputElement>) => {
+            if (typeof window === 'undefined') return;
+            if (!window.matchMedia?.('(pointer: coarse)').matches) return;
+
+            const el = e.currentTarget;
+
+            window.setTimeout(() => {
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 150);
+
+            window.setTimeout(() => {
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest',
+                });
+            }, 600);
+        },
+        [],
+    );
+
     const handleCopyAddress = useCallback(async () => {
         if (!urlAddress) return;
         const success = await copyToClipboard(urlAddress);
@@ -356,6 +382,7 @@ function Portfolio() {
                             className={styles.walletAddressInput}
                             placeholder={t('portfolio.pasteWalletAddress')}
                             onChange={handleAddressInput}
+                            onFocus={handleWalletAddressFocus}
                             autoComplete='off'
                             spellCheck={false}
                         />
@@ -522,6 +549,7 @@ function Portfolio() {
                                             'portfolio.pasteWalletAddress',
                                         )}
                                         onChange={handleAddressInput}
+                                        onFocus={handleWalletAddressFocus}
                                         autoComplete='off'
                                         spellCheck={false}
                                     />
