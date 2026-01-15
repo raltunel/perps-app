@@ -47,6 +47,10 @@
     font-family: inherit;
 }
 
+.walletAddressInputHeader:focus::placeholder {
+    color: transparent;
+}
+
 .walletAddressInputHeader:focus {
     outline: none;
     border-color: var(--accent1);
@@ -176,6 +180,10 @@
 .walletAddressInput::placeholder {
     color: var(--text2);
     font-family: inherit;
+}
+
+.walletAddressInput:focus::placeholder {
+    color: transparent;
 }
 
 .walletAddressInput:focus {
