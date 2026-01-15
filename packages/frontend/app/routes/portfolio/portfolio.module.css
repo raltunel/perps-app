@@ -1299,6 +1299,23 @@
         );
     }
 
+    .portfolioHeader {
+        align-items: flex-start;
+    }
+
+    .headerAddressSection {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .headerReturnToMine {
+        flex: 0 0 100%;
+        order: 10;
+        text-align: right;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
     .container header {
         font-size: var(--font-size-l);
     }
