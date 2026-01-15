@@ -7,6 +7,7 @@ import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
 import { getPaneCanvasAndIFrameDoc } from '../../overlayCanvas/overlayCanvasUtils';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import type { TabType } from '~/routes/trade';
+import { usePreviewOrderLines } from '../usePreviewOrderLines';
 
 interface ChartElementControlPanelProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +30,7 @@ export const ChartElementControlPanel: React.FC<
     const [originalPrice, setOriginalPrice] = useState<number | null>(null);
     const [top, setTop] = useState<string>('0px');
     const [left, setLeft] = useState<string>('0px');
+    const { updateYPosition } = usePreviewOrderLines();
 
     useEffect(() => {
         if (selectedOrderLine && originalPrice === null) {
@@ -100,6 +102,12 @@ export const ChartElementControlPanel: React.FC<
     const cancelChanges = () => {
         if (originalPrice !== null) {
             setPreviewPrice(originalPrice);
+            if (
+                selectedOrderLine &&
+                selectedOrderLine.type === 'PREVIEW_ORDER'
+            ) {
+                updateYPosition(originalPrice);
+            }
         }
         setSelectedOrderLine(undefined);
     };
