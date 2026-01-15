@@ -34,6 +34,9 @@ const YAxisOverlayCanvas: React.FC = () => {
     const dragPriceRef = useRef<number | undefined>(undefined);
     const dragFrozenPriceRef = useRef<number | undefined>(undefined);
     const isDraggingRef = useRef(false);
+    const orderInputPriceValueRef = useRef<number | undefined>(
+        orderInputPriceValue.value,
+    );
 
     const { symbolInfo } = useTradeDataStore();
     const lastCandle = useChartStore((state) => state.lastCandle);
@@ -190,6 +193,10 @@ const YAxisOverlayCanvas: React.FC = () => {
     useEffect(() => {
         localSelectedOrderLineRef.current = selectedOrderLine;
     }, [selectedOrderLine]);
+
+    useEffect(() => {
+        orderInputPriceValueRef.current = orderInputPriceValue.value;
+    }, [orderInputPriceValue.value]);
 
     useEffect(() => {
         if (!chart) return;
@@ -456,7 +463,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             const initialPrice =
                 isMobile && localSelectedOrderLineRef.current
                     ? localSelectedOrderLineRef.current.yPrice
-                    : orderInputPriceValue.value;
+                    : orderInputPriceValueRef.current;
 
             dragPriceRef.current = initialPrice;
             dragStartPriceRef.current = initialPrice;
