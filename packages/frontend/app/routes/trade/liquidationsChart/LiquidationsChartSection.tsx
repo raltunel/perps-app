@@ -60,12 +60,24 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
     const { activeTab, setActiveTab } = useLiqChartStore();
 
+    const [chartMode, setChartMode] = useState<'distribution' | 'cumulative'>(
+        'distribution',
+    );
+
     const buysRef = useRef<OrderBookRowIF[]>([]);
     const sellsRef = useRef<OrderBookRowIF[]>([]);
     buysRef.current = buys;
     sellsRef.current = sells;
 
     const { buyLiqs, sellLiqs } = useLiquidationStore();
+
+    const buyLiqsFilteredOB = useMemo(() => {
+        return buyLiqs.filter((liq) => liq.px >= obMinBuy);
+    }, [buyLiqs, obMinBuy]);
+
+    const sellLiqsFilteredOB = useMemo(() => {
+        return sellLiqs.filter((liq) => liq.px <= obMaxSell);
+    }, [sellLiqs, obMaxSell]);
 
     const handleTabChange = useCallback(
         (tab: LiqChartTabType) => setActiveTab(tab),
@@ -175,6 +187,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     }, [obMaxSell, obMinBuy]);
 
     const renderTabContent = useCallback(() => {
+        console.log('>>>>>>>>>>> renderTabContent', activeTab, loadingState);
         if (activeTab === 'Distribution') {
             if (loadingState === TableState.LOADING) {
                 return (
@@ -215,8 +228,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
             if (
                 loadingState === TableState.FILLED &&
-                inpBuys.length > 0 &&
-                inpSells.length > 0
+                buyLiqsFilteredOB.length > 0 &&
+                buyLiqsFilteredOB.length > 0
             ) {
                 return (
                     <motion.div
@@ -224,32 +237,45 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
                         transition={{ duration: 0.2 }}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            // alignItems: 'center',
-                        }}
+                        className={styles.chartWrapper}
                     >
                         <LiquidationsChart
-                            buyData={buyLiqs.filter(
-                                (liq) => liq.px >= obMinBuy,
-                            )}
-                            sellData={sellLiqs.filter(
-                                (liq) => liq.px <= obMaxSell,
-                            )}
+                            buyData={buyLiqsFilteredOB}
+                            sellData={sellLiqsFilteredOB}
                             liqBuys={[]}
                             liqSells={[]}
                             width={dimensions.width}
                             height={dimensions.height}
                             location={'obBook'}
+                            chartMode={chartMode}
                         />
+                        <button
+                            className={styles.modeButton}
+                            onClick={() =>
+                                setChartMode(
+                                    chartMode === 'distribution'
+                                        ? 'cumulative'
+                                        : 'distribution',
+                                )
+                            }
+                        >
+                            {chartMode === 'distribution'
+                                ? 'Distribution'
+                                : 'Cumulative'}
+                        </button>
                     </motion.div>
                 );
             }
         }
         return <div>Feed</div>;
-    }, [activeTab, inpBuys, inpSells, dimensions, loadingState]);
+    }, [
+        activeTab,
+        buyLiqsFilteredOB,
+        sellLiqsFilteredOB,
+        dimensions,
+        loadingState,
+        chartMode,
+    ]);
 
     const liqChartTabsComponent = (
         <div className={styles.liqChartTabContainer}>

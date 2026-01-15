@@ -22,6 +22,7 @@ interface LiquidationsChartProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData?: any;
     location: string;
+    chartMode: 'distribution' | 'cumulative';
 }
 
 interface LineData {
@@ -40,6 +41,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         height = 400,
         scaleData,
         location,
+        chartMode,
     } = props;
 
     const {
@@ -51,6 +53,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = useLiqChartStore();
     const focusSourceRef = useRef(focusSource);
     focusSourceRef.current = focusSource;
+
+    const chartModeRef = useRef(chartMode);
+    chartModeRef.current = chartMode;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
@@ -458,7 +463,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
-            .mainValue((d: LiqLevel) => d.ratio)
+            .mainValue((d: LiqLevel) =>
+                chartModeRef.current === 'distribution'
+                    ? d.ratio
+                    : d.cumulativeRatio,
+            )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
@@ -480,7 +489,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 }
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
-            .mainValue((d: LiqLevel) => d.ratio)
+            .mainValue((d: LiqLevel) =>
+                chartModeRef.current === 'distribution'
+                    ? d.ratio
+                    : d.cumulativeRatio,
+            )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
@@ -493,7 +506,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .seriesCanvasLine()
             .orient('horizontal')
             .curve(curve)
-            .mainValue((d: LiqLevel) => d.ratio)
+            .mainValue((d: LiqLevel) =>
+                chartModeRef.current === 'distribution'
+                    ? d.ratio
+                    : d.cumulativeRatio,
+            )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
@@ -511,7 +528,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .seriesCanvasLine()
             .orient('horizontal')
             .curve(curve)
-            .mainValue((d: LiqLevel) => d.ratio)
+            .mainValue((d: LiqLevel) =>
+                chartModeRef.current === 'distribution'
+                    ? d.ratio
+                    : d.cumulativeRatio,
+            )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
@@ -563,7 +584,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             sellLine(currentSellDataRef.current);
             buyLine(currentBuyDataRef.current);
         });
-    }, [width, height, location, chartReady]);
+    }, [width, height, location, chartReady, chartMode]);
 
     useEffect(() => {
         if (location !== 'obBook') return;
@@ -692,6 +713,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     sz:
                         (fromRow.sz || 0) +
                         ((toRow.sz || 0) - (fromRow.sz || 0)) * progress,
+                    cumulativeRatio:
+                        (fromRow.cumulativeRatio || 0) +
+                        ((toRow.cumulativeRatio || 0) -
+                            (fromRow.cumulativeRatio || 0)) *
+                            progress,
                 };
 
                 interpolatedData.push(interpolatedRow);
@@ -729,6 +755,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     sz:
                         (fromRow.sz || 0) +
                         ((toRow.sz || 0) - (fromRow.sz || 0)) * progress,
+                    cumulativeRatio:
+                        (fromRow.cumulativeRatio || 0) +
+                        ((toRow.cumulativeRatio || 0) -
+                            (fromRow.cumulativeRatio || 0)) *
+                            progress,
                 };
 
                 interpolatedData.push(interpolatedRow);
@@ -1064,7 +1095,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     useEffect(() => {
         updateScalesAndSeries();
-    }, [width, height, chartReady]);
+    }, [width, height, chartReady, chartMode]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -1189,7 +1220,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .decorate((context: CanvasRenderingContext2D) => {
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
-            .mainValue((d: LiqLevel) => d.ratio)
+            .mainValue((d: LiqLevel) =>
+                chartModeRef.current === 'distribution'
+                    ? d.ratio
+                    : d.cumulativeRatio,
+            )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
@@ -1205,7 +1240,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .decorate((context: CanvasRenderingContext2D) => {
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
-            .mainValue((d: LiqLevel) => d.ratio)
+            .mainValue((d: LiqLevel) =>
+                chartModeRef.current === 'distribution'
+                    ? d.ratio
+                    : d.cumulativeRatio,
+            )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
             .yScale(
