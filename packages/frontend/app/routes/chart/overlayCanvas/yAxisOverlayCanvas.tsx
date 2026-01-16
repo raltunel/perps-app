@@ -19,6 +19,8 @@ import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const yAxisCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const paneCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart, isChartReady } = useTradingView();
     const { orderInputPriceValue, symbol, isMidModeActive } =
         useTradeDataStore();
@@ -227,15 +229,27 @@ const YAxisOverlayCanvas: React.FC = () => {
     useEffect(() => {
         if (!chart || !isChartReady) return;
 
-        const { iframeDoc, yAxisCanvas, priceAxisContainers } =
-            getPriceAxisContainer(chart);
+        const {
+            iframeDoc,
+            yAxisCanvas,
+            sizeReferenceCanvas,
+            priceAxisContainers,
+        } = getPriceAxisContainer(chart);
+        const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+
         if (
             !iframeDoc ||
             !yAxisCanvas ||
             !yAxisCanvas.parentNode ||
-            !priceAxisContainers
+            !priceAxisContainers ||
+            !sizeReferenceCanvas ||
+            !paneCanvas
         )
             return;
+
+        // Store references
+        yAxisCanvasRef.current = sizeReferenceCanvas;
+        paneCanvasRef.current = paneCanvas;
 
         if (!canvasRef.current) {
             const newCanvas = iframeDoc.createElement('canvas');
@@ -246,8 +260,8 @@ const YAxisOverlayCanvas: React.FC = () => {
             newCanvas.style.cursor = 'default';
             newCanvas.style.pointerEvents = 'none';
             newCanvas.style.zIndex = '5555';
-            newCanvas.width = yAxisCanvas.width;
-            newCanvas.height = yAxisCanvas.height;
+            newCanvas.width = sizeReferenceCanvas.width;
+            newCanvas.height = paneCanvas.height;
             yAxisCanvas.parentNode.appendChild(newCanvas);
             canvasRef.current = newCanvas;
         }
@@ -255,10 +269,14 @@ const YAxisOverlayCanvas: React.FC = () => {
         const canvas = canvasRef.current;
 
         const updateCanvasSize = () => {
-            canvas.width = yAxisCanvas.width;
-            canvas.style.width = `${yAxisCanvas.width}px`;
-            canvas.height = yAxisCanvas.height;
-            canvas.style.height = `${yAxisCanvas.height}px`;
+            const currentSizeRef = yAxisCanvasRef.current;
+            const currentPaneCanvas = paneCanvasRef.current;
+            if (!currentSizeRef || !currentPaneCanvas) return;
+
+            canvas.width = currentSizeRef.width;
+            canvas.style.width = `${currentSizeRef.width}px`;
+            canvas.height = currentPaneCanvas.height;
+            canvas.style.height = `${currentPaneCanvas.height}px`;
         };
 
         updateCanvasSize();
@@ -267,7 +285,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             updateCanvasSize();
         });
 
-        yAxisResizeObserver.observe(yAxisCanvas);
+        yAxisResizeObserver.observe(sizeReferenceCanvas);
 
         const containerWidths = new Map<HTMLElement, number>();
         priceAxisContainers.forEach((container) => {
@@ -310,41 +328,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             priceAxisResizeObserver.observe(container);
         });
 
-        const ensureCanvasSize = () => {
-            if (!isInitialSizeSetRef.current) {
-                const yAxisRect = yAxisCanvas.getBoundingClientRect();
-                const canvasRect = canvas.getBoundingClientRect();
-
-                // Check if canvas position needs updating
-                if (
-                    yAxisRect.left !== canvasRect.left ||
-                    yAxisRect.top !== canvasRect.top
-                ) {
-                    canvas.style.left = '0';
-                    canvas.style.top = '0';
-                }
-
-                // Check if canvas size needs updating
-                const styleWidth = canvas.style.width;
-                const styleHeight = canvas.style.height;
-
-                if (
-                    styleWidth !== yAxisCanvas.style.width ||
-                    styleHeight !== yAxisCanvas.style.height
-                ) {
-                    canvas.style.width = yAxisCanvas.style.width;
-                    canvas.style.height = yAxisCanvas.style.height;
-                    yAxisCanvas.width = canvas.width;
-                    yAxisCanvas.height = canvas.height;
-                }
-
-                isInitialSizeSetRef.current = true;
-            }
-        };
-
         const handleCanvasMouseMove = (e: MouseEvent) => {
-            ensureCanvasSize();
-
             const rect = canvas.getBoundingClientRect();
             const y = e.clientY - rect.top;
 
@@ -352,8 +336,6 @@ const YAxisOverlayCanvas: React.FC = () => {
         };
 
         const handleYAxisMouseMove = (e: MouseEvent) => {
-            ensureCanvasSize();
-
             const rect = yAxisCanvas.getBoundingClientRect();
             const y = e.clientY - rect.top;
 
@@ -383,6 +365,26 @@ const YAxisOverlayCanvas: React.FC = () => {
             isInitialSizeSetRef.current = false;
         };
     }, [chart, isChartReady, isPaneChanged]);
+
+    // Update canvas size when scale domain changes
+    useEffect(() => {
+        if (!chart || !canvasRef.current) return;
+
+        const { sizeReferenceCanvas, yAxisCanvas } =
+            getPriceAxisContainer(chart);
+
+        if (!sizeReferenceCanvas) return;
+
+        // Update refs
+        yAxisCanvasRef.current = yAxisCanvas;
+
+        // Update canvas size - use style values for style, attribute values for attributes
+        const canvas = canvasRef.current;
+        canvas.style.width = sizeReferenceCanvas.style.width;
+        canvas.style.height = sizeReferenceCanvas.style.height;
+        canvas.width = sizeReferenceCanvas.width;
+        canvas.height = sizeReferenceCanvas.height;
+    }, [chart, JSON.stringify(scaleDataRef?.current?.yScale.domain())]);
 
     useEffect(() => {
         if (

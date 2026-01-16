@@ -175,6 +175,7 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
 export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
     iframeDoc: Document | null;
     yAxisCanvas: HTMLCanvasElement | null;
+    sizeReferenceCanvas: HTMLCanvasElement | null;
     priceAxisContainers: HTMLElement[] | null;
 } {
     const chartDiv = document.getElementById('tv_chart');
@@ -186,6 +187,7 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
         return {
             iframeDoc: null,
             yAxisCanvas: null,
+            sizeReferenceCanvas: null,
             priceAxisContainers: null,
         };
     }
@@ -201,6 +203,7 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
         return {
             iframeDoc,
             yAxisCanvas: null,
+            sizeReferenceCanvas: null,
             priceAxisContainers: null,
         };
     }
@@ -212,21 +215,47 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
     });
 
     let yAxisCanvas: HTMLCanvasElement | null = null;
+    let sizeReferenceCanvas: HTMLCanvasElement | null = null;
 
     if (activeContainer) {
         // Find the price-axis div within the active container
         const priceAxisDiv =
             activeContainer.querySelector<HTMLDivElement>('div.price-axis');
         if (priceAxisDiv) {
+            const priceAxisRect = priceAxisDiv.getBoundingClientRect();
             const canvases =
                 priceAxisDiv.querySelectorAll<HTMLCanvasElement>('canvas');
-            yAxisCanvas = canvases.length > 1 ? canvases[1] : null;
+
+            // Find canvas with highest z-index for overlay parent
+            let maxZIndex = -1;
+            for (const canvas of canvases) {
+                const zIndex = parseInt(canvas.style.zIndex) || 0;
+                if (zIndex > maxZIndex) {
+                    maxZIndex = zIndex;
+                    yAxisCanvas = canvas;
+                }
+            }
+
+            // Find canvas that matches price-axis dimensions for size reference
+            for (const canvas of canvases) {
+                const canvasStyleWidth = parseFloat(canvas.style.width) || 0;
+                const canvasStyleHeight = parseFloat(canvas.style.height) || 0;
+
+                if (
+                    Math.abs(canvasStyleWidth - priceAxisRect.width) < 1 &&
+                    Math.abs(canvasStyleHeight - priceAxisRect.height) < 1
+                ) {
+                    sizeReferenceCanvas = canvas;
+                    break;
+                }
+            }
         }
     }
 
     return {
         iframeDoc,
         yAxisCanvas: yAxisCanvas ?? null,
+        sizeReferenceCanvas: sizeReferenceCanvas ?? null,
         priceAxisContainers:
             priceAxisContainers.length > 0 ? priceAxisContainers : null,
     };
