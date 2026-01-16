@@ -362,9 +362,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         if (
             !currentBuyData ||
-            !currentSellData ||
-            currentBuyData.length === 0 ||
-            currentSellData.length === 0
+            !currentSellData
+            //  \\ currentBuyData.length === 0 ||
+            // currentSellData.length === 0
         )
             return;
 
@@ -1064,7 +1064,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     useEffect(() => {
         if (location === 'liqMobile' && !chartReady) return;
-        if (buyData.length === 0 || sellData.length === 0) return;
+        // if (buyData.length === 0 || sellData.length === 0) return;
 
         // For initial load, set current data directly
         if (!isInitialized.current) {

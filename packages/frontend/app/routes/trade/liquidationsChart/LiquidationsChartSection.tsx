@@ -50,9 +50,16 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         activeOrderTab,
         obMaxSell,
         obMinBuy,
+        obMinSell,
+        obMaxBuy,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
     const { loadingState } = useLiquidationStore();
+
+    const obMinSellRef = useRef<number>(obMinSell);
+    obMinSellRef.current = obMinSell;
+    const obMaxBuyRef = useRef<number>(obMaxBuy);
+    obMaxBuyRef.current = obMaxBuy;
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const tabContentRef = useRef<HTMLDivElement>(null);
@@ -72,11 +79,51 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const { buyLiqs, sellLiqs } = useLiquidationStore();
 
     const buyLiqsFilteredOB = useMemo(() => {
-        return buyLiqs.filter((liq) => liq.px >= obMinBuy);
+        let filteredBuyLiqs = buyLiqs.filter((liq) => liq.px >= obMinBuy);
+
+        if (
+            filteredBuyLiqs.length > 0 &&
+            obMinSellRef.current > 0 &&
+            obMaxBuyRef.current > 0
+        ) {
+            const midPx = (obMinSellRef.current + obMaxBuyRef.current) / 2;
+            filteredBuyLiqs = [
+                {
+                    px: midPx,
+                    sz: 0,
+                    type: 'buy',
+                    ratio: 0,
+                    cumulativeSz: 0,
+                    cumulativeRatio: 0,
+                },
+                ...filteredBuyLiqs,
+            ];
+        }
+        return filteredBuyLiqs;
     }, [buyLiqs, obMinBuy]);
 
     const sellLiqsFilteredOB = useMemo(() => {
-        return sellLiqs.filter((liq) => liq.px <= obMaxSell);
+        let filteredSellLiqs = sellLiqs.filter((liq) => liq.px <= obMaxSell);
+
+        if (
+            filteredSellLiqs.length > 0 &&
+            obMinSellRef.current > 0 &&
+            obMaxBuyRef.current > 0
+        ) {
+            const midPx = (obMinSellRef.current + obMaxBuyRef.current) / 2;
+            filteredSellLiqs = [
+                {
+                    px: midPx,
+                    sz: 0,
+                    type: 'sell',
+                    ratio: 0,
+                    cumulativeSz: 0,
+                    cumulativeRatio: 0,
+                },
+                ...filteredSellLiqs,
+            ];
+        }
+        return filteredSellLiqs;
     }, [sellLiqs, obMaxSell]);
 
     const handleTabChange = useCallback(
