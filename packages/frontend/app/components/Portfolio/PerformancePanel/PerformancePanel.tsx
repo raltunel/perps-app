@@ -99,7 +99,9 @@ export default function PerformancePanel({
                     {t('portfolio.accountOverview')}
                 </div>
                 <div className={styles.accountOverviewSubtitle}>
-                    {t('portfolio.updatesEveryThirtyMinutes')}
+                    {t('portfolio.updateFrequencyInMinutes', {
+                        numMinutes: 30,
+                    })}
                 </div>
             </div>
             {PERFORMANCE_METRICS.map((metric) => (

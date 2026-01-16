@@ -670,7 +670,7 @@
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
         "accountOverview": "账户概览",
-        "updatesEveryThirtyMinutes": "每30分钟更新一次",
+        "updateFrequencyInMinutes": "每{{numMinutes}}分钟更新一次",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",

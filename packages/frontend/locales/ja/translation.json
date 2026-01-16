@@ -670,7 +670,7 @@
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
         "accountOverview": "アカウント概要",
-        "updatesEveryThirtyMinutes": "30分ごとに更新",
+        "updateFrequencyInMinutes": "{{numMinutes}}分ごとに更新",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",

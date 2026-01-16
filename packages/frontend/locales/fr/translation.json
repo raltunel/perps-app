@@ -670,7 +670,7 @@
         "totalNetUsdValue": "Valeur nette totale en USD",
         "performance": "Performance",
         "accountOverview": "Aperçu du compte",
-        "updatesEveryThirtyMinutes": "Mise à jour toutes les 30 minutes",
+        "updateFrequencyInMinutes": "Mise à jour toutes les {{numMinutes}} minutes",
         "positions": "Positions",
         "feeSchedule": "Calendrier des frais",
         "vipTiers": "Niveaux VIP",

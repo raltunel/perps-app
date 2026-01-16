@@ -670,7 +670,7 @@
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
         "accountOverview": "계정 개요",
-        "updatesEveryThirtyMinutes": "30분마다 업데이트",
+        "updateFrequencyInMinutes": "{{numMinutes}}분마다 업데이트",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
