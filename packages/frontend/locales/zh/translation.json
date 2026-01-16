@@ -669,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "账户概览",
+        "updateFrequencyInMinutes": "每{{numMinutes}}分钟更新一次",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
