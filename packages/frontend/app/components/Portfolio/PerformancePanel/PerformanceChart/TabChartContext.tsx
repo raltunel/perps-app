@@ -148,6 +148,13 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     }, [isMobile]);
 
     useEffect(() => {
+        const raf = requestAnimationFrame(() => {
+            calculatePanelHeight();
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [activeTab, calculatePanelHeight]);
+
+    useEffect(() => {
         if (!userProfileLineData) return;
         const data = userProfileLineData;
 
