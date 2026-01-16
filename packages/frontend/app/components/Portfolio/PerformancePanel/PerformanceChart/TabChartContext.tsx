@@ -24,7 +24,6 @@ export interface TabChartContext {
 
 // Increased mobile chart height to show full content including labels
 const MOBILE_CHART_HEIGHT = 280;
-const MOBILE_CHART_WIDTH_PADDING = 32;
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
     const {
@@ -132,71 +131,21 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const calculatePanelHeight = useCallback(() => {
         const isMobileView = isMobile || window.innerWidth <= 768;
 
+        if (!containerRef.current) return;
+
+        const containerWidth = containerRef.current.clientWidth;
+
         if (isMobileView) {
-            setChartWidth(
-                Math.max(window.innerWidth - MOBILE_CHART_WIDTH_PADDING, 250),
-            );
+            setChartWidth(Math.max(Math.min(containerWidth, 950), 250));
             setChartHeight(MOBILE_CHART_HEIGHT);
             setIsChartReady(true);
             return;
         }
 
-        if (panelHeightRef.current === undefined) return;
+        const containerHeight = containerRef.current.clientHeight;
 
-        const header = document.getElementById('portfolio-header-container');
-
-        const performanceTabs = document.getElementById('performanceTabs');
-
-        const performanceChartControls = document.getElementById(
-            'performanceChartControls',
-        );
-
-        const metricsContainer = document.getElementById('metricsContainer');
-
-        const headerHeight = header ? header.clientHeight : 30;
-
-        const headerWidth = header ? header.clientWidth : 0;
-
-        const metricsContainerWidth = metricsContainer
-            ? metricsContainer.clientWidth
-            : 0;
-
-        const performanceTabsWidth = performanceTabs
-            ? performanceTabs.clientWidth
-            : 0;
-
-        const performanceTabsHeight = performanceTabs
-            ? performanceTabs.clientHeight
-            : 25;
-
-        const performanceChartControlsHeight = performanceChartControls
-            ? performanceChartControls.clientHeight
-            : performanceTabsHeight;
-
-        const calculatedChartHeight =
-            panelHeightRef.current -
-            headerHeight -
-            performanceChartControlsHeight -
-            10;
-
-        if (
-            window.innerWidth < 1280 + 50 &&
-            performanceTabsWidth + 50 > window.innerWidth
-        ) {
-            setChartWidth(
-                Math.min(
-                    950,
-                    Math.max(
-                        window.innerWidth - metricsContainerWidth - 50,
-                        250,
-                    ),
-                ),
-            );
-        } else {
-            setChartWidth(Math.min(950, Math.max(headerWidth, 250)));
-        }
-
-        setChartHeight(calculatedChartHeight);
+        setChartWidth(Math.max(Math.min(containerWidth, 940), 250));
+        setChartHeight(Math.max(containerHeight - 8, 180));
         setIsChartReady(true);
     }, [isMobile]);
 
@@ -205,8 +154,11 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             ref={containerRef}
             style={{
                 width: '100%',
-                height: isMobile ? 'auto' : '100%',
-                minHeight: isMobile ? `${MOBILE_CHART_HEIGHT}px` : undefined,
+                flex: 1,
+                minHeight: 0,
+                ...(isMobile
+                    ? { minHeight: `${MOBILE_CHART_HEIGHT}px` }
+                    : null),
                 overflow: 'visible',
             }}
         >

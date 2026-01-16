@@ -22,13 +22,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     const chartWidth = width || 850;
     const chartHeight = height || 250;
 
-    const xAxisHeight = 50;
-    const bottomGap =
-        parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue(
-                '--gap-m',
-            ),
-        ) || 16;
+    const xAxisHeight = isMobile ? 24 : 24;
 
     const [canvasInitialHeight, setCanvasInitialHeight] = React.useState<
         number | undefined
@@ -455,13 +449,13 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                         <div
                             className={styles.xAxisContainer}
                             style={{
-                                height: xAxisHeight - bottomGap - 1 + 'px',
+                                height: xAxisHeight + 'px',
                                 width: chartWidth + 'px',
                             }}
                         >
                             <svg
                                 id={`xAxis${isMobile ? 'Mobile' : ''}`}
-                                height={xAxisHeight - bottomGap - 1}
+                                height={xAxisHeight}
                                 width={chartWidth}
                                 style={{ paddingRight: yAxisPadding }}
                             />
