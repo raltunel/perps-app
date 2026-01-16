@@ -12,6 +12,10 @@
     justify-content: flex-start;
     align-items: flex-start;
 }
+.tableContent {
+    height: 100%;
+    width: 100%;
+}
 .performanceContainer,
 .loadingContainer {
     width: 100%;
@@ -34,6 +38,24 @@
     padding-top: var(--padding-m);
 }
 
+.accountOverviewHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: var(--padding-s);
+}
+
+.accountOverviewTitle {
+    color: var(--text1);
+    font-size: var(--font-size-s, 12px);
+    font-weight: 600;
+}
+
+.accountOverviewSubtitle {
+    color: var(--text2, #bcbcc4);
+    font-size: var(--font-size-xs, 11px);
+}
+
 .perfChart {
     width: 100%;
     height: 100%;
@@ -43,6 +65,31 @@
 
     align-items: center;
     background: var(--dark2);
+}
+
+.chartControls {
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: var(--gap-xs);
+    padding: var(--padding-s) var(--padding-m);
+}
+
+.chartControlsTabsRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+}
+
+.chartControlsFiltersRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
 }
 .metricRow {
     display: flex;

@@ -94,6 +94,14 @@ export default function PerformancePanel({
 
     const MetricsDisplay = React.memo(() => (
         <div id={'metricsContainer'} className={styles.metricsContainer}>
+            <div className={styles.accountOverviewHeader}>
+                <div className={styles.accountOverviewTitle}>
+                    {t('portfolio.accountOverview')}
+                </div>
+                <div className={styles.accountOverviewSubtitle}>
+                    {t('portfolio.updatesEveryThirtyMinutes')}
+                </div>
+            </div>
             {PERFORMANCE_METRICS.map((metric) => (
                 <div className={styles.metricRow} key={metric.label}>
                     <span>{metric.label}</span>
@@ -146,12 +154,28 @@ export default function PerformancePanel({
         >
             <MetricsDisplay />
             <motion.div {...animationConfig} className={styles.perfChart}>
-                <PortfolioChartHeader
-                    selectedVault={selectedVault}
-                    setSelectedVault={setSelectedVault}
-                    selectedPeriod={selectedPeriod}
-                    setSelectedPeriod={setSelectedPeriod}
-                />
+                <div
+                    id={'performanceChartControls'}
+                    className={styles.chartControls}
+                >
+                    <div className={styles.chartControlsTabsRow}>
+                        <Tabs
+                            tabs={AVAILABLE_TABS}
+                            defaultTab={activeTab}
+                            onTabChange={handleTabChange}
+                            wrapperId='performanceTabs'
+                            layoutIdPrefix='performanceTabIndicator'
+                        />
+                    </div>
+                    <div className={styles.chartControlsFiltersRow}>
+                        <PortfolioChartHeader
+                            selectedVault={selectedVault}
+                            setSelectedVault={setSelectedVault}
+                            selectedPeriod={selectedPeriod}
+                            setSelectedPeriod={setSelectedPeriod}
+                        />
+                    </div>
+                </div>
 
                 <TabChartContext
                     activeTab={activeTab}
@@ -174,13 +198,6 @@ export default function PerformancePanel({
 
     return (
         <div className={styles.container}>
-            <Tabs
-                tabs={AVAILABLE_TABS}
-                defaultTab={activeTab}
-                onTabChange={handleTabChange}
-                wrapperId='performanceTabs'
-                layoutIdPrefix='performanceTabIndicator'
-            />
             <AnimatePresence mode='wait'>
                 <div className={styles.tableContent} key={activeTab}>
                     {TabContent_}

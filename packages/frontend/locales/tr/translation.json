@@ -669,6 +669,8 @@
         "totalUsdVal": "Toplam USD Değeri",
         "totalNetUsdValue": "Toplam Net USD Değeri",
         "performance": "Performans",
+        "accountOverview": "Hesap Özeti",
+        "updatesEveryThirtyMinutes": "Her 30 dakikada bir güncellenir",
         "positions": "Pozisyonlar",
         "feeSchedule": "Ücret Çizelgesi",
         "vipTiers": "VIP Seviyeleri",

@@ -109,7 +109,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
         doFetch();
 
-        const intervalId = setInterval(doFetch, 30_000);
+        const intervalId = setInterval(doFetch, 30 * 60 * 1000);
 
         return () => {
             isCancelled = true;
@@ -147,6 +147,10 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
         const performanceTabs = document.getElementById('performanceTabs');
 
+        const performanceChartControls = document.getElementById(
+            'performanceChartControls',
+        );
+
         const metricsContainer = document.getElementById('metricsContainer');
 
         const headerHeight = header ? header.clientHeight : 30;
@@ -165,8 +169,15 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             ? performanceTabs.clientHeight
             : 25;
 
+        const performanceChartControlsHeight = performanceChartControls
+            ? performanceChartControls.clientHeight
+            : performanceTabsHeight;
+
         const calculatedChartHeight =
-            panelHeightRef.current - headerHeight - performanceTabsHeight - 10;
+            panelHeightRef.current -
+            headerHeight -
+            performanceChartControlsHeight -
+            10;
 
         if (
             window.innerWidth < 1280 + 50 &&
