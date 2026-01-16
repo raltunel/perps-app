@@ -145,7 +145,8 @@ export default function PerformancePanel({
     const [selectedPeriod, setSelectedPeriod] = useState<{
         label: string;
         value: string;
-    }>({ label: t('portfolio.allTime'), value: 'AllTime' });
+        timeframe: number;
+    }>({ label: t('portfolio.allTime'), value: 'AllTime', timeframe: 0 });
 
     const TabContent_ = !activeTab ? (
         LoadingContent

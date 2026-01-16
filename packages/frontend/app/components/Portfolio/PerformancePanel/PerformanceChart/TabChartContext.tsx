@@ -7,7 +7,7 @@ import CollateralPieChart from '../CollateralChart/CollateralPieChart';
 export interface TabChartContext {
     activeTab: string;
     selectedVault: { label: string; value: string };
-    selectedPeriod: { label: string; value: string };
+    selectedPeriod: { label: string; value: string; timeframe: number };
     pnlHistory: { time: number; value: number }[] | undefined;
     setPnlHistory: React.Dispatch<
         React.SetStateAction<{ time: number; value: number }[] | undefined>
@@ -96,8 +96,6 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                     return;
                 }
 
-                setPnlHistoryRef.current(data.pnlHistory);
-                setAccountValueHistoryRef.current(data.accountValueHistory);
                 setUserProfileLineDataRef.current(data);
             } catch (error) {
                 if (!isCancelled) {
@@ -148,6 +146,28 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         setChartHeight(Math.max(containerHeight - 8, 180));
         setIsChartReady(true);
     }, [isMobile]);
+
+    useEffect(() => {
+        if (!userProfileLineData) return;
+        const data = userProfileLineData;
+
+        if (selectedPeriod.value === 'AllTime') {
+            setPnlHistoryRef.current(data.pnlHistory);
+            setAccountValueHistoryRef.current(data.accountValueHistory);
+        } else {
+            const boundaryDate = Date.now() - selectedPeriod.timeframe;
+
+            const filteredPnlHistory = data.pnlHistory.filter(
+                (pnl: any) => pnl.time >= boundaryDate,
+            );
+            const filteredAccountValueHistory = data.accountValueHistory.filter(
+                (av: any) => av.time >= boundaryDate,
+            );
+
+            setPnlHistoryRef.current(filteredPnlHistory);
+            setAccountValueHistoryRef.current(filteredAccountValueHistory);
+        }
+    }, [selectedPeriod, userProfileLineData]);
 
     return (
         <div
