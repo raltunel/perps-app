@@ -21,6 +21,7 @@ import LiquidationsChart from './LiquidationOBChart';
 import styles from './LiquidationsChartSection.module.css';
 import OBLiqFetcher from './ObLiqFetcher';
 import { useLiquidationStore } from '~/stores/LiquidationStore';
+import type { LiqLevel } from './LiquidationUtils';
 
 interface LiquidationsChartSectionProps {
     symbol: string;
@@ -125,6 +126,53 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         }
         return filteredSellLiqs;
     }, [sellLiqs, obMaxSell]);
+
+    // Create discrete liq arrays mapped to orderbook slots (summing sz within each slot's price range)
+    const slottedLiqBuys = useMemo(() => {
+        const slicedBuys = buys.slice(0, orderCount);
+
+        // First pass: sum sz for each slot
+        const slotsWithSz = slicedBuys.map((slot, index) => {
+            const nextSlotPx = slicedBuys[index + 1]?.px ?? 0;
+            const matchingLiqs = buyLiqsFilteredOB.filter(
+                (liq) => liq.px <= slot.px && liq.px > nextSlotPx,
+            );
+            const summedSz = matchingLiqs.reduce((acc, liq) => acc + liq.sz, 0);
+            return { px: slot.px, sz: summedSz, type: 'buy' as const };
+        });
+
+        // Find max sz across all slots
+        const maxSz = Math.max(...slotsWithSz.map((s) => s.sz), 0);
+
+        // Second pass: calculate ratio as sz / maxSz
+        return slotsWithSz.map((slot) => ({
+            ...slot,
+            ratio: maxSz > 0 ? slot.sz / maxSz : 0,
+        }));
+    }, [buys, buyLiqsFilteredOB, orderCount]);
+
+    const slottedLiqSells = useMemo(() => {
+        const slicedSells = sells.slice(0, orderCount);
+
+        // First pass: sum sz for each slot
+        const slotsWithSz = slicedSells.map((slot, index) => {
+            const nextSlotPx = slicedSells[index + 1]?.px ?? Infinity;
+            const matchingLiqs = sellLiqsFilteredOB.filter(
+                (liq) => liq.px >= slot.px && liq.px < nextSlotPx,
+            );
+            const summedSz = matchingLiqs.reduce((acc, liq) => acc + liq.sz, 0);
+            return { px: slot.px, sz: summedSz, type: 'sell' as const };
+        });
+
+        // Find max sz across all slots
+        const maxSz = Math.max(...slotsWithSz.map((s) => s.sz), 0);
+
+        // Second pass: calculate ratio as sz / maxSz
+        return slotsWithSz.map((slot) => ({
+            ...slot,
+            ratio: maxSz > 0 ? slot.sz / maxSz : 0,
+        }));
+    }, [sells, sellLiqsFilteredOB, orderCount]);
 
     const handleTabChange = useCallback(
         (tab: LiqChartTabType) => setActiveTab(tab),
@@ -298,8 +346,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         <LiquidationsChart
                             buyData={buyLiqsFilteredOB}
                             sellData={sellLiqsFilteredOB}
-                            liqBuys={[]}
-                            liqSells={[]}
+                            liqBuys={slottedLiqBuys}
+                            liqSells={slottedLiqSells}
                             width={dimensions.width}
                             height={dimensions.height}
                             location={'obBook'}
@@ -328,6 +376,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         activeTab,
         buyLiqsFilteredOB,
         sellLiqsFilteredOB,
+        slottedLiqBuys,
+        slottedLiqSells,
         dimensions,
         loadingState,
         chartMode,

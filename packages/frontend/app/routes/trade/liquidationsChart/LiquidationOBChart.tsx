@@ -1394,9 +1394,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, [chart, location, updateScalesAndSeries]);
 
     useEffect(() => {
-        console.log('>>>> buyData', buyData);
-        console.log('>>>> sellData', sellData);
-    }, [buyData, sellData]);
+        const filteredSell = sellData.filter((s) => s.px < 97000);
+
+        console.log('>>>> filteredSell', filteredSell);
+        console.log('>>>> liqSells', liqSells);
+    }, [buyData, sellData, liqSells]);
 
     return (
         <div
