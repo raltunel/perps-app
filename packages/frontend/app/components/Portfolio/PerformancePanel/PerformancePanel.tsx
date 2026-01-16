@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
@@ -201,11 +201,7 @@ export default function PerformancePanel({
 
     return (
         <div className={styles.container}>
-            <AnimatePresence mode='wait'>
-                <div className={styles.tableContent} key={activeTab}>
-                    {TabContent_}
-                </div>
-            </AnimatePresence>
+            <div className={styles.tableContent}>{TabContent_}</div>
         </div>
     );
 }
