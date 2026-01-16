@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import * as d3 from 'd3';
 import React, { useEffect, useMemo } from 'react';
-import Button from '~/components/Button/Button';
 import styles from './CollateralPieChart.module.css';
 import useMediaQuery from '~/hooks/useMediaQuery';
 
-type PieData = { label: string; value: number };
+type PieData = { label: string; value: number; balance: number };
 
 type PieChartProps = {
     height?: number;
@@ -20,7 +19,11 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     const chartHeight = height || 150;
 
     const pieData: PieData[] = useMemo(
-        () => [{ label: t('portfolio.fusd'), value: 100 }],
+        () => [
+            { label: t('portfolio.fusd'), value: 50, balance: 5000 },
+            { label: t('Btc'), value: 30, balance: 3000 },
+            { label: t('Eth'), value: 20, balance: 2000 },
+        ],
         [t],
     );
 
@@ -66,6 +69,19 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
             ctx.closePath();
             ctx.fillStyle = color;
             ctx.fill();
+
+            const midAngle = Number((startAngle + endAngle) / 2).toFixed(4);
+
+            const textRadius = radius * 0.6;
+            const textX = width / 2 + textRadius * Math.cos(Number(midAngle));
+            const textY = height / 2 + textRadius * Math.sin(Number(midAngle));
+
+            ctx.fillStyle = '#f0f0f8';
+            ctx.font = '14px Lexend Deca';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(arc.data.label, textX, textY - 7);
+            ctx.fillText(arc.data.balance.toString(), textX, textY + 7);
         }
 
         arcs.forEach((arc: any) => {

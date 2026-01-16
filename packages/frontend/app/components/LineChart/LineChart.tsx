@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './LineChart.module.css';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
 
 type CurveType = 'step' | 'basic';
 
@@ -16,6 +17,8 @@ type LineChartProps = {
 
 const LineChart: React.FC<LineChartProps> = (props) => {
     const { lineData, chartName, curve, height, width, isMobile } = props;
+
+    const { formatNum } = useNumFormatter();
 
     const hasData = Array.isArray(lineData) && lineData.length > 0;
 
@@ -108,7 +111,9 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             yAxisTicksRef.current?.forEach((tick) => {
                 textMeasure.push(
-                    context.measureText(d3.format(',')(tick)).width,
+                    context.measureText(
+                        formatNum(tick as number, null, true, true),
+                    ).width,
                 );
             });
 
@@ -293,7 +298,10 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .call(
                     d3
                         .axisLeft(scaleDataRef.current.svgYScale)
-                        .tickValues(yAxisTicksRef.current),
+                        .tickValues(yAxisTicksRef.current)
+                        .tickFormat((d: any) =>
+                            formatNum(d as number, null, true, true),
+                        ),
                 )
                 .select('.domain')
                 .remove();
