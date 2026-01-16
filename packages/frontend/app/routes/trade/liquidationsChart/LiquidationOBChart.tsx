@@ -1393,6 +1393,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             });
     }, [chart, location, updateScalesAndSeries]);
 
+    useEffect(() => {
+        console.log('>>>> buyData', buyData);
+        console.log('>>>> sellData', sellData);
+    }, [buyData, sellData]);
+
     return (
         <div
             ref={d3CanvasLiqContianer}

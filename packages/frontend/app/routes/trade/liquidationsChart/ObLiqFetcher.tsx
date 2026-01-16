@@ -41,10 +41,21 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     const symbolInfoRef = useRef<SymbolInfoIF | null>(null);
     symbolInfoRef.current = symbolInfo;
 
-    const { setHrBuys, setHrSells, setHrLiqBuys, setHrLiqSells } =
-        useOrderBookStore();
+    const {
+        obMinSell,
+        obMaxBuy,
+        setHrBuys,
+        setHrSells,
+        setHrLiqBuys,
+        setHrLiqSells,
+    } = useOrderBookStore();
     const buysRef = useRef<OrderBookRowIF[]>([]);
     const sellsRef = useRef<OrderBookRowIF[]>([]);
+
+    const obMinSellRef = useRef<number>(0);
+    obMinSellRef.current = obMinSell;
+    const obMaxBuyRef = useRef<number>(0);
+    obMaxBuyRef.current = obMaxBuy;
 
     const [maxResolution, setMaxResolution] =
         useState<OrderRowResolutionIF | null>(null);
@@ -113,6 +124,7 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
             buyLiqs.push(liq);
             cumulativeSz += liq.sz;
         });
+
         cumulativeSz = 0;
         sells.forEach((level) => {
             const liq = parseLiqLevelRaw(
@@ -126,8 +138,34 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
             cumulativeSz += liq.sz;
         });
 
-        setBuyLiqs(buyLiqs);
-        setSellLiqs(sellLiqs);
+        const startLiqForBuy: LiqLevel[] = [];
+        const startLiqForSell: LiqLevel[] = [];
+
+        const obMidPx = (obMaxBuyRef.current + obMinSellRef.current) / 2;
+
+        if (buyLiqs.length > 0 && obMidPx > 0) {
+            startLiqForBuy.push({
+                px: obMidPx,
+                sz: 0,
+                type: 'buy',
+                ratio: 0,
+                cumulativeSz: 0,
+                cumulativeRatio: 0,
+            });
+        }
+        if (sellLiqs.length > 0 && obMidPx > 0) {
+            startLiqForSell.push({
+                px: obMidPx,
+                sz: 0,
+                type: 'sell',
+                ratio: 0,
+                cumulativeSz: 0,
+                cumulativeRatio: 0,
+            });
+        }
+
+        setBuyLiqs([...startLiqForBuy, ...buyLiqs]);
+        setSellLiqs([...startLiqForSell, ...sellLiqs]);
     }, []);
 
     useEffect(() => {

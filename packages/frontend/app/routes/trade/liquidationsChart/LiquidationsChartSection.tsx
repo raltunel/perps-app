@@ -180,14 +180,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         [inpOrderCount],
     );
 
-    useEffect(() => {
-        console.log('>>>>>>>>>>> obMaxSell', obMaxSell);
-        console.log('>>>>>>>>>>> obMinBuy', obMinBuy);
-        console.log('>>>>>>>>>>> ..........................................');
-    }, [obMaxSell, obMinBuy]);
-
     const renderTabContent = useCallback(() => {
-        console.log('>>>>>>>>>>> renderTabContent', activeTab, loadingState);
         if (activeTab === 'Distribution') {
             if (loadingState === TableState.LOADING) {
                 return (

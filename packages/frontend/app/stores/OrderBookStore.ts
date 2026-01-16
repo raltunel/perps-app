@@ -60,6 +60,10 @@ interface OrderBookStore {
     obMinBuy: number;
     setObMaxSell: (obMaxSell: number) => void;
     setObMinBuy: (obMinBuy: number) => void;
+    obMaxBuy: number;
+    setObMaxBuy: (obMaxBuy: number) => void;
+    obMinSell: number;
+    setObMinSell: (obMinSell: number) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>()(
@@ -140,6 +144,10 @@ export const useOrderBookStore = create<OrderBookStore>()(
             setObMaxSell: (obMaxSell: number) => set({ obMaxSell }),
             obMinBuy: 0,
             setObMinBuy: (obMinBuy: number) => set({ obMinBuy }),
+            obMaxBuy: 0,
+            setObMaxBuy: (obMaxBuy: number) => set({ obMaxBuy }),
+            obMinSell: 0,
+            setObMinSell: (obMinSell: number) => set({ obMinSell }),
         }),
         {
             name: 'ORDERBOOK',

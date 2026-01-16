@@ -116,6 +116,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setUsualResolution,
         setObMaxSell,
         setObMinBuy,
+        setObMaxBuy,
+        setObMinSell,
     } = useOrderBookStore();
     const midPriceRef = useRef<number | null>(null);
     midPriceRef.current = midPrice;
@@ -359,9 +361,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
     useEffect(() => {
         if (buys.length > 0 && buys.length > orderCount) {
             setObMinBuy(buys[orderCount - 1].px);
+            setObMaxBuy(buys[0].px);
         }
         if (sells.length > 0 && sells.length > orderCount) {
             setObMaxSell(sells[orderCount - 1].px);
+            setObMinSell(sells[0].px);
         }
     }, [buys, sells, orderCount]);
 
