@@ -139,12 +139,33 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const showAreaText = useRef(false);
 
     const minLiqLine = 10;
+    const minAreaWidth = 10; // minimum width in pixels for area chart ticks
     const liqLineWidth = 2;
 
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
     const hideTooltipRef = useRef(false);
+
+    // Helper to ensure minimum width for area chart ticks (using ref for stable reference)
+    const getMinRatioRef = useRef((ratio: number | undefined): number => {
+        if (!ratio || ratio === 0) return 0;
+        const minRatio = minAreaWidth / widthRef.current;
+        return Math.max(ratio, minRatio);
+    });
+
+    // Update the ref function when width changes
+    useEffect(() => {
+        getMinRatioRef.current = (ratio: number | undefined): number => {
+            if (!ratio || ratio === 0) return 0;
+            const minRatio = minAreaWidth / widthRef.current;
+            return Math.max(ratio, minRatio);
+        };
+    }, [width]);
+
+    const getMinRatio = (ratio: number | undefined): number => {
+        return getMinRatioRef.current(ratio);
+    };
 
     // calculates center y for liq chart (on overlay chart that center point is changed based on tv chart y axis positioning)
     const getCenterY = useCallback(() => {
@@ -465,8 +486,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? d.ratio
-                    : d.cumulativeRatio,
+                    ? getMinRatio(d.ratio)
+                    : getMinRatio(d.cumulativeRatio),
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -491,8 +512,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? d.ratio
-                    : d.cumulativeRatio,
+                    ? getMinRatio(d.ratio)
+                    : getMinRatio(d.cumulativeRatio),
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -508,8 +529,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? d.ratio
-                    : d.cumulativeRatio,
+                    ? getMinRatio(d.ratio)
+                    : getMinRatio(d.cumulativeRatio),
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -530,8 +551,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? d.ratio
-                    : d.cumulativeRatio,
+                    ? getMinRatio(d.ratio)
+                    : getMinRatio(d.cumulativeRatio),
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -932,6 +953,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 ? currentBuyDataRef.current
                 : currentSellDataRef.current;
 
+            if (!hoveredArray || hoveredArray.length === 0) return;
+
             if (locationRef.current === 'liqMobile') {
                 hoveredArray = hoveredArray.slice(0, hoveredArray.length - 1);
             }
@@ -1222,8 +1245,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? d.ratio
-                    : d.cumulativeRatio,
+                    ? getMinRatio(d.ratio)
+                    : getMinRatio(d.cumulativeRatio),
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -1242,8 +1265,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? d.ratio
-                    : d.cumulativeRatio,
+                    ? getMinRatio(d.ratio)
+                    : getMinRatio(d.cumulativeRatio),
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
