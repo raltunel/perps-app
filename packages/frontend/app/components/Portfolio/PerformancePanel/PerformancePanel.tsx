@@ -1,4 +1,10 @@
-import React, { useMemo, useState, useCallback, useRef } from 'react';
+import React, {
+    useMemo,
+    useState,
+    useCallback,
+    useRef,
+    useEffect,
+} from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Tabs from '~/components/Tabs/Tabs';
@@ -7,12 +13,15 @@ import CollateralPieChart from './CollateralChart/CollateralPieChart';
 import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
 import TabChartContext from './PerformanceChart/TabChartContext';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface PerformancePanelProps {
     userData: any;
     panelHeight?: number;
     isMobile: boolean;
 }
+
+type PerformanceTab = 'performance' | 'accountValue' | 'collateral';
 
 const AVAILABLE_TABS = [
     { id: 'performance', label: 'portfolio.performance' },
@@ -33,7 +42,11 @@ export default function PerformancePanel({
     isMobile,
 }: PerformancePanelProps) {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState('performance');
+    const { portfolioPerformanceTab, setPortfolioPerformanceTab } =
+        useAppSettings();
+    const [activeTab, setActiveTab] = useState<PerformanceTab>(
+        portfolioPerformanceTab,
+    );
     const chartStageRef = useRef<HTMLDivElement>(null);
 
     const { formatNum } = useNumFormatter();
@@ -123,9 +136,17 @@ export default function PerformancePanel({
 
     const [userProfileLineData, setUserProfileLineData] = useState<any>();
 
-    const handleTabChange = useCallback((tab: string) => {
-        setActiveTab(tab);
-    }, []);
+    useEffect(() => {
+        setActiveTab(portfolioPerformanceTab);
+    }, [portfolioPerformanceTab]);
+
+    const handleTabChange = useCallback(
+        (tab: string) => {
+            setActiveTab(tab as PerformanceTab);
+            setPortfolioPerformanceTab(tab as PerformanceTab);
+        },
+        [setPortfolioPerformanceTab],
+    );
 
     const LoadingContent = useMemo(
         () => (
@@ -170,14 +191,16 @@ export default function PerformancePanel({
                             layoutIdPrefix='performanceTabIndicator'
                         />
                     </div>
-                    <div className={styles.chartControlsFiltersRow}>
-                        <PortfolioChartHeader
-                            selectedVault={selectedVault}
-                            setSelectedVault={setSelectedVault}
-                            selectedPeriod={selectedPeriod}
-                            setSelectedPeriod={setSelectedPeriod}
-                        />
-                    </div>
+                    {activeTab !== 'collateral' && (
+                        <div className={styles.chartControlsFiltersRow}>
+                            <PortfolioChartHeader
+                                selectedVault={selectedVault}
+                                setSelectedVault={setSelectedVault}
+                                selectedPeriod={selectedPeriod}
+                                setSelectedPeriod={setSelectedPeriod}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <TabChartContext
