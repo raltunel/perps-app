@@ -103,7 +103,7 @@ export default function AffiliatesPage() {
                         color: 'var(--aff-text-primary)',
                     }}
                 >
-                    Referral Dashboard
+                    Affiliate Dashboard
                 </h1>
                 <p style={{ color: 'var(--aff-text-muted)' }}>
                     Track your earnings as they grow with every referral.
