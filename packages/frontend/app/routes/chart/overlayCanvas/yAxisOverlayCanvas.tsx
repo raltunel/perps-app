@@ -216,11 +216,21 @@ const YAxisOverlayCanvas: React.FC = () => {
         positionOrderLines,
         chart,
         JSON.stringify(scaleDataRef?.current?.yScale.domain()),
+        canvasSize,
     ]);
 
     useEffect(() => {
         localSelectedOrderLineRef.current = selectedOrderLine;
-    }, [selectedOrderLine]);
+
+        if (
+            isMobile &&
+            canvasRef.current &&
+            localSelectedOrderLineRef.current &&
+            selectedOrderLine === undefined
+        ) {
+            canvasRef.current.style.pointerEvents = 'none';
+        }
+    }, [selectedOrderLine, isMobile]);
 
     useEffect(() => {
         orderInputPriceValueRef.current = orderInputPriceValue.value;
@@ -796,7 +806,14 @@ const YAxisOverlayCanvas: React.FC = () => {
         };
 
         draw();
-    }, [canvasRef.current, chart, isMobile, selectedOrderLine, canvasSize]);
+    }, [
+        canvasRef.current,
+        chart,
+        isMobile,
+        selectedOrderLine,
+        canvasSize,
+        JSON.stringify(scaleDataRef?.current?.yScale.domain()),
+    ]);
 
     return null;
 };
