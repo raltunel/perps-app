@@ -283,7 +283,7 @@ const YAxisOverlayCanvas: React.FC = () => {
                 unsubscribe();
             }
         };
-    }, [chart]);
+    }, [chart, isPaneChanged]);
 
     useEffect(() => {
         if (!chart || !isChartReady) return;
