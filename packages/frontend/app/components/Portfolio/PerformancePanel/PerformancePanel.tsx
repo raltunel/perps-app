@@ -103,8 +103,6 @@ export default function PerformancePanel({
         </div>
     ));
 
-    const [isLineDataFetched, setIsLineDataFetched] = useState(false);
-
     const [accountValueHistory, setAccountValueHistory] = useState<
         { time: number; value: number }[] | undefined
     >();
@@ -118,10 +116,6 @@ export default function PerformancePanel({
     const handleTabChange = useCallback((tab: string) => {
         setActiveTab(tab);
     }, []);
-
-    const handleLineDataFetched = (isDataFetched: boolean) => {
-        setIsLineDataFetched(() => isDataFetched);
-    };
 
     const LoadingContent = useMemo(
         () => (
@@ -163,8 +157,6 @@ export default function PerformancePanel({
                     activeTab={activeTab}
                     selectedVault={selectedVault}
                     selectedPeriod={selectedPeriod}
-                    handleLineDataFetched={handleLineDataFetched}
-                    isLineDataFetched={isLineDataFetched}
                     setAccountValueHistory={setAccountValueHistory}
                     setPnlHistory={setPnlHistory}
                     pnlHistory={pnlHistory}
