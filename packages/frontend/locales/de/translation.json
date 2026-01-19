@@ -669,6 +669,8 @@
         "totalUsdVal": "Total USD Val",
         "totalNetUsdValue": "Total Net USD Value",
         "performance": "Performance",
+        "accountOverview": "Kontoübersicht",
+        "updateFrequencyInMinutes": "Aktualisiert alle {{numMinutes}} Minuten",
         "positions": "Positions",
         "feeSchedule": "Fee Schedule",
         "vipTiers": "VIP Tiers",
