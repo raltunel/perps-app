@@ -336,15 +336,21 @@ export const TradingViewProvider: React.FC<{
                 showBuysSellsOnChart && chart.chart().refreshMarks();
             });
 
-            chart.subscribe('study_event', (studyId: any) => {
-                const studyElement = chart.activeChart().getStudyById(studyId);
-
-                const colors = getBsColor();
-                studyElement.applyOverrides({
-                    'volume.color.0': colors.sell,
-                    'volume.color.1': colors.buy,
-                });
-            });
+            chart.subscribe(
+                'study_event',
+                (studyId: any, studyEventType: any) => {
+                    if (studyEventType !== 'remove') {
+                        const studyElement = chart
+                            .activeChart()
+                            .getStudyById(studyId);
+                        const colors = getBsColor();
+                        studyElement.applyOverrides({
+                            'volume.color.0': colors.sell,
+                            'volume.color.1': colors.buy,
+                        });
+                    }
+                },
+            );
         }
     }, [chart]);
 
