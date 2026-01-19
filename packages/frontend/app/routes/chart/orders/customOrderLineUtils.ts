@@ -321,14 +321,15 @@ function getTriggerConditionText(rawText: string, orderType: string): string {
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
 
-function formatPrice(price: number): string {
-    if (price >= 10000) {
+export function formatPrice(price: number): string {
+    const absPrice = Math.abs(price);
+    if (absPrice >= 10000) {
         return price.toFixed(0);
-    } else if (price >= 1) {
+    } else if (absPrice >= 1) {
         return price.toFixed(2);
-    } else if (price >= 0.01) {
+    } else if (absPrice >= 0.01) {
         return price.toFixed(4);
-    } else if (price >= 0.0001) {
+    } else if (absPrice >= 0.0001) {
         return price.toFixed(6);
     } else {
         return price.toFixed(8);

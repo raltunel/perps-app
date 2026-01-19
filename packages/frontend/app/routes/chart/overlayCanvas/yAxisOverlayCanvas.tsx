@@ -7,6 +7,7 @@ import {
     getPriceAxisContainer,
     getPaneCanvasAndIFrameDoc,
 } from './overlayCanvasUtils';
+import { formatPrice, getPricetoPixel } from '../orders/customOrderLineUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
 import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
@@ -52,6 +53,23 @@ const YAxisOverlayCanvas: React.FC = () => {
     const localSelectedOrderLineRef = useRef(selectedOrderLine);
     const isMobile = useMobile();
     const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+
+    const syncCanvasSize = () => {
+        if (!chart || !canvasRef.current) return;
+
+        const { sizeReferenceCanvas, yAxisCanvas } =
+            getPriceAxisContainer(chart);
+
+        if (!sizeReferenceCanvas) return;
+
+        yAxisCanvasRef.current = yAxisCanvas;
+
+        const canvas = canvasRef.current;
+        canvas.style.width = sizeReferenceCanvas.style.width;
+        canvas.style.height = sizeReferenceCanvas.style.height;
+        canvas.width = sizeReferenceCanvas.width;
+        canvas.height = sizeReferenceCanvas.height;
+    };
 
     const draggablePrice = useMemo(() => {
         return isMobile && selectedOrderLine
@@ -198,7 +216,30 @@ const YAxisOverlayCanvas: React.FC = () => {
 
     useEffect(() => {
         orderInputPriceValueRef.current = orderInputPriceValue.value;
-    }, [orderInputPriceValue.value]);
+
+        // Sync selectedOrderLine when price changes from non-drag source (e.g., input field)
+        if (
+            isMobile &&
+            orderInputPriceValue.changeType !== 'dragging' &&
+            orderInputPriceValue.changeType !== 'dragEnd' &&
+            selectedOrderLine &&
+            selectedOrderLine.type === 'PREVIEW_ORDER' &&
+            orderInputPriceValue.value !== undefined
+        ) {
+            setSelectedOrderLine({
+                ...selectedOrderLine,
+                yPrice: orderInputPriceValue.value,
+                textValue:
+                    selectedOrderLine.textValue &&
+                    selectedOrderLine.textValue.type === 'Limit'
+                        ? {
+                              ...selectedOrderLine.textValue,
+                              price: orderInputPriceValue.value,
+                          }
+                        : selectedOrderLine.textValue,
+            });
+        }
+    }, [orderInputPriceValue.value, orderInputPriceValue.changeType]);
 
     useEffect(() => {
         if (!chart) return;
@@ -261,7 +302,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             newCanvas.style.pointerEvents = 'none';
             newCanvas.style.zIndex = '5555';
             newCanvas.width = sizeReferenceCanvas.width;
-            newCanvas.height = paneCanvas.height;
+            newCanvas.height = sizeReferenceCanvas.height;
             yAxisCanvas.parentNode.appendChild(newCanvas);
             canvasRef.current = newCanvas;
         }
@@ -270,13 +311,12 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         const updateCanvasSize = () => {
             const currentSizeRef = yAxisCanvasRef.current;
-            const currentPaneCanvas = paneCanvasRef.current;
-            if (!currentSizeRef || !currentPaneCanvas) return;
+            if (!currentSizeRef) return;
 
             canvas.width = currentSizeRef.width;
-            canvas.style.width = `${currentSizeRef.width}px`;
-            canvas.height = currentPaneCanvas.height;
-            canvas.style.height = `${currentPaneCanvas.height}px`;
+            canvas.style.width = currentSizeRef.style.width;
+            canvas.height = currentSizeRef.height;
+            canvas.style.height = currentSizeRef.style.height;
         };
 
         updateCanvasSize();
@@ -368,22 +408,7 @@ const YAxisOverlayCanvas: React.FC = () => {
 
     // Update canvas size when scale domain changes
     useEffect(() => {
-        if (!chart || !canvasRef.current) return;
-
-        const { sizeReferenceCanvas, yAxisCanvas } =
-            getPriceAxisContainer(chart);
-
-        if (!sizeReferenceCanvas) return;
-
-        // Update refs
-        yAxisCanvasRef.current = yAxisCanvas;
-
-        // Update canvas size - use style values for style, attribute values for attributes
-        const canvas = canvasRef.current;
-        canvas.style.width = sizeReferenceCanvas.style.width;
-        canvas.style.height = sizeReferenceCanvas.style.height;
-        canvas.width = sizeReferenceCanvas.width;
-        canvas.height = sizeReferenceCanvas.height;
+        syncCanvasSize();
     }, [chart, JSON.stringify(scaleDataRef?.current?.yScale.domain())]);
 
     useEffect(() => {
@@ -490,7 +515,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
             if (!isDraggingRef.current) return;
-            if (mouseOutOfFrameRef.current) return;
+            if (mouseOutOfFrameRef.current && !isMobile) return;
 
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
@@ -702,51 +727,36 @@ const YAxisOverlayCanvas: React.FC = () => {
             return;
         }
 
-        let animationFrameId: number | null = null;
-        const zoomDomain = JSON.stringify(
-            scaleDataRef?.current?.yScale.domain(),
-        );
-        const isZooming = zoomDomain !== '[]';
-
         const draw = () => {
             const scaleData = scaleDataRef.current;
             if (!scaleData) return;
 
-            const paneIndex = getMainSeriesPaneIndex(chart);
-            if (paneIndex === null) return;
-
-            const priceScalePane = chart.activeChart().getPanes()[
-                paneIndex
-            ] as IPaneApi;
-            const priceScale = priceScalePane.getMainSourcePriceScale();
-            if (!priceScale) return;
-
-            const isLogarithmic = priceScale.getMode() === 1;
             const price = selectedOrderLine.yPrice;
 
-            const yPixel = isLogarithmic
-                ? scaleData.scaleSymlog(price)
-                : scaleData.yScale(price);
+            const { pixel: yPixel } = getPricetoPixel(
+                chart,
+                price,
+                selectedOrderLine.type,
+                canvas.height,
+                scaleData,
+            );
+            const dpr = window.devicePixelRatio || 1;
 
-            const fontSize = 12;
-            const padding = 4;
+            const fontSize = 12 * dpr;
             const borderWidth = 2;
 
-            const priceText = price.toFixed(price > 10000 ? 0 : 2);
+            const priceText = formatPrice(price);
 
             ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif`;
-            const textWidth = ctx.measureText(priceText).width;
+            const labelWidth = canvas.width;
 
-            const labelWidth = textWidth + padding * 2;
-            const labelHeight = 20;
+            const yPadding = 4 * dpr;
+            const labelHeight = 20 * dpr + yPadding;
 
             const x = 0;
-            const y = yPixel - labelHeight / 2 - 1;
+            const y = yPixel - yPadding;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
 
             ctx.save();
 
@@ -766,26 +776,10 @@ const YAxisOverlayCanvas: React.FC = () => {
             ctx.textBaseline = 'middle';
 
             const textX = Math.round(x + labelWidth / 2);
-            const textY = Math.round(yPixel) - 2;
-
-            ctx.fillText(priceText, textX, textY);
+            ctx.fillText(priceText, textX, y + labelHeight / 2);
         };
 
-        if (isZooming && animationFrameId === null) {
-            const animate = () => {
-                draw();
-                animationFrameId = requestAnimationFrame(animate);
-            };
-            animationFrameId = requestAnimationFrame(animate);
-        } else {
-            draw();
-        }
-
-        return () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-        };
+        draw();
     }, [
         canvasRef.current,
         chart,

@@ -1224,8 +1224,6 @@ const LabelComponent = ({
                 value: newPrice,
                 changeType: 'dragEnd',
             });
-            setActiveDragLine(undefined);
-            setSelectedOrderLine(undefined);
         }
 
         const handleDragEnd = async () => {
@@ -1357,6 +1355,9 @@ const LabelComponent = ({
                         },
                     });
                 }
+                if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
+                    updatePreviewOrderPrice(tempSelectedLine);
+                }
 
                 setSelectedOrderLine({
                     ...tempSelectedLine.parentLine,
@@ -1372,6 +1373,9 @@ const LabelComponent = ({
                 }
                 if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
                     updatePreviewOrderPrice(tempSelectedLine);
+
+                    setActiveDragLine(undefined);
+                    setSelectedOrderLine(undefined);
                     cursorText = 'row-resize';
                 }
             }
