@@ -28,6 +28,7 @@ const YAxisOverlayCanvas: React.FC = () => {
     const [isDrag, setIsDrag] = useState(false);
     const [mouseY, setMouseY] = useState(0);
     const [isPaneChanged, setIsPaneChanged] = useState(false);
+    const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
     const isNearOrderPriceRef = useRef(false);
     const isInitialSizeSetRef = useRef(false);
     const { updateYPosition } = usePreviewOrderLines();
@@ -69,6 +70,13 @@ const YAxisOverlayCanvas: React.FC = () => {
         canvas.style.height = sizeReferenceCanvas.style.height;
         canvas.width = sizeReferenceCanvas.width;
         canvas.height = sizeReferenceCanvas.height;
+
+        if (isMobile) {
+            setCanvasSize({
+                width: sizeReferenceCanvas.width,
+                height: sizeReferenceCanvas.height,
+            });
+        }
     };
 
     const draggablePrice = useMemo(() => {
@@ -299,7 +307,8 @@ const YAxisOverlayCanvas: React.FC = () => {
             newCanvas.style.top = '0';
             newCanvas.style.left = '0';
             newCanvas.style.cursor = 'default';
-            newCanvas.style.pointerEvents = 'none';
+            newCanvas.style.pointerEvents =
+                isMobile && draggablePrice ? 'auto' : 'none';
             newCanvas.style.zIndex = '5555';
             newCanvas.width = sizeReferenceCanvas.width;
             newCanvas.height = sizeReferenceCanvas.height;
@@ -317,6 +326,13 @@ const YAxisOverlayCanvas: React.FC = () => {
             canvas.style.width = currentSizeRef.style.width;
             canvas.height = currentSizeRef.height;
             canvas.style.height = currentSizeRef.style.height;
+
+            if (isMobile) {
+                setCanvasSize({
+                    width: currentSizeRef.width,
+                    height: currentSizeRef.height,
+                });
+            }
         };
 
         updateCanvasSize();
@@ -780,13 +796,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         };
 
         draw();
-    }, [
-        canvasRef.current,
-        chart,
-        isMobile,
-        selectedOrderLine,
-        JSON.stringify(scaleDataRef?.current?.yScale.domain()),
-    ]);
+    }, [canvasRef.current, chart, isMobile, selectedOrderLine, canvasSize]);
 
     return null;
 };
