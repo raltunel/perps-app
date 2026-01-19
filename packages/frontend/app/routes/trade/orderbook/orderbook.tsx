@@ -745,6 +745,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const assignSelectedResolution = useCallback(
         (resolution: OrderRowResolutionIF) => {
+            console.log('>>>> addToResolutionPair', symbol, resolution);
             setSelectedResolution(resolution);
             addToResolutionPair(symbol, resolution);
         },

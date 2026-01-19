@@ -131,14 +131,18 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     scaleDataRef.current = scaleData;
 
     const animFrameRef = useRef<number | null>(null);
-    const animDuration = 5000;
+    const animDuration = 1000;
     const isAnimating = useRef(false);
     const isInitialized = useRef(false);
 
     const showLiqText = useRef(false);
     const showAreaText = useRef(false);
 
-    const minLiqLine = 10;
+    // Debug flag - set to true to show liq sizes on lines
+    const debugTexts = false;
+
+    const minLiqLine = 2;
+    const baseLiqWidth = 6; // base width when slot has liq value
     const minAreaWidth = 10; // minimum width in pixels for area chart ticks
     const liqLineWidth = 2;
 
@@ -287,10 +291,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         rowHeight * index +
                         rowHeight / 2;
 
+                    const hasLiq = (liq.sz || 0) > 0.01;
+                    const minWidth = hasLiq
+                        ? minAreaWidth + baseLiqWidth
+                        : minLiqLine;
                     const xStart =
                         widthRef.current -
                         widthRef.current * (liq.ratio || 0) -
-                        minLiqLine;
+                        minWidth;
 
                     const xEnd = widthRef.current;
 
@@ -298,6 +306,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.moveTo(xStart, yPos);
                     context.lineTo(xEnd, yPos);
                     context.stroke();
+
+                    if (debugTexts && liq.sz > 0.01) {
+                        // Draw liq size and ratio text to the left of the line
+                        context.fillStyle = sellColorRef.current;
+                        context.font = '10px Arial';
+                        context.textAlign = 'right';
+                        const sizeText = `${liq.sz.toFixed(2)} (${((liq.ratio || 0) * 100).toFixed(1)}%)`;
+                        context.fillText(sizeText, xStart - 4, yPos + 3);
+                    }
 
                     if (showLiqText.current) {
                         // Draw px value text
@@ -325,10 +342,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         rowHeight * index +
                         (isSellFilled ? 0 : diff * rowHeight);
 
+                    const hasLiq = (liq.sz || 0) > 0.01;
+                    const minWidth = hasLiq
+                        ? minAreaWidth + baseLiqWidth
+                        : minLiqLine;
                     const xStart =
                         widthRef.current -
                         widthRef.current * (liq.ratio || 0) -
-                        minLiqLine;
+                        minWidth;
 
                     const xEnd = widthRef.current;
 
@@ -336,6 +357,19 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.moveTo(xStart, yPositionIndex);
                     context.lineTo(xEnd, yPositionIndex);
                     context.stroke();
+
+                    if (debugTexts && liq.sz > 0.01) {
+                        // Draw liq size and ratio text to the left of the line
+                        context.fillStyle = buyColorRef.current;
+                        context.font = '10px Arial';
+                        context.textAlign = 'right';
+                        const sizeText = `${liq.sz.toFixed(2)} (${((liq.ratio || 0) * 100).toFixed(1)}%)`;
+                        context.fillText(
+                            sizeText,
+                            xStart - 4,
+                            yPositionIndex + 3,
+                        );
+                    }
 
                     if (showLiqText.current) {
                         // Draw px value text
@@ -757,29 +791,43 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const interpolatedData: LiqLevel[] = [];
 
-            if (fromData.length != toData.length) {
-                return toData;
-            }
+            const maxLength = Math.max(fromData.length, toData.length);
 
-            for (let i = 0; i < fromData.length; i++) {
+            for (let i = 0; i < maxLength; i++) {
                 const fromRow = fromData[i];
                 const toRow = toData[i];
 
+                // Create default row with zero values for missing data
+                const defaultRow: LiqLevel = {
+                    ratio: 0,
+                    px: fromRow?.px || toRow?.px || 0,
+                    sz: 0,
+                    type: fromRow?.type || toRow?.type || 'buy',
+                    cumulativeRatio: 0,
+                    cumulativeSz: 0,
+                };
+
+                const safeFromRow = fromRow || defaultRow;
+                const safeToRow = toRow || defaultRow;
+
                 const interpolatedRow = {
-                    ...fromRow,
+                    ...safeFromRow,
                     ratio:
-                        (fromRow.ratio || 0) +
-                        ((toRow.ratio || 0) - (fromRow.ratio || 0)) * progress,
+                        (safeFromRow.ratio || 0) +
+                        ((safeToRow.ratio || 0) - (safeFromRow.ratio || 0)) *
+                            progress,
                     px:
-                        (fromRow.px || 0) +
-                        ((toRow.px || 0) - (fromRow.px || 0)) * progress,
+                        (safeFromRow.px || 0) +
+                        ((safeToRow.px || 0) - (safeFromRow.px || 0)) *
+                            progress,
                     sz:
-                        (fromRow.sz || 0) +
-                        ((toRow.sz || 0) - (fromRow.sz || 0)) * progress,
+                        (safeFromRow.sz || 0) +
+                        ((safeToRow.sz || 0) - (safeFromRow.sz || 0)) *
+                            progress,
                     cumulativeRatio:
-                        (fromRow.cumulativeRatio || 0) +
-                        ((toRow.cumulativeRatio || 0) -
-                            (fromRow.cumulativeRatio || 0)) *
+                        (safeFromRow.cumulativeRatio || 0) +
+                        ((safeToRow.cumulativeRatio || 0) -
+                            (safeFromRow.cumulativeRatio || 0)) *
                             progress,
                 };
 
@@ -1102,9 +1150,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         }
 
         // For subsequent updates, animate to new data
-        // if (!isAnimating.current) {
         animateChart(buyData, sellData, liqBuys, liqSells);
-        // }
     }, [
         buyData,
         sellData,
@@ -1415,13 +1461,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 updateScalesAndSeries();
             });
     }, [chart, location, updateScalesAndSeries]);
-
-    useEffect(() => {
-        const filteredSell = sellData.filter((s) => s.px < 97000);
-
-        console.log('>>>> filteredSell', filteredSell);
-        console.log('>>>> liqSells', liqSells);
-    }, [buyData, sellData, liqSells]);
 
     return (
         <div

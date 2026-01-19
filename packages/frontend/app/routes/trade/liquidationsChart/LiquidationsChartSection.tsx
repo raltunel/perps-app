@@ -53,6 +53,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         obMinBuy,
         obMinSell,
         obMaxBuy,
+        addToResolutionPair,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
     const { loadingState } = useLiquidationStore();
@@ -127,52 +128,59 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         return filteredSellLiqs;
     }, [sellLiqs, obMaxSell]);
 
+    // Find max sz across all liq levels (both buy and sell sides)
+    const maxLiqSz = useMemo(() => {
+        const allLiqs = [...buyLiqs, ...sellLiqs];
+        if (allLiqs.length === 0) return 0;
+        return Math.max(...allLiqs.map((liq) => liq.sz));
+    }, [buyLiqs, sellLiqs]);
+
     // Create discrete liq arrays mapped to orderbook slots (summing sz within each slot's price range)
     const slottedLiqBuys = useMemo(() => {
         const slicedBuys = buys.slice(0, orderCount);
 
-        // First pass: sum sz for each slot
+        // Map slots with sz and count for averaging
         const slotsWithSz = slicedBuys.map((slot, index) => {
             const nextSlotPx = slicedBuys[index + 1]?.px ?? 0;
             const matchingLiqs = buyLiqsFilteredOB.filter(
                 (liq) => liq.px <= slot.px && liq.px > nextSlotPx,
             );
             const summedSz = matchingLiqs.reduce((acc, liq) => acc + liq.sz, 0);
-            return { px: slot.px, sz: summedSz, type: 'buy' as const };
+            const count = matchingLiqs.length;
+            const avgSz = count > 0 ? summedSz / count : 0;
+            return { px: slot.px, sz: summedSz, avgSz, type: 'buy' as const };
         });
 
-        // Find max sz across all slots
-        const maxSz = Math.max(...slotsWithSz.map((s) => s.sz), 0);
-
-        // Second pass: calculate ratio as sz / maxSz
+        // Calculate ratio using average sz / maxLiqSz
         return slotsWithSz.map((slot) => ({
             ...slot,
-            ratio: maxSz > 0 ? slot.sz / maxSz : 0,
+            ratio: maxLiqSz > 0 ? slot.avgSz / maxLiqSz : 0,
         }));
-    }, [buys, buyLiqsFilteredOB, orderCount]);
+    }, [buys, buyLiqsFilteredOB, maxLiqSz, orderCount]);
 
     const slottedLiqSells = useMemo(() => {
         const slicedSells = sells.slice(0, orderCount);
 
-        // First pass: sum sz for each slot
+        // Map slots with sz and count for averaging
         const slotsWithSz = slicedSells.map((slot, index) => {
             const nextSlotPx = slicedSells[index + 1]?.px ?? Infinity;
             const matchingLiqs = sellLiqsFilteredOB.filter(
                 (liq) => liq.px >= slot.px && liq.px < nextSlotPx,
             );
             const summedSz = matchingLiqs.reduce((acc, liq) => acc + liq.sz, 0);
-            return { px: slot.px, sz: summedSz, type: 'sell' as const };
+            const count = matchingLiqs.length;
+            const avgSz = count > 0 ? summedSz / count : 0;
+            return { px: slot.px, sz: summedSz, avgSz, type: 'sell' as const };
         });
 
-        // Find max sz across all slots
-        const maxSz = Math.max(...slotsWithSz.map((s) => s.sz), 0);
-
-        // Second pass: calculate ratio as sz / maxSz
-        return slotsWithSz.map((slot) => ({
-            ...slot,
-            ratio: maxSz > 0 ? slot.sz / maxSz : 0,
-        }));
-    }, [sells, sellLiqsFilteredOB, orderCount]);
+        // Calculate ratio using average sz / maxLiqSz
+        return slotsWithSz
+            .map((slot) => ({
+                ...slot,
+                ratio: maxLiqSz > 0 ? slot.avgSz / maxLiqSz : 0,
+            }))
+            .reverse();
+    }, [sells, sellLiqsFilteredOB, maxLiqSz, orderCount]);
 
     const handleTabChange = useCallback(
         (tab: LiqChartTabType) => setActiveTab(tab),
@@ -406,6 +414,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         );
                         if (resolution) {
                             setSelectedResolution(resolution);
+                            addToResolutionPair(symbol, resolution);
                         }
                     }}
                 />
