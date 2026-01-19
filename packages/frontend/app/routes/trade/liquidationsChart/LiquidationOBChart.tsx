@@ -143,7 +143,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const minLiqLine = 2;
     const baseLiqWidth = 6; // base width when slot has liq value
-    const minAreaWidth = 10; // minimum width in pixels for area chart ticks
+    const minAreaWidth = 2; // minimum width in pixels for area chart ticks
     const liqLineWidth = 2;
 
     const buyColorRef = useRef(getBsColor().buy);
