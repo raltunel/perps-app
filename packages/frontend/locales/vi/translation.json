@@ -669,6 +669,8 @@
         "totalUsdVal": "Tổng giá trị USD",
         "totalNetUsdValue": "Tổng giá trị USD ròng",
         "performance": "Hiệu suất",
+        "accountOverview": "Tổng quan tài khoản",
+        "updateFrequencyInMinutes": "Cập nhật mỗi {{numMinutes}} phút",
         "positions": "Vị thế",
         "feeSchedule": "Biểu phí",
         "vipTiers": "Cấp độ VIP",

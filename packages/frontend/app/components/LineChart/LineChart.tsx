@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './LineChart.module.css';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
 
 type CurveType = 'step' | 'basic';
 
@@ -17,18 +18,14 @@ type LineChartProps = {
 const LineChart: React.FC<LineChartProps> = (props) => {
     const { lineData, chartName, curve, height, width, isMobile } = props;
 
+    const { formatNum } = useNumFormatter();
+
     const hasData = Array.isArray(lineData) && lineData.length > 0;
 
     const chartWidth = width || 850;
     const chartHeight = height || 250;
 
-    const xAxisHeight = 50;
-    const bottomGap =
-        parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue(
-                '--gap-m',
-            ),
-        ) || 16;
+    const xAxisHeight = isMobile ? 24 : 24;
 
     const [canvasInitialHeight, setCanvasInitialHeight] = React.useState<
         number | undefined
@@ -114,7 +111,9 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             yAxisTicksRef.current?.forEach((tick) => {
                 textMeasure.push(
-                    context.measureText(d3.format(',')(tick)).width,
+                    context.measureText(
+                        formatNum(tick as number, null, true, true),
+                    ).width,
                 );
             });
 
@@ -299,7 +298,10 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .call(
                     d3
                         .axisLeft(scaleDataRef.current.svgYScale)
-                        .tickValues(yAxisTicksRef.current),
+                        .tickValues(yAxisTicksRef.current)
+                        .tickFormat((d: any) =>
+                            formatNum(d as number, null, true, true),
+                        ),
                 )
                 .select('.domain')
                 .remove();
@@ -455,13 +457,13 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                         <div
                             className={styles.xAxisContainer}
                             style={{
-                                height: xAxisHeight - bottomGap - 1 + 'px',
+                                height: xAxisHeight + 'px',
                                 width: chartWidth + 'px',
                             }}
                         >
                             <svg
                                 id={`xAxis${isMobile ? 'Mobile' : ''}`}
-                                height={xAxisHeight - bottomGap - 1}
+                                height={xAxisHeight}
                                 width={chartWidth}
                                 style={{ paddingRight: yAxisPadding }}
                             />
