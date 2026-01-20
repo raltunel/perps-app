@@ -1,225 +1,151 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import type { HorizontalLineData } from '../LiqudationLines';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useLiquidationStore } from '~/stores/LiquidationStore';
 import type { LiqLevel } from '~/routes/trade/liquidationsChart/LiquidationUtils';
-import {
-    useLiqChartStore,
-    type LiqThresholdLevel,
-} from '~/stores/LiqChartStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
-// Slot height in pixels for chart liq lines
-const SLOT_HEIGHT_PX = 4;
+// Minimum slot height in pixels
+const MIN_SLOT_HEIGHT_PX = 4;
+// Maximum number of slots to create (controls granularity)
+const MAX_SLOT_COUNT = 150;
 
 interface SlottedLiq {
-    px: number;
-    sz: number;
-    avgSz: number;
-    type: 'buy' | 'sell';
-    ratio: number;
+    px: number; // center price of slot
+    sz: number; // total size in slot
+    minPx: number; // slot lower bound
+    maxPx: number; // slot upper bound
+    ratio: number; // ratio to max size
 }
 
 export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
+    const { buyLiqs, sellLiqs, liqThresholds } = useLiquidationStore();
+
     const { symbolInfo } = useTradeDataStore();
-    const { buyLiqs, sellLiqs } = useLiquidationStore();
+    const symbolPriceRef = useRef(symbolInfo?.markPx ?? 0);
+    symbolPriceRef.current = symbolInfo?.markPx ?? 0;
 
-    const markPxRef = useRef(symbolInfo?.markPx);
-    markPxRef.current = symbolInfo?.markPx;
-    const [lines, setLines] = useState<HorizontalLineData[]>([]);
-    const { liqLevels } = useLiqChartStore();
-
-    // Get chart boundaries from scaleData
-    const chartBounds = useMemo(() => {
-        if (!scaleData?.yScale) return null;
-        const domain = scaleData.yScale.domain();
-        return {
-            minPx: Math.min(domain[0], domain[1]),
-            maxPx: Math.max(domain[0], domain[1]),
-        };
-    }, [scaleData?.yScale?.domain()?.join(',')]);
-
-    // Calculate price range per slot based on pixel height
-    const pricePerSlot = useMemo(() => {
-        if (!scaleData?.yScale || !chartBounds) return 0;
-        const range = scaleData.yScale.range();
-        const totalPixels = Math.abs(range[1] - range[0]);
-        const totalPrice = chartBounds.maxPx - chartBounds.minPx;
-        if (totalPixels === 0) return 0;
-        return (totalPrice / totalPixels) * SLOT_HEIGHT_PX;
-    }, [scaleData?.yScale, chartBounds]);
-
-    // Find max sz across all liq levels (both buy and sell sides)
-    const maxLiqSz = useMemo(() => {
-        const allLiqs = [...buyLiqs, ...sellLiqs];
-        if (allLiqs.length === 0) return 0;
-        return Math.max(...allLiqs.map((liq) => liq.sz));
-    }, [buyLiqs, sellLiqs]);
-
-    // Filter liqs within chart bounds
-    const filteredBuyLiqs = useMemo(() => {
-        if (!chartBounds) return [];
-        return buyLiqs.filter(
-            (liq) => liq.px >= chartBounds.minPx && liq.px <= chartBounds.maxPx,
-        );
-    }, [buyLiqs, chartBounds]);
-
-    const filteredSellLiqs = useMemo(() => {
-        if (!chartBounds) return [];
-        return sellLiqs.filter(
-            (liq) => liq.px >= chartBounds.minPx && liq.px <= chartBounds.maxPx,
-        );
-    }, [sellLiqs, chartBounds]);
-
-    // Generate slots based on chart bounds and slot height
-    const generateSlots = useCallback(
-        (type: 'buy' | 'sell'): { px: number; nextPx: number }[] => {
-            if (!chartBounds || pricePerSlot <= 0) return [];
-
-            const slots: { px: number; nextPx: number }[] = [];
-            const markPx = markPxRef.current ?? 0;
-
-            if (type === 'buy') {
-                // Buy slots: from markPx down to minPx
-                let currentPx = markPx;
-                while (currentPx > chartBounds.minPx) {
-                    const nextPx = currentPx - pricePerSlot;
-                    slots.push({
-                        px: currentPx,
-                        nextPx: Math.max(nextPx, chartBounds.minPx),
-                    });
-                    currentPx = nextPx;
-                }
-            } else {
-                // Sell slots: from markPx up to maxPx
-                let currentPx = markPx;
-                while (currentPx < chartBounds.maxPx) {
-                    const nextPx = currentPx + pricePerSlot;
-                    slots.push({
-                        px: currentPx,
-                        nextPx: Math.min(nextPx, chartBounds.maxPx),
-                    });
-                    currentPx = nextPx;
-                }
-            }
-
-            return slots;
-        },
-        [chartBounds, pricePerSlot],
-    );
-
-    // Slot buy liqs
-    const slottedBuyLiqs = useMemo((): SlottedLiq[] => {
-        const slots = generateSlots('buy');
-        if (slots.length === 0) return [];
-
-        return slots
-            .map((slot) => {
-                const matchingLiqs = filteredBuyLiqs.filter(
-                    (liq) => liq.px <= slot.px && liq.px > slot.nextPx,
-                );
-                const summedSz = matchingLiqs.reduce(
-                    (acc, liq) => acc + liq.sz,
-                    0,
-                );
-                const count = matchingLiqs.length;
-                const avgSz = count > 0 ? summedSz / count : 0;
-                const ratio = maxLiqSz > 0 ? avgSz / maxLiqSz : 0;
-
-                return {
-                    px: (slot.px + slot.nextPx) / 2, // center of slot
-                    sz: summedSz,
-                    avgSz,
-                    type: 'buy' as const,
-                    ratio,
-                };
-            })
-            .filter((slot) => slot.sz > 0);
-    }, [generateSlots, filteredBuyLiqs, maxLiqSz]);
-
-    // Slot sell liqs
-    const slottedSellLiqs = useMemo((): SlottedLiq[] => {
-        const slots = generateSlots('sell');
-        if (slots.length === 0) return [];
-
-        return slots
-            .map((slot) => {
-                const matchingLiqs = filteredSellLiqs.filter(
-                    (liq) => liq.px >= slot.px && liq.px < slot.nextPx,
-                );
-                const summedSz = matchingLiqs.reduce(
-                    (acc, liq) => acc + liq.sz,
-                    0,
-                );
-                const count = matchingLiqs.length;
-                const avgSz = count > 0 ? summedSz / count : 0;
-                const ratio = maxLiqSz > 0 ? avgSz / maxLiqSz : 0;
-
-                return {
-                    px: (slot.px + slot.nextPx) / 2, // center of slot
-                    sz: summedSz,
-                    avgSz,
-                    type: 'sell' as const,
-                    ratio,
-                };
-            })
-            .filter((slot) => slot.sz > 0);
-    }, [generateSlots, filteredSellLiqs, maxLiqSz]);
-
+    // Get color based on slot USD value and thresholds
     const getColor = useCallback(
-        (ratio: number) => {
-            let foundLevel;
-            liqLevels.forEach((level) => {
-                if (
-                    ratio >= (level.minRatio ?? 0) &&
-                    ratio < (level.maxRatio ?? 100)
-                ) {
-                    foundLevel = level;
-                    return;
-                }
+        (slotSz: number) => {
+            const slotSzValue = slotSz * symbolPriceRef.current;
+
+            // Check against thresholds (highest to lowest)
+            if (slotSzValue >= liqThresholds[2]) {
+                return '#FDE725'; // Highest level - yellow
+            }
+            if (slotSzValue >= liqThresholds[1]) {
+                return '#2BAE7D'; // Second level - green
+            }
+            if (slotSzValue >= liqThresholds[0]) {
+                return '#287D8D'; // Third level - blue
+            }
+            return '#461668'; // Lowest level - purple
+        },
+        [liqThresholds],
+    );
+
+    // Main computation: from raw liqs to slotted lines
+    const slottedLines = useMemo((): HorizontalLineData[] => {
+        if (!scaleData?.yScale) return [];
+
+        // 1. Get chart price boundaries
+        const domain = scaleData.yScale.domain();
+        const minPx = Math.min(domain[0], domain[1]);
+        const maxPx = Math.max(domain[0], domain[1]);
+        const priceRange = maxPx - minPx;
+
+        if (priceRange <= 0) return [];
+
+        // 2. Merge buy and sell arrays, filter by visible range
+        const allLiqs: LiqLevel[] = [...buyLiqs, ...sellLiqs].filter(
+            (liq) => liq.px >= minPx && liq.px <= maxPx,
+        );
+
+        if (allLiqs.length === 0) return [];
+
+        // 3. Calculate slot configuration
+        // Get chart pixel height
+        const range = scaleData.yScale.range();
+        const chartHeightPx = Math.abs(range[1] - range[0]);
+
+        // Calculate how many 4px slots would fit
+        const potentialSlotCount = Math.floor(
+            chartHeightPx / MIN_SLOT_HEIGHT_PX,
+        );
+
+        // Limit to MAX_SLOT_COUNT, adjust slot size if needed
+        const slotCount = Math.min(potentialSlotCount, MAX_SLOT_COUNT);
+
+        if (slotCount <= 0) return [];
+
+        // Calculate actual slot height in pixels and price per slot
+        const actualSlotHeightPx = chartHeightPx / slotCount;
+        const pricePerSlot = priceRange / slotCount;
+
+        // 4. Create slots with price ranges
+        const slots: {
+            minPx: number;
+            maxPx: number;
+            centerPx: number;
+            totalSz: number;
+        }[] = [];
+
+        for (let i = 0; i < slotCount; i++) {
+            const slotMinPx = minPx + i * pricePerSlot;
+            const slotMaxPx = minPx + (i + 1) * pricePerSlot;
+            slots.push({
+                minPx: slotMinPx,
+                maxPx: slotMaxPx,
+                centerPx: (slotMinPx + slotMaxPx) / 2,
+                totalSz: 0,
             });
-
-            return foundLevel
-                ? (foundLevel as LiqThresholdLevel).color
-                : '#461668';
-        },
-        [liqLevels],
-    );
-
-    const generateHorizontalLine = useCallback(
-        (slottedLiq: SlottedLiq): HorizontalLineData => {
-            const ratioPercent = slottedLiq.ratio * 100;
-            return {
-                yPrice: slottedLiq.px,
-                liqValue: slottedLiq.sz,
-                color: getColor(ratioPercent),
-                strokeStyle: getColor(ratioPercent),
-                lineWidth: SLOT_HEIGHT_PX,
-                type: slottedLiq.type === 'sell' ? 'Short' : 'Long',
-                dash: undefined,
-                globalAlpha: 0.4,
-            } as HorizontalLineData;
-        },
-        [getColor],
-    );
-
-    useEffect(() => {
-        if (slottedBuyLiqs.length === 0 && slottedSellLiqs.length === 0) {
-            setLines([]);
-            return;
         }
 
-        const newLines: HorizontalLineData[] = [];
-
-        slottedBuyLiqs.forEach((liq) => {
-            newLines.push(generateHorizontalLine(liq));
+        // 5. Distribute liqs into slots (sum sz)
+        allLiqs.forEach((liq) => {
+            // Find which slot this liq belongs to
+            const slotIndex = Math.floor((liq.px - minPx) / pricePerSlot);
+            // Clamp to valid range (handle edge case where px === maxPx)
+            const clampedIndex = Math.min(
+                Math.max(slotIndex, 0),
+                slotCount - 1,
+            );
+            slots[clampedIndex].totalSz += liq.sz;
         });
 
-        slottedSellLiqs.forEach((liq) => {
-            newLines.push(generateHorizontalLine(liq));
+        // 6. Find max sz for ratio calculation
+        const maxSz = Math.max(...slots.map((s) => s.totalSz));
+        if (maxSz === 0) return [];
+
+        // 7. Convert slots to HorizontalLineData (only non-empty slots)
+        const lines: HorizontalLineData[] = [];
+
+        slots.forEach((slot) => {
+            if (slot.totalSz <= 0) return;
+
+            const color = getColor(slot.totalSz);
+
+            lines.push({
+                yPrice: slot.centerPx,
+                liqValue: slot.totalSz,
+                color: color,
+                strokeStyle: color,
+                lineWidth: actualSlotHeightPx,
+                type: 'Liq',
+                dash: undefined,
+                globalAlpha: 0.4,
+            } as HorizontalLineData);
         });
 
-        setLines(newLines);
-    }, [slottedBuyLiqs, slottedSellLiqs, generateHorizontalLine]);
+        return lines;
+    }, [
+        scaleData?.yScale,
+        scaleData?.yScale?.domain()?.join(','),
+        scaleData?.yScale?.range()?.join(','),
+        buyLiqs,
+        sellLiqs,
+        getColor,
+    ]);
 
-    return lines;
+    return slottedLines;
 };

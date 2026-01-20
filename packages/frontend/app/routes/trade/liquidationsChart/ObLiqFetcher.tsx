@@ -30,7 +30,17 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
     const { subscribe, unsubscribe } = useWs();
 
-    const { setBuyLiqs, setSellLiqs, setLoadingState } = useLiquidationStore();
+    const {
+        setBuyLiqs,
+        setSellLiqs,
+        setLoadingState,
+        setMaxLiqUSD,
+        setMinLiqUSD,
+        maxLiqUSD,
+        minLiqUSD,
+    } = useLiquidationStore();
+    const maxLiqUSDRef = useRef(maxLiqUSD);
+    const minLiqUSDRef = useRef(minLiqUSD);
 
     const { maxLiqValue, minLiqValue, setMaxLiqValue, setMinLiqValue } =
         useLiqChartStore();
@@ -79,6 +89,12 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
             (max, level) => Math.max(max, level[1] / 1e8),
             0,
         );
+
+        const buysMinSz = buys.reduce(
+            (min, level) => Math.min(min, level[1] / 1e8),
+            Infinity,
+        );
+
         const buysTotalSz = buys.reduce(
             (total, level) => total + level[1] / 1e8,
             0,
@@ -90,7 +106,13 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
             0,
         );
 
+        const sellsMinSz = sells.reduce(
+            (min, level) => Math.min(min, level[1] / 1e8),
+            Infinity,
+        );
+
         const maxSz = Math.max(buysMaxSz, sellsMaxSz);
+        const minSz = Math.min(buysMinSz, sellsMinSz);
 
         const sellsTotalSz = sells.reduce(
             (total, level) => total + level[1] / 1e8,
@@ -129,6 +151,13 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
 
         setBuyLiqs(buyLiqs);
         setSellLiqs(sellLiqs);
+
+        if (maxLiqUSDRef.current === 0) {
+            setMaxLiqUSD(maxSz * (symbolInfoRef.current?.markPx ?? 0) * 5);
+        }
+        if (minLiqUSDRef.current === 0) {
+            setMinLiqUSD(minSz * (symbolInfoRef.current?.markPx ?? 0));
+        }
     }, []);
 
     useEffect(() => {

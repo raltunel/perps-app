@@ -17,6 +17,8 @@ export type LiqThresholdLevel = {
     color: string;
     minRatio: number;
     maxRatio?: number;
+    minValue?: number;
+    maxValue?: number;
 };
 
 const defaultLiqLevels = [
@@ -78,7 +80,9 @@ export const useLiqChartStore = create<LiqChartStore>()(
         {
             name: 'LIQCHART',
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({}),
+            partialize: (state) => ({
+                liqLevels: state.liqLevels,
+            }),
         },
     ),
 );
