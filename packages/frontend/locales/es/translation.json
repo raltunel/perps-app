@@ -467,7 +467,7 @@
         "toCustomizeAffiliateCode": "Los códigos de afiliado por defecto son los primeros seis caracteres de tu dirección de wallet. Usuarios con > $1M en volumen de trading pueden personalizar su código.",
         "claimRewardsWithAmount": "Reclamar {{amount}} en recompensas",
         "selectATabToViewData": "Selecciona una pestaña para ver datos",
-        "trackingLinkExplanation": "Recibirás <0>{{affiliatePercent}}</0> de las comisiones de usuarios referidos y ellos recibirán un descuento de <1>{{userPercent}}</1>.",
+        "trackingLinkExplanation": "Recibirás <0>{{referrerPercent}}</0> de las comisiones de usuarios referidos y ellos recibirán un descuento de <1>{{inviteePercent}}</1>.",
         "claim": "Reclamar"
     },
     "deposit": {

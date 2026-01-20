@@ -467,7 +467,7 @@
         "toCustomizeAffiliateCode": "Ortaklık kodları varsayılan olarak cüzdan adresinizin ilk altı karakteridir. 1 milyon dolardan fazla işlem hacmine sahip kullanıcılar ortaklık kodlarını özelleştirebilir.",
         "claimRewardsWithAmount": "{{amount}} tutarında ödül talep et",
         "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",
-        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{affiliatePercent}}</0> kadarını alacaksınız ve onlar <1>{{userPercent}}</1> indirim alacaklar.",
+        "trackingLinkExplanation": "Yönlendirilen kullanıcı ücretlerinin <0>{{referrerPercent}}</0> kadarını alacaksınız ve onlar <1>{{inviteePercent}}</1> indirim alacaklar.",
         "claim": "Talep et"
     },
     "deposit": {
