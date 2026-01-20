@@ -134,7 +134,6 @@ export function YourStatsSection() {
                         <StatCard
                             label={STATS_LABELS.FEES_EARNED}
                             value={affiliateEarnings}
-                            tooltip={'total fees paid to affiliates'}
                         />
                     )}
 
