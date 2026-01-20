@@ -5,6 +5,7 @@ import React, {
     useId,
     type ReactNode,
 } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './Tooltip.module.css';
 
 type TooltipPosition =
@@ -326,23 +327,27 @@ const Tooltip: React.FC<TooltipProps> = ({
                 {children}
             </div>
 
-            {/* Render tooltip using portal-like approach with fixed positioning */}
-            {isVisible && content && (
-                <div
-                    ref={tooltipRef}
-                    id={tooltipId}
-                    role='tooltip'
-                    className={`${styles.tooltip} ${isPositioned ? styles.visible : styles.positioning} ${
-                        isMobile.current ? styles.mobileTooltip : ''
-                    }`}
-                    style={{
-                        left: tooltipPosition.left,
-                        top: tooltipPosition.top,
-                    }}
-                >
-                    {content}
-                </div>
-            )}
+            {/* Render tooltip using portal to document.body for correct fixed positioning */}
+            {isVisible &&
+                content &&
+                typeof document !== 'undefined' &&
+                createPortal(
+                    <div
+                        ref={tooltipRef}
+                        id={tooltipId}
+                        role='tooltip'
+                        className={`${styles.tooltip} ${isPositioned ? styles.visible : styles.positioning} ${
+                            isMobile.current ? styles.mobileTooltip : ''
+                        }`}
+                        style={{
+                            left: tooltipPosition.left,
+                            top: tooltipPosition.top,
+                        }}
+                    >
+                        {content}
+                    </div>,
+                    document.body,
+                )}
         </>
     );
 };
