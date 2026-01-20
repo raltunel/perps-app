@@ -10,8 +10,6 @@ import type { LineData } from './component/LineComponent';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useMobile } from '~/hooks/useMediaQuery';
 
-export const tempPendingOrders: LineData[] = [];
-
 export const useOpenOrderLines = (): LineData[] => {
     const { bsColor, getBsColor } = useAppSettings();
     const { chart } = useTradingView();
@@ -123,10 +121,7 @@ export const useOpenOrderLines = (): LineData[] => {
                 };
             });
 
-        setLines([
-            ...newLines.filter((i) => i.yPrice > 0),
-            ...tempPendingOrders,
-        ]);
+        setLines(newLines.filter((i) => i.yPrice > 0));
     }, [
         chart,
         JSON.stringify(userSymbolOrders),

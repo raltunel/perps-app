@@ -7,8 +7,6 @@ import {
     updateOverlayCanvasSize,
 } from '../orders/customOrderLineUtils';
 import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
-import { tempPendingOrders } from '../orders/useOpenOrderLines';
-import type { LineData } from '../orders/component/LineComponent';
 import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 
@@ -246,29 +244,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         setClickedOrder(null);
                         setIsProcessing(false);
                         setProcessingProgress(0);
-
-                        if (mousePrice && activeOrder) {
-                            const quantity = activeOrder.size || 0;
-
-                            const newPendingOrder: LineData = {
-                                xLoc: 0.4,
-                                yPrice: mousePrice,
-                                textValue: {
-                                    type: 'Limit',
-                                    price: mousePrice,
-                                    triggerCondition: '',
-                                },
-                                quantityTextValue: quantity,
-                                quantityText: quantity.toString(),
-                                color: colors[side],
-                                type: 'LIMIT',
-                                lineStyle: 3,
-                                lineWidth: 1,
-                                side: side,
-                            };
-
-                            tempPendingOrders.push(newPendingOrder);
-                        }
                     }, 100);
                 }
             };
@@ -603,26 +578,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     setClickedOrder(null);
                     setIsProcessing(false);
                     setProcessingProgress(0);
-
-                    // Add to tempPendingOrders
-                    const newPendingOrder: LineData = {
-                        xLoc: 0.4,
-                        yPrice: price,
-                        textValue: {
-                            type: 'Limit',
-                            price: price,
-                            triggerCondition: '',
-                        },
-                        quantityTextValue: preparedOrder.size,
-                        quantityText: preparedOrder.size.toString(),
-                        color: colors[side],
-                        type: 'LIMIT',
-                        lineStyle: 3,
-                        lineWidth: 1,
-                        side: side,
-                    };
-
-                    tempPendingOrders.push(newPendingOrder);
                     clearPreparedOrder();
                 }, 100);
             }
@@ -687,9 +642,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     setProcessingProgress(0);
 
                     if (activeOrder) {
-                        const quantity = activeOrder.size || 0;
-
-                        // Set prepared order with all info
                         setPreparedOrder({
                             price: price,
                             side: side,
@@ -698,25 +650,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             currency: activeOrder.currency,
                             timestamp: Date.now(),
                         });
-
-                        const newPendingOrder: LineData = {
-                            xLoc: 0.4,
-                            yPrice: price,
-                            textValue: {
-                                type: 'Limit',
-                                price: price,
-                                triggerCondition: '',
-                            },
-                            quantityTextValue: quantity,
-                            quantityText: quantity.toString(),
-                            color: colors[side],
-                            type: 'LIMIT',
-                            lineStyle: 3,
-                            lineWidth: 1,
-                            side: side,
-                        };
-
-                        tempPendingOrders.push(newPendingOrder);
                     }
                 }, 100);
             }
@@ -764,11 +697,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     setIsProcessing(false);
                     setProcessingProgress(0);
 
-                    // Create sell stop order line
                     if (activeOrder) {
-                        const quantity = activeOrder.size || 0;
-
-                        // Set prepared order with all info
                         setPreparedOrder({
                             price: price,
                             side: side,
@@ -777,25 +706,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             currency: activeOrder.currency,
                             timestamp: Date.now(),
                         });
-
-                        const newPendingOrder: LineData = {
-                            xLoc: 0.4,
-                            yPrice: price,
-                            textValue: {
-                                type: 'Limit',
-                                price: price,
-                                triggerCondition: '',
-                            },
-                            quantityTextValue: quantity,
-                            quantityText: quantity.toString(),
-                            color: colors[side],
-                            type: 'LIMIT',
-                            lineStyle: 3,
-                            lineWidth: 1,
-                            side: side,
-                        };
-
-                        tempPendingOrders.push(newPendingOrder);
                     }
                 }, 100);
             }
