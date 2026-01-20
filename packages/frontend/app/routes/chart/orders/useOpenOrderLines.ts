@@ -8,6 +8,7 @@ import {
 } from './customOrderLineUtils';
 import type { LineData } from './component/LineComponent';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 export const tempPendingOrders: LineData[] = [];
 
@@ -16,6 +17,7 @@ export const useOpenOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
     const { userSymbolOrders, positions, symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
+    const isMobile = useMobile();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
@@ -53,7 +55,7 @@ export const useOpenOrderLines = (): LineData[] => {
 
                 const color =
                     side === 'buy' ? getBsColor().buy : getBsColor().sell;
-                const xLoc = 0.4;
+                const xLoc = isMobile ? 0.3 : 0.4;
                 const tempTriggerCondition =
                     triggerCondition && triggerCondition !== 'N/A'
                         ? triggerCondition
@@ -68,12 +70,16 @@ export const useOpenOrderLines = (): LineData[] => {
                 };
                 const type = 'LIMIT';
 
+                let priceColor: string | undefined;
+
                 if (orderType === 'Limit') {
                     label = {
                         type: 'Limit',
                         price: limitPx,
                         triggerCondition: tempTriggerCondition,
                     };
+
+                    priceColor = '#3b82f6';
                 } else {
                     if (orderType === 'Stop Limit') {
                         label = {
@@ -104,6 +110,7 @@ export const useOpenOrderLines = (): LineData[] => {
                     xLoc,
                     yPrice,
                     textValue: label,
+                    priceColor,
                     quantityTextValue,
                     quantityText:
                         quantityTextFormatWithComma(quantityTextValue),

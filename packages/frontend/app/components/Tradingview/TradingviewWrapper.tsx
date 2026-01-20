@@ -4,12 +4,20 @@ import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
+import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
+import type { TabType } from '~/routes/trade';
+
+interface TradingViewWrapperProps {
+    switchTab?: (tab: TabType) => void;
+}
 import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
 import LimitOrderPlacementCanvas from '~/routes/chart/overlayCanvas/LimitOrderPlacementCanvas';
 import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
 import { QuickModeConfirmModal } from '~/routes/chart/components/QuickModeConfirmModal';
 
-const TradingViewWrapper: React.FC = () => {
+const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
+    switchTab,
+}) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [tvLib, setTvLib] = useState<any>(null);
     const [chartLoadingStatus, setChartLoadingStatus] = useState<
@@ -81,9 +89,11 @@ const TradingViewWrapper: React.FC = () => {
                     key={chartKey}
                     tradingviewLib={tvLib}
                     setChartLoadingStatus={setChartLoadingStatus}
+                    switchTab={switchTab}
                 >
                     <TradingViewChart />
                     <OrderLinesOverlayCanvas />
+                    <YaxisOverlayCanvas />
                     <LimitOrderPlacementCanvas />
                 </TradingViewProvider>
             )}

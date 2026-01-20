@@ -1,16 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import type { UserPositionIF } from '~/utils/UserDataIFs';
 import CollateralPieChart from '../CollateralChart/CollateralPieChart';
 
 export interface TabChartContext {
     activeTab: string;
     selectedVault: { label: string; value: string };
-    selectedPeriod: { label: string; value: string };
-    isLineDataFetched: boolean;
-    handleLineDataFetched: (isDataFetched: boolean) => void;
+    selectedPeriod: { label: string; value: string; timeframe: number };
     pnlHistory: { time: number; value: number }[] | undefined;
     setPnlHistory: React.Dispatch<
         React.SetStateAction<{ time: number; value: number }[] | undefined>
@@ -21,139 +18,251 @@ export interface TabChartContext {
     >;
     userProfileLineData: any;
     setUserProfileLineData: React.Dispatch<React.SetStateAction<any>>;
+    panelHeight?: number;
+    isMobile?: boolean;
 }
+
+// Increased mobile chart height to show full content including labels
+const MOBILE_CHART_HEIGHT = 280;
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
     const {
         activeTab,
         selectedVault,
         selectedPeriod,
-        isLineDataFetched,
-        handleLineDataFetched,
         pnlHistory,
         setPnlHistory,
         accountValueHistory,
         setAccountValueHistory,
         userProfileLineData,
         setUserProfileLineData,
+        panelHeight,
+        isMobile,
     } = props;
+
+    const panelHeightRef = useRef(panelHeight);
+
+    useEffect(() => {
+        panelHeightRef.current = panelHeight;
+    }, [panelHeight]);
 
     const { userAddress } = useUserDataStore();
 
-    const { fetchUserPortfolio } = useInfoApi();
+    const { fetchUserHistory } = useInfoApi();
 
-    const [parsedKey, setParsedKey] = useState<string>();
-    const [chartWidth, setChartWidth] = useState<number>(
-        window.innerWidth > 768
-            ? Math.min(850, window.innerWidth - 50)
-            : window.innerWidth - 50,
-    );
-    const [chartHeight, setChartHeight] = useState<number>(
-        Math.max(250 - (870 - window.innerHeight), 100),
-    );
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [chartWidth, setChartWidth] = useState<number | null>(null);
+    const [chartHeight, setChartHeight] = useState<number | null>(null);
+    const [isChartReady, setIsChartReady] = useState(false);
 
-    const parseUserProfileData = (data: any, key: string) => {
-        const userPositionData = data.get(key) as UserPositionIF;
+    const fetchUserHistoryRef = useRef(fetchUserHistory);
+    useEffect(() => {
+        fetchUserHistoryRef.current = fetchUserHistory;
+    }, [fetchUserHistory]);
 
-        if (userPositionData.accountValueHistory) {
-            const accountValueHistory =
-                userPositionData.accountValueHistory.map((accountValue) => {
-                    return {
-                        time: accountValue[0],
-                        value: Number(accountValue[1]),
-                    };
-                });
+    const setPnlHistoryRef = useRef(setPnlHistory);
+    useEffect(() => {
+        setPnlHistoryRef.current = setPnlHistory;
+    }, [setPnlHistory]);
 
-            setAccountValueHistory(() => accountValueHistory);
-        }
+    const setAccountValueHistoryRef = useRef(setAccountValueHistory);
+    useEffect(() => {
+        setAccountValueHistoryRef.current = setAccountValueHistory;
+    }, [setAccountValueHistory]);
 
-        if (userPositionData.pnlHistory) {
-            const pnlHistory = userPositionData.pnlHistory.map((pnlValue) => {
-                return {
-                    time: pnlValue[0],
-                    value: Number(pnlValue[1]),
-                };
-            });
-
-            setPnlHistory(() => pnlHistory);
-        }
-
-        setParsedKey(() => key);
-    };
+    const setUserProfileLineDataRef = useRef(setUserProfileLineData);
+    useEffect(() => {
+        setUserProfileLineDataRef.current = setUserProfileLineData;
+    }, [setUserProfileLineData]);
 
     useEffect(() => {
-        if (userAddress && !isLineDataFetched) {
-            fetchUserPortfolio(userAddress).then((data) => {
-                setUserProfileLineData(() => data);
-
-                handleLineDataFetched(true);
-            });
+        if (!userAddress) {
+            return;
         }
-    }, [userAddress, isLineDataFetched]);
 
-    useEffect(() => {
-        const key =
-            selectedVault.value === 'perp'
-                ? 'perp' + selectedPeriod.value
-                : selectedPeriod.value === 'AllTime'
-                  ? 'allTime'
-                  : selectedPeriod.value?.toLowerCase();
+        let isCancelled = false;
 
-        if (key !== parsedKey && userProfileLineData) {
-            parseUserProfileData(userProfileLineData, key);
-        }
-    }, [
-        userProfileLineData,
-        selectedVault.value,
-        selectedPeriod.value,
-        activeTab,
-    ]);
+        const doFetch = async () => {
+            try {
+                const data = await fetchUserHistoryRef.current(userAddress);
+                if (isCancelled) return;
+                if (
+                    data.pnlHistory.length === 0 &&
+                    data.accountValueHistory.length === 0
+                ) {
+                    setPnlHistoryRef.current([]);
+                    setAccountValueHistoryRef.current([]);
+                    setUserProfileLineDataRef.current(data);
+                    return;
+                }
 
-    window.addEventListener('resize', () => {
-        const height = window.innerHeight;
-        const width = window.innerWidth;
-
-        if (width > 768) {
-            if (width < 1250) {
-                setChartWidth(() => Math.max(850 - (1250 - width), 250));
-            } else {
-                setChartWidth(() => 900);
+                setUserProfileLineDataRef.current(data);
+            } catch (error) {
+                if (!isCancelled) {
+                    console.error('Failed to fetch user history:', error);
+                }
             }
-        } else {
-            setChartWidth(() => width - 50);
+        };
+
+        doFetch();
+
+        const intervalId = setInterval(doFetch, 30 * 60 * 1000);
+
+        return () => {
+            isCancelled = true;
+            clearInterval(intervalId);
+        };
+    }, [userAddress]);
+
+    useEffect(() => {
+        window.addEventListener('resize', calculatePanelHeight);
+
+        return () => {
+            window.removeEventListener('resize', calculatePanelHeight);
+        };
+    }, []);
+
+    useEffect(() => {
+        calculatePanelHeight();
+    }, [panelHeight, isMobile]);
+
+    const calculatePanelHeight = useCallback(() => {
+        const isMobileView = isMobile || window.innerWidth <= 768;
+
+        if (!containerRef.current) return;
+
+        const containerWidth = containerRef.current.clientWidth;
+
+        if (isMobileView) {
+            setChartWidth(Math.max(Math.min(containerWidth, 950), 250));
+            setChartHeight(MOBILE_CHART_HEIGHT);
+            setIsChartReady(true);
+            return;
         }
 
-        if (height < 870) {
-            setChartHeight(() => Math.max(250 - (870 - height), 100));
+        const containerHeight = containerRef.current.clientHeight;
+
+        setChartWidth(Math.max(Math.min(containerWidth, 940), 250));
+        setChartHeight(Math.max(containerHeight - 8, 180));
+        setIsChartReady(true);
+    }, [isMobile]);
+
+    useEffect(() => {
+        const raf = requestAnimationFrame(() => {
+            calculatePanelHeight();
+        });
+        return () => cancelAnimationFrame(raf);
+    }, [activeTab, calculatePanelHeight]);
+
+    useEffect(() => {
+        if (!userProfileLineData) return;
+        const data = userProfileLineData;
+
+        if (selectedPeriod.value === 'AllTime') {
+            setPnlHistoryRef.current(data.pnlHistory);
+            setAccountValueHistoryRef.current(data.accountValueHistory);
         } else {
-            setChartHeight(() => 250);
+            const boundaryDate = Date.now() - selectedPeriod.timeframe;
+
+            const filteredPnlHistory = data.pnlHistory.filter(
+                (pnl: any) => pnl.time >= boundaryDate,
+            );
+            const filteredAccountValueHistory = data.accountValueHistory.filter(
+                (av: any) => av.time >= boundaryDate,
+            );
+
+            setPnlHistoryRef.current(filteredPnlHistory);
+            setAccountValueHistoryRef.current(filteredAccountValueHistory);
         }
-    });
+    }, [selectedPeriod, userProfileLineData]);
 
     return (
-        <div>
-            {activeTab === 'Performance' && pnlHistory && (
-                <LineChart
-                    lineData={pnlHistory}
-                    curve={'step'}
-                    chartName={selectedVault.value + selectedPeriod.value}
-                    height={chartHeight}
-                    width={chartWidth}
-                />
-            )}
+        <div
+            ref={containerRef}
+            style={{
+                width: '100%',
+                flex: 1,
+                minHeight: 0,
+                ...(isMobile
+                    ? { minHeight: `${MOBILE_CHART_HEIGHT}px` }
+                    : null),
+                overflow: 'visible',
+            }}
+        >
+            {isChartReady && chartWidth && chartHeight && (
+                <>
+                    {activeTab === 'performance' && pnlHistory && (
+                        <div style={{ position: 'relative' }}>
+                            <LineChart
+                                // key={`performance-${chartWidth}-${chartHeight}`}
+                                lineData={pnlHistory}
+                                curve={'basic'}
+                                chartName={
+                                    selectedVault.value + selectedPeriod.value
+                                }
+                                height={chartHeight}
+                                width={chartWidth}
+                                isMobile={isMobile}
+                            />
+                            {pnlHistory.length === 0 && (
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'var(--text2)',
+                                        fontSize: 'var(--font-size-s)',
+                                        pointerEvents: 'none',
+                                    }}
+                                >
+                                    No history yet
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-            {activeTab === 'Account Value' && accountValueHistory && (
-                <LineChart
-                    lineData={accountValueHistory}
-                    curve={'step'}
-                    chartName={selectedVault.value + selectedPeriod.value}
-                    height={chartHeight}
-                    width={chartWidth}
-                />
-            )}
+                    {activeTab === 'accountValue' && accountValueHistory && (
+                        <div style={{ position: 'relative' }}>
+                            <LineChart
+                                // key={`account-${chartWidth}-${chartHeight}`}
+                                lineData={accountValueHistory}
+                                curve={'basic'}
+                                chartName={
+                                    selectedVault.value + selectedPeriod.value
+                                }
+                                height={chartHeight}
+                                width={chartWidth}
+                                isMobile={isMobile}
+                            />
+                            {accountValueHistory.length === 0 && (
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'var(--text2)',
+                                        fontSize: 'var(--font-size-s)',
+                                        pointerEvents: 'none',
+                                    }}
+                                >
+                                    No history yet
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-            {activeTab === 'Collateral' && (
-                <CollateralPieChart height={chartHeight} width={chartWidth} />
+                    {activeTab === 'collateral' && (
+                        <CollateralPieChart
+                            key={`collateral-${chartWidth}-${chartHeight}`}
+                            height={chartHeight}
+                            width={chartWidth}
+                        />
+                    )}
+                </>
             )}
         </div>
     );

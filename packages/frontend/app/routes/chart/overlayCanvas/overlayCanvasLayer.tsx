@@ -5,10 +5,9 @@ import {
     getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     mousePositionRef,
-    scaleDataRef,
-    type CanvasSize,
 } from './overlayCanvasUtils';
 import type { IPaneApi } from '~/tv/charting_library';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 interface OverlayCanvasLayerProps {
     id: string;
@@ -44,8 +43,10 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     const animationFrameRef = useRef<number>(0);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
+    const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
 
-    const [canvasSize, setCanvasSize] = useState<CanvasSize>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [canvasSize, setCanvasSize] = useState<any>();
 
     useEffect(() => {
         if (!chart || !scaleDataRef.current) return;

@@ -8,8 +8,10 @@ import React, {
     useState,
     type MouseEvent,
     type ReactNode,
+    type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import { MdClose } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 import styles from './Modal.module.css';
 
 export type ModalPosition = 'center' | 'bottomRight' | 'bottomSheet';
@@ -42,6 +44,7 @@ export function useGlobalModal() {
 }
 
 export function GlobalModalHost({ children }: { children?: ReactNode }) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [payload, setPayload] = useState<Payload | null>(null);
 
@@ -69,12 +72,70 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
     }, [open]);
 
     const backdropPointerDownOnSelf = useRef(false);
+    const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+    const modalContainerRef = useRef<HTMLDivElement | null>(null);
+
+    // Focus management: save previous focus and restore on close
+    useEffect(() => {
+        if (open) {
+            previouslyFocusedElement.current =
+                document.activeElement as HTMLElement;
+            // Focus the modal container or first focusable element
+            setTimeout(() => {
+                const initialFocusEl =
+                    modalContainerRef.current?.querySelector<HTMLElement>(
+                        '[data-modal-initial-focus]',
+                    );
+
+                if (
+                    initialFocusEl &&
+                    !initialFocusEl.hasAttribute('disabled')
+                ) {
+                    initialFocusEl.focus();
+                    return;
+                }
+
+                // Focus the modal container itself (not the close button) to avoid
+                // showing a focus ring when opened via keyboard shortcut.
+                // The container is focusable via tabindex="-1" for accessibility.
+                modalContainerRef.current?.focus();
+            }, 0);
+        } else {
+            // Restore focus when modal closes
+            previouslyFocusedElement.current?.focus();
+        }
+    }, [open]);
+
+    // Focus trap handler
+    const handleFocusTrap = useCallback((e: ReactKeyboardEvent) => {
+        if (e.key !== 'Tab' || !modalContainerRef.current) return;
+
+        const focusableElements =
+            modalContainerRef.current.querySelectorAll<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+        }
+    }, []);
 
     // ---- bottom sheet drag  ----
     const sheetRef = useRef<HTMLDivElement | null>(null);
+    const contentRef = useRef<HTMLDivElement | null>(null);
     const drag = useRef({ startY: 0, y: 0, active: false });
 
     const onDragStart = (clientY: number) => {
+        // Only allow drag if content is scrolled to top (or near top)
+        const scrollTop = contentRef.current?.scrollTop ?? 0;
+        if (scrollTop > 5) return; // Don't start drag if user is scrolling content
+
         drag.current = { startY: clientY, y: 0, active: true };
         if (sheetRef.current) sheetRef.current.style.transition = 'none';
     };
@@ -103,9 +164,10 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
     const handleMouseMove = (e: MouseEvent) => onDragMove(e.clientY);
     const handleMouseUp = () => onDragEnd();
 
-    const handleTouchStart = (e: TouchEvent) =>
+    const handleTouchStart = (e: React.TouchEvent) =>
         onDragStart(e.touches[0].clientY);
-    const handleTouchMove = (e: TouchEvent) => onDragMove(e.touches[0].clientY);
+    const handleTouchMove = (e: React.TouchEvent) =>
+        onDragMove(e.touches[0].clientY);
     const handleTouchEnd = () => onDragEnd();
 
     const ctxValue = useMemo<Ctx>(
@@ -136,6 +198,7 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
             {children}
             {open && payload && (
                 <div
+                    ref={modalContainerRef}
                     className={`${styles.outside_modal} ${
                         payload.position === 'bottomSheet'
                             ? styles.bottomSheetContainer
@@ -146,6 +209,8 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     role='dialog'
                     aria-modal='true'
                     aria-labelledby='global-modal-title'
+                    tabIndex={-1}
+                    onKeyDown={handleFocusTrap}
                     onPointerDown={(e) => {
                         e.stopPropagation();
                         backdropPointerDownOnSelf.current =
@@ -185,25 +250,42 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             onMouseLeave={
                                 drag.current.active ? handleMouseUp : undefined
                             }
+                            onMouseDown={handleMouseDown}
+                            onTouchStart={handleTouchStart}
                             onTouchMove={handleTouchMove}
                             onTouchEnd={handleTouchEnd}
                         >
-                            <div
-                                className={styles.bottomSheetHandle}
-                                onMouseDown={handleMouseDown}
-                                onTouchStart={handleTouchStart}
-                            >
+                            {/* Wrap handle + header in a draggable zone */}
+                            {/* <div
+                                className={styles.dragZone}
+                             
+                            > */}
+                            <div className={styles.bottomSheetHandle}>
                                 <div className={styles.handle} />
                             </div>
                             <header>
                                 <span />
                                 <h3 id='global-modal-title'>{payload.title}</h3>
-                                <MdClose
+                                <button
+                                    type='button'
                                     onClick={() => dismiss('internal')}
-                                    color='var(--text2)'
-                                />
+                                    aria-label={t('aria.closeModal')}
+                                    className={styles.closeButton}
+                                    data-modal-close
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onTouchStart={(e) => e.stopPropagation()}
+                                >
+                                    <MdClose
+                                        color='var(--text2)'
+                                        aria-hidden='true'
+                                    />
+                                </button>
                             </header>
-                            <div className={styles.modalContent}>
+                            {/* </div> */}
+                            <div
+                                className={styles.modalContent}
+                                ref={contentRef}
+                            >
                                 {payload.content}
                                 <div className={styles.safeAreaSpacer} />
                             </div>
@@ -216,10 +298,18 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                             <header>
                                 <span />
                                 <h3 id='global-modal-title'>{payload.title}</h3>
-                                <MdClose
+                                <button
+                                    type='button'
                                     onClick={() => dismiss('internal')}
-                                    color='var(--text2)'
-                                />
+                                    aria-label={t('aria.closeModal')}
+                                    className={styles.closeButton}
+                                    data-modal-close
+                                >
+                                    <MdClose
+                                        color='var(--text2)'
+                                        aria-hidden='true'
+                                    />
+                                </button>
                             </header>
                             <div className={styles.modalContent}>
                                 {payload.content}

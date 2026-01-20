@@ -1,6 +1,7 @@
 import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 import { getMainSeriesPaneIndex } from '../overlayCanvas/overlayCanvasUtils';
 import { t } from 'i18next';
+import type { ChartLineType } from '../data/utils/utils';
 
 export type LineLabelType =
     | 'PNL'
@@ -60,7 +61,7 @@ export const addCustomOrderLine = async (
 export const priceToPixel = (
     chart: IChartingLibraryWidget,
     price: number,
-    lineType: 'PNL' | 'LIMIT' | 'LIQ',
+    lineType: ChartLineType,
 ) => {
     const { pixel, chartHeight } = getPricetoPixel(chart, price, lineType);
 
@@ -85,7 +86,7 @@ export function getDynamicSymlogConstant(
 export const getPricetoPixel = (
     chart: IChartingLibraryWidget,
     price: number,
-    lineType: 'PNL' | 'LIMIT' | 'LIQ',
+    lineType: ChartLineType,
     chartHeight?: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData?: any,
@@ -188,7 +189,7 @@ export const createAnchoredMainText = async (
     yPrice: number,
     textValue: LineLabel,
     borderColor: string,
-    lineType: 'PNL' | 'LIMIT' | 'LIQ',
+    lineType: ChartLineType,
 ) => {
     const text = formatLineLabel(textValue);
     return createAnchoredText(
@@ -208,7 +209,7 @@ export const createQuantityAnchoredText = async (
     xLoc: number,
     yPrice: number,
     text: string,
-    lineType: 'PNL' | 'LIMIT' | 'LIQ',
+    lineType: ChartLineType,
 ) => {
     return createAnchoredText(
         chart,
@@ -227,7 +228,7 @@ export const createCancelAnchoredText = async (
     chart: IChartingLibraryWidget,
     xLoc: number,
     yPrice: number,
-    lineType: 'PNL' | 'LIMIT' | 'LIQ',
+    lineType: ChartLineType,
 ) => {
     return createAnchoredText(
         chart,
@@ -249,7 +250,7 @@ export const createAnchoredText = async (
     backgroundColor: string,
     wordWrapWidth: number,
     borderColor: string,
-    lineType: 'PNL' | 'LIMIT' | 'LIQ',
+    lineType: ChartLineType,
     color?: string,
 ) => {
     const shape = await chart.activeChart().createAnchoredShape(
@@ -324,14 +325,31 @@ function getTriggerConditionText(rawText: string, orderType: string): string {
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
 
+export function formatPrice(price: number): string {
+    const absPrice = Math.abs(price);
+    if (absPrice >= 10000) {
+        return price.toFixed(0);
+    } else if (absPrice >= 1) {
+        return price.toFixed(2);
+    } else if (absPrice >= 0.01) {
+        return price.toFixed(4);
+    } else if (absPrice >= 0.0001) {
+        return price.toFixed(6);
+    } else {
+        return price.toFixed(8);
+    }
+}
+
 export function formatLineLabel(label: LineLabel): string {
     switch (label.type) {
         case 'PNL': {
             const pnl = quantityTextFormatWithComma(Math.abs(label.pnl));
             return ' PnL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl} `);
         }
-        case 'Limit':
-            return ` ${t('transactions.limit')} ${label.price}  ${label.triggerCondition} `;
+        case 'Limit': {
+            const formattedPrice = formatPrice(label.price);
+            return ` ${t('transactions.limit')} ${formattedPrice}  ${label.triggerCondition} `;
+        }
         case 'Take Profit Market':
             return getTriggerConditionText(
                 label.triggerCondition,

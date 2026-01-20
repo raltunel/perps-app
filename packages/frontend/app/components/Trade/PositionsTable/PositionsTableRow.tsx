@@ -22,6 +22,7 @@ import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
 import { useTranslation } from 'react-i18next';
+import useMediaQuery from '~/hooks/useMediaQuery';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -32,6 +33,7 @@ interface PositionsTableRowProps {
 const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
     (props) => {
         const navigate = useNavigate();
+        const isMobile = useMediaQuery('(max-width: 768px)');
 
         const { t, i18n } = useTranslation();
 
@@ -130,7 +132,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 return (
                     <ShareModal close={modalCtrl.close} position={position} />
                 );
-            } else if (modalContent === 'leverage') {
+            }
+
+            if (modalContent === 'leverage') {
                 return (
                     <LeverageSliderModal
                         currentLeverage={position.leverage.value}
@@ -140,23 +144,79 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         }}
                     />
                 );
-            } else if (modalContent === 'tpsl') {
+            }
+
+            if (modalContent === 'tpsl') {
                 return (
-                    <Modal close={modalCtrl.close} title='TP/SL for Position'>
+                    <Modal
+                        close={modalCtrl.close}
+                        title={t('transactions.tpSlForPosition')}
+                    >
                         <TakeProfitsModal
                             closeTPModal={modalCtrl.close}
                             position={position}
                         />
                     </Modal>
                 );
-            } else if (modalContent === 'limitChase') {
+            }
+
+            //  MOBILE ONLY: Close options selector
+            if (modalContent === 'closeOptions' && isMobile) {
+                return (
+                    <Modal
+                        title={t('transactions.closePosition')}
+                        close={modalCtrl.close}
+                    >
+                        <div className={styles.closeOptionsContainer}>
+                            <div className={styles.positionInfo}>
+                                {t('transactions.currentPosition')}:{' '}
+                                {Math.abs(position.szi)} {position.coin}
+                            </div>
+
+                            <div className={styles.closeOptions}>
+                                <button
+                                    className={styles.closeOption}
+                                    onClick={() =>
+                                        setModalContent('marketClose')
+                                    }
+                                >
+                                    <div className={styles.optionTitle}>
+                                        {t('transactions.market')}
+                                    </div>
+                                    <div className={styles.optionDescription}>
+                                        {t('transactions.closeAtCurrentPrice')}
+                                    </div>
+                                </button>
+
+                                <button
+                                    className={styles.closeOption}
+                                    onClick={() =>
+                                        setModalContent('limitChase')
+                                    }
+                                >
+                                    <div className={styles.optionTitle}>
+                                        {t('transactions.limit')}
+                                    </div>
+                                    <div className={styles.optionDescription}>
+                                        {t('transactions.closeAtAPriceYouSet')}
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </Modal>
+                );
+            }
+
+            if (modalContent === 'limitChase') {
                 return (
                     <LimitCloseModal
                         position={position}
                         close={modalCtrl.close}
                     />
                 );
-            } else if (modalContent === 'marketClose') {
+            }
+
+            if (modalContent === 'marketClose') {
                 return (
                     <MarketCloseModal
                         position={position}
@@ -164,8 +224,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     />
                 );
             }
+
             return null;
-        }, [modalContent, modalCtrl.close, position]);
+        }, [modalContent, modalCtrl.close, position, isMobile, t]);
 
         // Memoize navigation handler
         const handleCoinClick = useCallback(() => {
@@ -345,27 +406,39 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     className={`${styles.cell} ${styles.coinCell}`}
                     style={gradientStyle}
                 >
-                    <span
-                        style={{
-                            color: baseColor,
-                            cursor: isLinkDisabled ? 'default' : 'pointer',
-                        }}
-                        onClick={isLinkDisabled ? undefined : handleCoinClick}
-                    >
-                        {position.coin}
-                    </span>
+                    {isLinkDisabled ? (
+                        <span style={{ color: baseColor }}>
+                            {position.coin}
+                        </span>
+                    ) : (
+                        <button
+                            type='button'
+                            className={styles.coinButton}
+                            style={{ color: baseColor }}
+                            onClick={handleCoinClick}
+                            aria-label={t('tradeTable.goToMarket', {
+                                coin: position.coin,
+                            })}
+                        >
+                            {position.coin}
+                        </button>
+                    )}
                     {position.leverage.value &&
                         position.coin.toLowerCase() === 'btc' && (
-                            <span
+                            <button
+                                type='button'
                                 className={styles.badge}
                                 onClick={openLeverageModal}
                                 style={{
                                     color: baseColor,
                                     backgroundColor: hexToRgba(baseColor, 0.15),
                                 }}
+                                aria-label={t('leverage.adjustLeverage', {
+                                    value: Math.floor(position.leverage.value),
+                                })}
                             >
                                 {Math.floor(position.leverage.value)}x
-                            </span>
+                            </button>
                         )}
                 </div>
                 <div
@@ -385,7 +458,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 <div className={`${styles.cell} ${styles.markPriceCell}`}>
                     {formatNum(coinPriceMap.get(position.coin) ?? 0)}
                 </div>
-                <div
+                <button
+                    type='button'
                     onClick={openShareModal}
                     className={`${styles.cell} ${styles.pnlCell}`}
                     style={{
@@ -396,6 +470,15 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                   ? getBsColor().sell
                                   : 'var(--text2)',
                     }}
+                    aria-label={t('share.sharePosition', {
+                        pnl: formatNum(
+                            position.unrealizedPnl,
+                            2,
+                            true,
+                            true,
+                            true,
+                        ),
+                    })}
                 >
                     {formatNum(position.unrealizedPnl, 2, true, true, true)} (
                     {formatNum(
@@ -406,8 +489,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         true,
                     )}
                     %)
-                    <RiExternalLinkLine color='var(--text2)' />
-                </div>
+                    <RiExternalLinkLine
+                        color='var(--text2)'
+                        aria-hidden='true'
+                    />
+                </button>
                 <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                     {liquidationDisp}
                 </div>
@@ -446,32 +532,38 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 )}
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
-                        {/* <button className={styles.actionButton}>Limit</button> */}
-                        {/* <button
-                            className={styles.actionButton}
-                            onClick={handleMarketClose}
-                            disabled={isClosing}
-                        >
-                            {isClosing ? 'Closing...' : 'Market'}
-                        </button> */}
-                        <button
-                            className={styles.actionButton}
-                            onClick={() => {
-                                setModalContent('marketClose');
-                                modalCtrl.open();
-                            }}
-                        >
-                            {t('transactions.market')}
-                        </button>
-                        <button
-                            className={styles.actionButton}
-                            onClick={() => {
-                                setModalContent('limitChase');
-                                modalCtrl.open();
-                            }}
-                        >
-                            {t('transactions.limit')}
-                        </button>
+                        {isMobile ? (
+                            <button
+                                className={styles.primaryCloseButton}
+                                onClick={() => {
+                                    setModalContent('closeOptions');
+                                    modalCtrl.open();
+                                }}
+                            >
+                                {t('common.close')}
+                            </button>
+                        ) : (
+                            <>
+                                <button
+                                    className={styles.actionButton}
+                                    onClick={() => {
+                                        setModalContent('marketClose');
+                                        modalCtrl.open();
+                                    }}
+                                >
+                                    {t('transactions.market')}
+                                </button>
+                                <button
+                                    className={styles.actionButton}
+                                    onClick={() => {
+                                        setModalContent('limitChase');
+                                        modalCtrl.open();
+                                    }}
+                                >
+                                    {t('transactions.limit')}
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
                 {modalCtrl.isOpen && renderModalContent()}

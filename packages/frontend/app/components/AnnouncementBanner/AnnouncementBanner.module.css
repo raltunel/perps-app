@@ -81,11 +81,21 @@
 .update .closeButton {
     color: var(--white);
 }
-
+.notInPageHeader {
+    display: none;
+}
+@media (max-width: 1268px) {
+    .inPageHeader {
+        display: none;
+    }
+    .notInPageHeader {
+        display: flex;
+    }
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .announcementBanner {
-        padding: var(--padding-s) var(--padding-m);
+        /* padding: var(--padding-s) var(--padding-m); */
     }
 
     .content {
@@ -101,11 +111,11 @@
 
 @media (max-width: 480px) {
     .announcementBanner {
-        padding: var(--padding-xs) var(--padding-s);
+        /* padding: var(--padding-xs) var(--padding-s); */
     }
 
     .content {
         font-size: var(--font-size-xs);
-        padding-right: var(--padding-m);
+        /* padding-right: var(--padding-m); */
     }
 }
