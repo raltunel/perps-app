@@ -434,25 +434,24 @@ export default function PageHeader() {
     const invalidRefCodeModal = useModal('closed');
 
     // run the FUUL context
-    const { isAffiliateCodeFree } = useFuul();
+    const { isRefCodeFree } = useFuul();
 
     useEffect(() => {
         const checkRefCode = async (): Promise<void> => {
             if (referralCodeFromURL.value) {
-                // const isCodeClaimed: boolean = await isAffiliateCodeFree(
+                // const isCodeClaimed: boolean = await isRefCodeFree(
                 //     referralCodeFromURL.value,
                 // );
                 // isCodeClaimed
                 //     ? referralStore.cache(referralCodeFromURL.value)
                 //     : invalidRefCodeModal.open();
-                // Cache the code immediately from URL - validation happens in CodeTabs
                 referralStore.cache(referralCodeFromURL.value);
             }
         };
         checkRefCode();
     }, [
         referralCodeFromURL.value,
-        // isAffiliateCodeFree,
+        // isRefCodeFree,
     ]);
 
     return (
