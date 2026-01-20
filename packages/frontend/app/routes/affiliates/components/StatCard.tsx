@@ -1,13 +1,15 @@
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import styles from '../affiliates.module.css';
 
-interface StatCardProps {
+interface PropsIF {
     label: string;
     value: string;
     tooltip?: string;
 }
 
-export function StatCard({ label, value, tooltip }: StatCardProps) {
+export function StatCard(props: PropsIF) {
+    const { label, value, tooltip } = props;
+
     return (
         <div className={styles['stat-card']}>
             <div className={styles['stat-label']}>
