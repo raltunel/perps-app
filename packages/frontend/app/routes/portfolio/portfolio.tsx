@@ -648,40 +648,36 @@ function Portfolio() {
                         </div>
                         {showTransactButtons ? (
                             <div className={styles.totalNetDisplay}>
-                                <h6>
+                                <div className={styles.totalNetValue}>
                                     <span>
-                                        {t('portfolio.totalNetUsdValue')}:
-                                    </span>{' '}
-                                    {totalEquityFormatted}
+                                        {t('portfolio.totalNetUsdValue')}
+                                    </span>
+                                    <h6>{totalEquityFormatted}</h6>
                                     {/* {formatCurrency(totalValue)} */}
-                                </h6>
-                                {showTransactButtons && (
-                                    <div className={styles.buttonContainer}>
-                                        <div className={styles.rowButton}>
-                                            <SimpleButton
-                                                onClick={openDepositModal}
-                                                bg='accent1'
-                                            >
-                                                {t('common.deposit')}
-                                            </SimpleButton>
-                                            <SimpleButton
-                                                onClick={openWithdrawModal}
-                                                bg='dark3'
-                                                hoverBg='accent1'
-                                            >
-                                                {t('common.withdraw')}
-                                            </SimpleButton>
-                                            <SimpleButton
-                                                onClick={openSendModal}
-                                                className={styles.sendMobile}
-                                                bg='dark3'
-                                                hoverBg='accent1'
-                                            >
-                                                {t('common.send')}
-                                            </SimpleButton>
-                                        </div>
-                                    </div>
-                                )}
+                                </div>
+                                <div className={styles.totalNetActions}>
+                                    <SimpleButton
+                                        onClick={openDepositModal}
+                                        bg='accent1'
+                                    >
+                                        {t('common.deposit')}
+                                    </SimpleButton>
+                                    <SimpleButton
+                                        onClick={openWithdrawModal}
+                                        bg='dark3'
+                                        hoverBg='accent1'
+                                    >
+                                        {t('common.withdraw')}
+                                    </SimpleButton>
+                                    <SimpleButton
+                                        onClick={openSendModal}
+                                        className={styles.sendMobile}
+                                        bg='dark3'
+                                        hoverBg='accent1'
+                                    >
+                                        {t('common.send')}
+                                    </SimpleButton>
+                                </div>
                             </div>
                         ) : (
                             <div className={styles.totalNetDisplayNonUser}>
