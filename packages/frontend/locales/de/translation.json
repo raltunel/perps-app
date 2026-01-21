@@ -467,7 +467,7 @@
         "toCustomizeAffiliateCode": "Affiliate-Codes entsprechen standardmäßig den ersten sechs Zeichen Ihrer Wallet-Adresse. Benutzer mit > 1 Mio. USD Handelsvolumen können ihren Affiliate-Code anpassen.",
         "claimRewardsWithAmount": "{{amount}} an Belohnungen beanspruchen",
         "selectATabToViewData": "Wählen Sie einen Tab aus, um Daten anzuzeigen",
-        "trackingLinkExplanation": "Sie erhalten <0>{{affiliatePercent}}</0> der Gebühren der geworbenen Benutzer und diese erhalten einen Rabatt von <1>{{userPercent}}</1>.",
+        "trackingLinkExplanation": "Sie erhalten <0>{{referrerPercent}}</0> der Gebühren der geworbenen Benutzer und diese erhalten einen Rabatt von <1>{{inviteePercent}}</1>.",
         "claim": "Einlösen"
     },
     "deposit": {

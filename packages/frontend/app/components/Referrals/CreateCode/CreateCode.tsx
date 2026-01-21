@@ -117,10 +117,7 @@ export default function CreateCode(props: PropsIF) {
                     <p className={styles.trackingLinkExplanation}>
                         <Trans
                             i18nKey='referrals.trackingLinkExplanation'
-                            values={{
-                                referrerPercent: referrerPercent,
-                                inviteePercent: inviteePercent,
-                            }}
+                            values={{ referrerPercent, inviteePercent }}
                             components={[<span />, <span />]}
                         />
                     </p>
