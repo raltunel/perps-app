@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import React, { useEffect, useMemo, useRef } from 'react';
 import styles from './CollateralPieChart.module.css';
 import useMediaQuery from '~/hooks/useMediaQuery';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 
 type PieData = { label: string; value: number; balance: number };
 
@@ -15,6 +16,8 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     const { t } = useTranslation();
     const { height, width } = props;
     const isMobile = useMediaQuery('(max-width: 768px)');
+
+    const { balance } = useUnifiedMarginData();
 
     const chartHeight = height || 150;
     const chartWidth = width || chartHeight;
@@ -41,14 +44,33 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     const canvasHeight = canvasSize;
     const canvasWidth = canvasSize;
 
-    const pieData: PieData[] = useMemo(
-        () => [
-            { label: t('portfolio.fusd'), value: 50, balance: 5000 },
-            { label: t('Btc'), value: 30, balance: 3000 },
-            { label: t('Eth'), value: 20, balance: 2000 },
-        ],
-        [t],
-    );
+    const pieData: PieData[] = useMemo(() => {
+        if (balance) {
+            if (Array.isArray(balance) && balance.length > 0) {
+                const total = balance.reduce(
+                    (sum, item) => sum + item.total,
+                    0,
+                );
+
+                const pieData: PieData[] = [];
+
+                balance.forEach((item) => {
+                    pieData.push({
+                        label: item.coin,
+                        value: (item.value / total) * 100,
+                        balance: item.total,
+                    });
+                });
+
+                return pieData;
+            } else {
+                return [
+                    { label: balance.coin, value: 100, balance: balance.total },
+                ];
+            }
+        }
+        return [];
+    }, [t, balance]);
 
     const dataColorSet = [
         '#7371fc',
@@ -69,6 +91,8 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+
+        const coinCount = pieData.length;
 
         const width = canvas.width;
         const height = canvas.height;
@@ -95,7 +119,7 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
 
             const midAngle = Number((startAngle + endAngle) / 2).toFixed(4);
 
-            const textRadius = radius * 0.6;
+            const textRadius = radius * (coinCount > 1 ? 0.6 : 0);
             const textX = width / 2 + textRadius * Math.cos(Number(midAngle));
             const textY = height / 2 + textRadius * Math.sin(Number(midAngle));
 
