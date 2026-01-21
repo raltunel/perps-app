@@ -999,10 +999,11 @@ export default function WebDataConsumer() {
     }, []);
 
     useEffect(() => {
-        if (!isEstablished(sessionState)) {
+        const isSessionEstablished = isEstablished(sessionState);
+        if (!isSessionEstablished && !userAddress) {
             resetRefs();
         }
-    }, [isEstablished(sessionState)]);
+    }, [sessionState, userAddress, resetRefs]);
 
     // Update positions in TradeDataStore when unified data changes
     useEffect(() => {

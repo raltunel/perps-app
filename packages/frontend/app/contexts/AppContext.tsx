@@ -44,7 +44,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setManualAddress,
     } = useDebugStore();
 
-    const { setUserAddress } = useUserDataStore();
+    const { setUserAddress, userAddress } = useUserDataStore();
 
     const { resetUserData } = useTradeDataStore();
 
@@ -93,6 +93,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         // 4. Fallback to Debug Wallet or Empty
         if (isDebugWalletActive) {
             setUserAddress(debugWallet.address);
+        } else if (userAddress) {
+            // Keep last known address/data available for read-only views
+            return;
         } else {
             setUserAddress('');
             resetUserData();
@@ -106,6 +109,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         debugWallet,
         manualAddressEnabled,
         manualAddress,
+        userAddress,
     ]);
 
     // Initialize Pyth price service on mount
