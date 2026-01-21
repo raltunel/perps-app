@@ -9,7 +9,9 @@ import React, {
     useState,
 } from 'react';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './Tabs.module.css';
 import { t } from 'i18next';
@@ -86,12 +88,32 @@ export default function Tabs(props: TabsProps) {
     } = props;
 
     const { positions, balance } = useUnifiedMarginData();
+    const { manualAddressEnabled, manualAddress, isDebugWalletActive } =
+        useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const { orderHistory, userFills, userFundings, userOrders } =
         useTradeDataStore();
 
     const sessionState = useSession();
-    const isSessionEstablished = isEstablished(sessionState);
+    const isSessionEstablished = useMemo(() => {
+        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
+            return true;
+        }
+        if (isDebugWalletActive) {
+            return true;
+        }
+        if (userAddress) {
+            return true;
+        }
+        return isEstablished(sessionState);
+    }, [
+        manualAddressEnabled,
+        manualAddress,
+        isDebugWalletActive,
+        userAddress,
+        sessionState,
+    ]);
 
     const positionsCount = useMemo(() => {
         return isSessionEstablished
