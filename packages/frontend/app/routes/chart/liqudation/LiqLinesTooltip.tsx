@@ -11,6 +11,7 @@ import type {
 } from '~/tv/charting_library';
 import type { HorizontalLineData } from './LiqudationLines';
 import { LiqChartTooltipType, useLiqChartStore } from '~/stores/LiqChartStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 interface LiqTooltipProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -31,6 +32,10 @@ const LiqLineTooltip = ({
     const { activeTooltipType } = useLiqChartStore();
     const activeTooltipTypeRef = useRef(activeTooltipType);
     activeTooltipTypeRef.current = activeTooltipType;
+
+    const { symbolInfo } = useTradeDataStore();
+    const symbolPriceRef = useRef(symbolInfo?.markPx ?? 0);
+    symbolPriceRef.current = symbolInfo?.markPx ?? 0;
 
     const { chart } = useTradingView();
 
@@ -108,7 +113,8 @@ const LiqLineTooltip = ({
                     placedLine.type
                 } Liquidations </p>` +
                     `<p style="color:${placedLine.type === 'Short' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
-                    `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(placedLine.liqValue, null, true)} TKN </p>`,
+                    // `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(placedLine.liqValue, null, true)} TKN </p>`,
+                    `<p style="color: var(--text2, #bcbcc4)"> Liquidation: ${formatNum(placedLine.liqValue * symbolPriceRef.current, null, true)} USD </p>`,
             );
 
             const width = liqLineTooltipRef.current

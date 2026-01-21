@@ -29,6 +29,7 @@ export const parseLiqLevelRaw = (
     cumulativeSz: number,
     maxSz: number,
     totalSz: number,
+    // cumulativeRatioCoef : number = 1,
 ): LiqLevel => {
     const sz = level[1] / 1e8;
     return {
@@ -37,6 +38,6 @@ export const parseLiqLevelRaw = (
         type: type,
         cumulativeSz: cumulativeSz + sz,
         ratio: sz / maxSz,
-        cumulativeRatio: (cumulativeSz + sz) / totalSz,
+        cumulativeRatio: (2 * (cumulativeSz + sz)) / totalSz,
     };
 };

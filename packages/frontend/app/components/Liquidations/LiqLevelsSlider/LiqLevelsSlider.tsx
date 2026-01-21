@@ -7,7 +7,6 @@ import { useLiquidationStore } from '~/stores/LiquidationStore';
 export const LiqLevelsSlider = () => {
     const { liqLevels } = useLiqChartStore();
     const { liqThresholds } = useLiquidationStore();
-    const { formatNum } = useNumFormatter();
     const trackRef = useRef<HTMLDivElement>(null);
 
     // Fixed threshold percentages for display (visual representation)
@@ -37,12 +36,12 @@ export const LiqLevelsSlider = () => {
 
     const formatThreshold = (value: number) => {
         if (value >= 1_000_000) {
-            return `$${formatNum((value / 1_000_000).toFixed(1))}M`;
+            return `$${(value / 1_000_000).toFixed(1)}M`;
         }
         if (value >= 1_000) {
-            return `$${formatNum((value / 1_000).toFixed(0))}K`;
+            return `$${(value / 1_000).toFixed(0)}K`;
         }
-        return `$${formatNum(value.toFixed(0))}`;
+        return `$${value.toFixed(0)}`;
     };
 
     // Get level ranges for display using fixed thresholds
@@ -50,7 +49,7 @@ export const LiqLevelsSlider = () => {
         return [
             {
                 level: liqLevels[3],
-                range: `< ${formatThreshold(liqThresholds[0])}`,
+                range: `MIN - ${formatThreshold(liqThresholds[0])}`,
             },
             {
                 level: liqLevels[2],
@@ -62,7 +61,7 @@ export const LiqLevelsSlider = () => {
             },
             {
                 level: liqLevels[0],
-                range: `> ${formatThreshold(liqThresholds[2])}`,
+                range: `${formatThreshold(liqThresholds[2])} - MAX`,
             },
         ];
     };
@@ -114,18 +113,27 @@ export const LiqLevelsSlider = () => {
                                   : liqLevels[0].color;
 
                         return (
-                            <div
-                                key={index}
-                                className={styles.thumb}
-                                style={
-                                    {
-                                        left: `${percentage}%`,
-                                        '--gradient-left': leftColor,
-                                        '--gradient-right': rightColor,
-                                        cursor: 'default',
-                                    } as React.CSSProperties
-                                }
-                            />
+                            <>
+                                <div
+                                    key={index}
+                                    // className={styles.thumb}
+                                    className={
+                                        styles.thumb + ' ' + styles.passiveThumb
+                                    }
+                                    style={
+                                        {
+                                            left: `${percentage}%`,
+                                            '--gradient-left': leftColor,
+                                            '--gradient-right': rightColor,
+                                            cursor: 'default',
+                                        } as React.CSSProperties
+                                    }
+                                >
+                                    <span className={styles.passiveThumbLabel}>
+                                        {formatThreshold(liqThresholds[index])}
+                                    </span>
+                                </div>
+                            </>
                         );
                     })}
                 </div>

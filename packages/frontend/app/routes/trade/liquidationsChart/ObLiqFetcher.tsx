@@ -130,7 +130,7 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
                 'buy',
                 cumulativeSz,
                 maxSz,
-                buysTotalSz,
+                buysTotalSz + sellsTotalSz,
             );
             buyLiqs.push(liq);
             cumulativeSz += liq.sz;
@@ -143,7 +143,7 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
                 'sell',
                 cumulativeSz,
                 maxSz,
-                sellsTotalSz,
+                buysTotalSz + sellsTotalSz,
             );
             sellLiqs.push(liq);
             cumulativeSz += liq.sz;

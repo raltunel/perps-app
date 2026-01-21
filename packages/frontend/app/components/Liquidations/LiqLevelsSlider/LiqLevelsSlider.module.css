@@ -81,7 +81,7 @@
     position: relative;
     height: 12px;
     border-radius: var(--radius-s);
-    cursor: pointer;
+    /* cursor: pointer; */
     user-select: none;
 }
 
@@ -123,4 +123,15 @@
 .thumb:active {
     cursor: grabbing;
     transform: translate(-50%, -50%) scale(1.2);
+}
+
+.passiveThumb {
+    width: 2px;
+}
+
+.passiveThumbLabel {
+    position: absolute;
+    top: 100%;
+    transform: translateX(-50%);
+    opacity: 0.5;
 }
