@@ -128,7 +128,7 @@ export default function Strategies() {
                                 <div>{strategy?.pnl ?? '-'}</div>
                             </div>
                             <div>
-                                <div>PNL</div>
+                                <div>PnL</div>
                                 <div>{strategy?.pnl ?? '-'}</div>
                             </div>
                             <div>
