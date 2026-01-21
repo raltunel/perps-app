@@ -134,6 +134,7 @@ export function YourStatsSection() {
                         <StatCard
                             label={STATS_LABELS.FEES_EARNED}
                             value={affiliateEarnings}
+                            tooltip={'Commission earned from your invitees'}
                         />
                     )}
 
@@ -157,7 +158,9 @@ export function YourStatsSection() {
                         <StatCard
                             label={STATS_LABELS.ACTIVE_TRADERS}
                             value={activeTraders}
-                            tooltip='Active Invitee who made at least one trade in the last 30 days'
+                            tooltip={
+                                'Number of invitees who are actively trading'
+                            }
                         />
                     )}
 
@@ -169,7 +172,7 @@ export function YourStatsSection() {
                         <StatCard
                             label={STATS_LABELS.TRADING_VOLUME}
                             value={volumeReferred}
-                            tooltip='Invitees Trading Volume'
+                            tooltip='Sum of trade volume by your invitees'
                         />
                     )}
 
@@ -189,7 +192,7 @@ export function YourStatsSection() {
                         <StatCard
                             label={STATS_LABELS.INVITEES}
                             value={invitees}
-                            tooltip='Number of users who joined the affiliate program with your code.'
+                            tooltip='Number of users who connected their wallets'
                         />
                     )}
                 </div>

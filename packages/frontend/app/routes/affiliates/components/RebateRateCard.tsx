@@ -1,4 +1,6 @@
+import Tooltip from '~/components/Tooltip/Tooltip';
 import styles from '../affiliates.module.css';
+import { IoInformationCircleOutline } from 'react-icons/io5';
 
 interface RebateRateCardProps {
     rebateRate: string;
@@ -34,6 +36,16 @@ export function RebateRateCard({
                     <span className={styles['rebate-detail-label']}>
                         Rebates earned
                     </span>
+                    <Tooltip
+                        position='right'
+                        content={'Rebate earned from your own trading'}
+                        className={styles['tooltip-trigger']}
+                    >
+                        <IoInformationCircleOutline
+                            size={14}
+                            color={'var(--aff-text-subtle)'}
+                        />
+                    </Tooltip>
                     <span className={styles['rebate-detail-value']}>
                         ${rebatesEarned}
                     </span>
