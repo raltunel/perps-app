@@ -345,7 +345,7 @@ function Portfolio() {
         ? formatNum(userData.vaultEquity)
         : DASH_PLACEHOLDER;
 
-    // Calculate PNL percentage for display
+    // Calculate PnL percentage for display
     const totalValue = portfolio.balances.contract + portfolio.balances.wallet;
     const pnlValue = hasPnl ? userData.pnl : 0;
     const pnlPercent = totalValue > 0 ? (pnlValue / totalValue) * 100 : 0;
@@ -462,7 +462,7 @@ function Portfolio() {
     const mobileStatsSection = (
         <div className={styles.mobileStats}>
             <div className={styles.mobileStatRow}>
-                <span className={styles.mobileStatLabel}>PNL</span>
+                <span className={styles.mobileStatLabel}>PnL</span>
                 <span
                     className={`${styles.mobileStatValue} ${pnlValue >= 0 ? styles.positive : styles.negative}`}
                 >
