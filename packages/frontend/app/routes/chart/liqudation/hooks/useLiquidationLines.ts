@@ -7,7 +7,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 // Minimum slot height in pixels
 const MIN_SLOT_HEIGHT_PX = 4;
 // Maximum number of slots to create (controls granularity)
-const MAX_SLOT_COUNT = 150;
+const MAX_SLOT_COUNT = 200;
 
 interface SlottedLiq {
     px: number; // center price of slot
