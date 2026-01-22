@@ -185,7 +185,7 @@ export default function Trade() {
     debugToolbarOpenRef.current = debugToolbarOpen;
 
     const visibilityRefs = useRef({
-        order: false,
+        order: true,
         chart: false,
         book: false,
         recent: false,
@@ -205,12 +205,12 @@ export default function Trade() {
     const switchTab = useCallback(
         (tab: TabType) => {
             if (activeTab === tab) return;
+            // Keep previously visited tabs mounted (hidden via CSS) so that
+            // local state inside panels (e.g. order size input) does not reset
+            // when switching between mobile modules.
             visibilityRefs.current = {
-                order: tab === 'order',
-                chart: tab === 'chart',
-                book: tab === 'book',
-                recent: tab === 'recent',
-                positions: tab === 'positions',
+                ...visibilityRefs.current,
+                [tab]: true,
             };
             requestAnimationFrame(() => setActiveTab(tab));
         },
@@ -1007,7 +1007,7 @@ export default function Trade() {
                     >
                         {(activeTab === 'chart' ||
                             visibilityRefs.current.chart) && (
-                            <MemoizedTradingViewWrapper />
+                            <MemoizedTradingViewWrapper switchTab={switchTab} />
                         )}
                     </div>
                     <div
@@ -1183,7 +1183,9 @@ export default function Trade() {
                                         id='chartSection'
                                         className={styles.chart}
                                     >
-                                        <MemoizedTradingViewWrapper />
+                                        <MemoizedTradingViewWrapper
+                                            switchTab={switchTab}
+                                        />
                                     </div>
                                 </div>
                                 <div
