@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useRef } from 'react';
 import type { HorizontalLineData } from '../LiqudationLines';
 import { useLiquidationStore } from '~/stores/LiquidationStore';
-import type { LiqLevel } from '~/routes/trade/liquidationsChart/LiquidationUtils';
+import {
+    type LiqLevel,
+    getLiqColorForValue,
+} from '~/routes/trade/liquidationsChart/LiquidationUtils';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 // Minimum slot height in pixels
@@ -26,20 +29,9 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
 
     // Get color based on slot USD value and thresholds
     const getColor = useCallback(
-        (slotSz: number) => {
+        (slotSz: number): string | null => {
             const slotSzValue = slotSz * symbolPriceRef.current;
-
-            // Check against thresholds (highest to lowest)
-            if (slotSzValue >= liqThresholds[2]) {
-                return '#FDE725'; // Highest level - yellow
-            }
-            if (slotSzValue >= liqThresholds[1]) {
-                return '#2BAE7D'; // Second level - green
-            }
-            if (slotSzValue >= liqThresholds[0]) {
-                return '#287D8D'; // Third level - blue
-            }
-            return '#461668'; // Lowest level - purple
+            return getLiqColorForValue(slotSzValue, liqThresholds);
         },
         [liqThresholds],
     );
@@ -124,6 +116,9 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
             if (slot.totalSz <= 0) return;
 
             const color = getColor(slot.totalSz);
+
+            // Skip rendering if color is null (below 100K threshold - transparent)
+            if (color === null) return;
 
             lines.push({
                 yPrice: slot.centerPx,

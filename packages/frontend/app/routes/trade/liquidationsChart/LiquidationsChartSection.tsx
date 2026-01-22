@@ -69,9 +69,11 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
     const { activeTab, setActiveTab } = useLiqChartStore();
 
-    const [chartMode, setChartMode] = useState<'distribution' | 'cumulative'>(
-        'distribution',
-    );
+    // const [chartMode, setChartMode] = useState<'distribution' | 'cumulative'>(
+    //     'cumulative',
+    // );
+
+    const chartMode = 'cumulative';
 
     const buysRef = useRef<OrderBookRowIF[]>([]);
     const sellsRef = useRef<OrderBookRowIF[]>([]);
@@ -361,7 +363,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             location={'obBook'}
                             chartMode={chartMode}
                         />
-                        <button
+                        {/* <button
                             className={styles.modeButton}
                             onClick={() =>
                                 setChartMode(
@@ -374,7 +376,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             {chartMode === 'distribution'
                                 ? 'Distribution'
                                 : 'Cumulative'}
-                        </button>
+                        </button> */}
                     </motion.div>
                 );
             }
