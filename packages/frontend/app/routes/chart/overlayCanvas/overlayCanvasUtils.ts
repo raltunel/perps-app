@@ -2,16 +2,9 @@ import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 import type { LineData } from '../orders/component/LineComponent';
 import type { LabelLocation } from '../orders/orderLineUtils';
 
-export type LabelLocationData = { label: LabelLocation; parentLine: LineData };
-
-type ScaleData = {
-    yScale: d3.ScaleLinear<number, number>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    scaleSymlog: any;
-};
-
-export const scaleDataRef: { current: ScaleData | null } = {
-    current: null,
+export type LabelLocationData = {
+    label: LabelLocation | undefined;
+    parentLine: LineData;
 };
 
 export const mousePositionRef = { current: { x: 0, y: 0 } };
@@ -24,7 +17,7 @@ export function findLimitLabelAtPosition(
     y: number,
     drawnLabels: LineData[],
 ): {
-    label: LabelLocation;
+    label: LabelLocation | undefined;
     parentLine: LineData;
     matchType: 'onLabel' | 'onLine';
 } | null {
@@ -57,14 +50,13 @@ export function findLimitLabelAtPosition(
     }
     if (yMathcLineLoc && yMathcParentLine) {
         return {
-            label: yMathcLineLoc,
+            label: undefined,
             parentLine: yMathcParentLine,
             matchType: 'onLine',
         };
     }
     return null;
 }
-
 export function getXandYLocationForChartDrag(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any,
@@ -73,12 +65,19 @@ export function getXandYLocationForChartDrag(
     let offsetY = event.y * dpr;
     let offsetX = event.x * dpr;
 
-    if (
-        typeof TouchEvent !== 'undefined' &&
-        event.sourceEvent instanceof TouchEvent
-    ) {
-        offsetY = event.sourceEvent.touches[0].clientY * dpr;
-        offsetX = event.sourceEvent.touches[0].clientX * dpr;
+    // BACKUP : LIQUIDATION
+
+    //if (
+    //    typeof TouchEvent !== 'undefined' &&
+    //    event.sourceEvent instanceof TouchEvent
+    //) {
+    //  offsetY = event.sourceEvent.touches[0].clientY * dpr;
+    // offsetX = event.sourceEvent.touches[0].clientX * dpr;
+    //}
+
+    if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
+        offsetY = event.sourceEvent.touches[0].clientY - rect.top;
+        offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
     }
 
     return { offsetX: offsetX, offsetY: offsetY };
@@ -189,6 +188,7 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
 export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
     iframeDoc: Document | null;
     yAxisCanvas: HTMLCanvasElement | null;
+    sizeReferenceCanvas: HTMLCanvasElement | null;
     priceAxisContainers: HTMLElement[] | null;
 } {
     const chartDiv = document.getElementById('tv_chart');
@@ -200,6 +200,7 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
         return {
             iframeDoc: null,
             yAxisCanvas: null,
+            sizeReferenceCanvas: null,
             priceAxisContainers: null,
         };
     }
@@ -215,6 +216,7 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
         return {
             iframeDoc,
             yAxisCanvas: null,
+            sizeReferenceCanvas: null,
             priceAxisContainers: null,
         };
     }
@@ -226,21 +228,47 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
     });
 
     let yAxisCanvas: HTMLCanvasElement | null = null;
+    let sizeReferenceCanvas: HTMLCanvasElement | null = null;
 
     if (activeContainer) {
         // Find the price-axis div within the active container
         const priceAxisDiv =
             activeContainer.querySelector<HTMLDivElement>('div.price-axis');
         if (priceAxisDiv) {
+            const priceAxisRect = priceAxisDiv.getBoundingClientRect();
             const canvases =
                 priceAxisDiv.querySelectorAll<HTMLCanvasElement>('canvas');
-            yAxisCanvas = canvases.length > 1 ? canvases[1] : null;
+
+            // Find canvas with highest z-index for overlay parent
+            let maxZIndex = -1;
+            for (const canvas of canvases) {
+                const zIndex = parseInt(canvas.style.zIndex) || 0;
+                if (zIndex > maxZIndex) {
+                    maxZIndex = zIndex;
+                    yAxisCanvas = canvas;
+                }
+            }
+
+            // Find canvas that matches price-axis dimensions for size reference
+            for (const canvas of canvases) {
+                const canvasStyleWidth = parseFloat(canvas.style.width) || 0;
+                const canvasStyleHeight = parseFloat(canvas.style.height) || 0;
+
+                if (
+                    Math.abs(canvasStyleWidth - priceAxisRect.width) < 1 &&
+                    Math.abs(canvasStyleHeight - priceAxisRect.height) < 1
+                ) {
+                    sizeReferenceCanvas = canvas;
+                    break;
+                }
+            }
         }
     }
 
     return {
         iframeDoc,
         yAxisCanvas: yAxisCanvas ?? null,
+        sizeReferenceCanvas: sizeReferenceCanvas ?? null,
         priceAxisContainers:
             priceAxisContainers.length > 0 ? priceAxisContainers : null,
     };

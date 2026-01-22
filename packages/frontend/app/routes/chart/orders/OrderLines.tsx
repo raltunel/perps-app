@@ -4,10 +4,17 @@ import { usePositionOrderLines } from './usePositionOrderLines';
 import LineComponent, { type LineData } from './component/LineComponent';
 import LabelComponent from './component/LabelComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import { type LabelLocationData } from '../overlayCanvas/overlayCanvasUtils';
+import {
+    getMainSeriesPaneIndex,
+    type LabelLocationData,
+} from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 import { usePreviewOrderLines } from './usePreviewOrderLines';
+import { ChartElementControlPanel } from './component/ChartElementControlPanel';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
+import type { IPaneApi } from '~/tv/charting_library';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -29,7 +36,7 @@ export default function OrderLines({
     canvasSize,
     scaleData,
     overlayCanvasMousePositionRef,
-    zoomChanged,
+    // zoomChanged,
 }: OrderLinesProps) {
     const { chart } = useTradingView();
 
@@ -40,11 +47,21 @@ export default function OrderLines({
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);
 
+    // BACKUP : LIQUIDATON
+    // const [zoomChanged, setZoomChanged] = useState(false);
+    const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
+
+    const animationFrameRef = useRef<number>(0);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isZoomingRef = useRef(false);
     const [localChartReady, setLocalChartReady] = useState(true);
     const drawnLabelsRef = useRef<LineData[]>([]);
-    const [selectedLine, setSelectedLine] = useState<
+    const { setSelectedOrderLine } = useChartLinesStore();
+    const [activeDragLine, setActiveDragLine] = useState<
         undefined | LabelLocationData
     >(undefined);
+    const { setPriceDomain, setZoomChanged, zoomChanged } =
+        useChartScaleStore();
 
     const arePricesEqual = (a?: number, b?: number) => {
         if (a === undefined || b === undefined) return false;
@@ -98,26 +115,101 @@ export default function OrderLines({
             ...(obPreviewLine && !hidePreviewLine ? [obPreviewLine] : []),
         ];
 
-        const updatedLines = linesData.map((line) => {
+        let draggedLine: LineData | null = null;
+        const otherLines = linesData.filter((line) => {
             //handle lines with undefined oid
-            if (!line.oid) return line;
+            if (!line.oid) return true;
             if (
                 line.type !== 'PNL' &&
-                selectedLine &&
-                line.oid === selectedLine.parentLine.oid
+                activeDragLine &&
+                line.oid === activeDragLine.parentLine.oid
             ) {
                 matchFound = true;
-                return selectedLine.parentLine;
+                draggedLine = activeDragLine.parentLine;
+                return false;
             }
-            return line;
+            return true;
         });
 
-        if (selectedLine && !matchFound) {
-            setSelectedLine(undefined);
+        const updatedLines = draggedLine
+            ? [...otherLines, draggedLine]
+            : otherLines;
+
+        if (activeDragLine && !matchFound) {
+            setActiveDragLine(undefined);
+            setSelectedOrderLine(undefined);
         }
 
         setLines(updatedLines);
-    }, [openLines, positionLines, obPreviewLine, selectedLine]);
+    }, [openLines, positionLines, obPreviewLine, activeDragLine]);
+
+    useEffect(() => {
+        if (!chart || !scaleData) return;
+
+        const chartRef = chart.activeChart();
+        const paneIndex = getMainSeriesPaneIndex(chart);
+        if (paneIndex === null) return;
+        const priceScalePane = chartRef.getPanes()[paneIndex] as IPaneApi;
+        const priceScale = priceScalePane.getMainSourcePriceScale();
+        if (!priceScale) return;
+
+        const loop = () => {
+            const priceRange = priceScale.getVisiblePriceRange();
+            if (priceRange) {
+                const currentRange = {
+                    min: priceRange.from,
+                    max: priceRange.to,
+                };
+
+                scaleData?.yScale.domain([currentRange.min, currentRange.max]);
+                scaleData?.scaleSymlog.domain([
+                    currentRange.min,
+                    currentRange.max,
+                ]);
+
+                const prevRange = prevRangeRef.current;
+                const hasChanged =
+                    !prevRange ||
+                    prevRange.min !== currentRange.min ||
+                    prevRange.max !== currentRange.max;
+
+                if (hasChanged) {
+                    prevRangeRef.current = currentRange;
+                    setPriceDomain({
+                        min: currentRange.min,
+                        max: currentRange.max,
+                    });
+
+                    if (!isZoomingRef.current) {
+                        isZoomingRef.current = true;
+                        setZoomChanged(true);
+                    }
+
+                    if (debounceTimerRef.current) {
+                        clearTimeout(debounceTimerRef.current);
+                    }
+
+                    debounceTimerRef.current = setTimeout(() => {
+                        isZoomingRef.current = false;
+                        setZoomChanged(false);
+                    }, 200);
+                }
+            }
+
+            animationFrameRef.current = requestAnimationFrame(loop);
+        };
+
+        animationFrameRef.current = requestAnimationFrame(loop);
+
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [chart, scaleData]);
 
     useEffect(() => {
         if (!scaleData || !chart || !canvasSize) return;
@@ -152,9 +244,9 @@ export default function OrderLines({
             const min = Math.min(minY, maxY);
             return (
                 (line.yPrice >= min && line.yPrice <= max && isVisibleEnough) ||
-                (selectedLine &&
+                (activeDragLine &&
                     line.oid &&
-                    line.oid === selectedLine?.parentLine.oid)
+                    line.oid === activeDragLine?.parentLine.oid)
             );
         });
 
@@ -162,7 +254,7 @@ export default function OrderLines({
     }, [
         lines,
         canvasSize,
-        selectedLine,
+        activeDragLine,
         JSON.stringify(scaleData?.yScale.domain()),
     ]);
 
@@ -184,13 +276,19 @@ export default function OrderLines({
                     canvasSize={canvasSize}
                     drawnLabelsRef={drawnLabelsRef}
                     scaleData={scaleData}
-                    selectedLine={selectedLine}
-                    setSelectedLine={setSelectedLine}
+                    activeDragLine={activeDragLine}
+                    setActiveDragLine={setActiveDragLine}
                     overlayCanvasMousePositionRef={
                         overlayCanvasMousePositionRef
                     }
                 />
             )}
+
+            <ChartElementControlPanel
+                chart={chart}
+                canvasHeight={canvasSize?.height || 0}
+                canvasWidth={canvasSize?.width || 0}
+            />
         </>
     );
 }

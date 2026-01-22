@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import * as d3 from 'd3';
-import React, { useEffect, useMemo } from 'react';
-import Button from '~/components/Button/Button';
+import React, { useEffect, useMemo, useRef } from 'react';
 import styles from './CollateralPieChart.module.css';
 import useMediaQuery from '~/hooks/useMediaQuery';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 
-type PieData = { label: string; value: number };
+type PieData = { label: string; value: number; balance: number };
 
 type PieChartProps = {
     height?: number;
@@ -17,12 +17,60 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     const { height, width } = props;
     const isMobile = useMediaQuery('(max-width: 768px)');
 
-    const chartHeight = height || 150;
+    const { balance } = useUnifiedMarginData();
 
-    const pieData: PieData[] = useMemo(
-        () => [{ label: t('portfolio.fusd'), value: 100 }],
-        [t],
+    const chartHeight = height || 150;
+    const chartWidth = width || chartHeight;
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    const minCanvasSizeBase = isMobile ? 160 : 180;
+    const maxCanvasSizeBase = isMobile ? 240 : 320;
+    const availableHeight = Math.max(chartHeight - (isMobile ? 24 : 32), 120);
+    const availableWidth = Math.max(chartWidth - (isMobile ? 24 : 48), 120);
+    const maxCanvasSize = Math.min(
+        maxCanvasSizeBase,
+        availableHeight,
+        availableWidth,
     );
+    const minCanvasSize = Math.min(minCanvasSizeBase, maxCanvasSize);
+    const baseCanvasSize = Math.min(
+        availableHeight * (isMobile ? 0.9 : 0.85),
+        availableWidth * (isMobile ? 0.75 : 0.65),
+    );
+    const canvasSize = Math.max(
+        Math.min(baseCanvasSize, maxCanvasSize),
+        minCanvasSize,
+    );
+    const canvasHeight = canvasSize;
+    const canvasWidth = canvasSize;
+
+    const pieData: PieData[] = useMemo(() => {
+        if (balance) {
+            if (Array.isArray(balance) && balance.length > 0) {
+                const total = balance.reduce(
+                    (sum, item) => sum + item.total,
+                    0,
+                );
+
+                const pieData: PieData[] = [];
+
+                balance.forEach((item) => {
+                    pieData.push({
+                        label: item.coin,
+                        value: (item.value / total) * 100,
+                        balance: item.total,
+                    });
+                });
+
+                return pieData;
+            } else {
+                return [
+                    { label: balance.coin, value: 100, balance: balance.total },
+                ];
+            }
+        }
+        return [];
+    }, [t, balance]);
 
     const dataColorSet = [
         '#7371fc',
@@ -33,28 +81,30 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
     ];
 
     const color = d3
-        .scaleOrdinal<string>()
+        .scaleOrdinal()
         .domain(pieData.map((d) => d.label))
         .range(dataColorSet);
 
     useEffect(() => {
-        const canvas = document.getElementById(
-            'pie-canvas',
-        ) as HTMLCanvasElement;
-        const ctx = canvas?.getContext('2d');
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const width = canvas?.width;
-        const height = canvas?.height;
+        const coinCount = pieData.length;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
         const radius = Math.min(width, height) / 2;
 
-        const pie = d3.pie<PieData>().value((d: any) => d.value);
+        const pie = d3.pie().value((d: any) => d.value);
         const arcs = pie(pieData);
 
         function drawArc(
             ctx: CanvasRenderingContext2D,
-            arc: d3.PieArcDatum<PieData>,
+            arc: any,
             color: string,
         ) {
             const startAngle = arc.startAngle;
@@ -66,12 +116,25 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
             ctx.closePath();
             ctx.fillStyle = color;
             ctx.fill();
+
+            const midAngle = Number((startAngle + endAngle) / 2).toFixed(4);
+
+            const textRadius = radius * (coinCount > 1 ? 0.6 : 0);
+            const textX = width / 2 + textRadius * Math.cos(Number(midAngle));
+            const textY = height / 2 + textRadius * Math.sin(Number(midAngle));
+
+            ctx.fillStyle = '#f0f0f8';
+            ctx.font = '14px Lexend Deca';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(arc.data.label, textX, textY - 7);
+            ctx.fillText(arc.data.balance.toString(), textX, textY + 7);
         }
 
         arcs.forEach((arc: any) => {
             drawArc(ctx, arc, color(arc.data.label));
         });
-    }, [pieData]);
+    }, [pieData, canvasHeight, canvasWidth]);
 
     const legend = (
         <div className={styles.legendContainer}>
@@ -104,13 +167,9 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
             <div className={styles.dataContainer}>
                 <div className={styles.dataLabel}>
                     <canvas
-                        id='pie-canvas'
-                        width={
-                            isMobile
-                                ? '200px'
-                                : Math.max(Math.min(chartHeight, 250), 100)
-                        }
-                        height={Math.max(Math.min(chartHeight, 250), 100)}
+                        ref={canvasRef}
+                        width={canvasWidth}
+                        height={canvasHeight}
                     ></canvas>
                 </div>
                 {legend}

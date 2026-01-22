@@ -1,5 +1,11 @@
-import React, { useMemo, useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, {
+    useMemo,
+    useState,
+    useCallback,
+    useRef,
+    useEffect,
+} from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
@@ -7,12 +13,20 @@ import CollateralPieChart from './CollateralChart/CollateralPieChart';
 import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
 import TabChartContext from './PerformanceChart/TabChartContext';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface PerformancePanelProps {
     userData: any;
     panelHeight?: number;
     isMobile: boolean;
 }
+
+interface PerformanceMetric {
+    label: string;
+    value: string;
+}
+
+type PerformanceTab = 'performance' | 'accountValue' | 'collateral';
 
 const AVAILABLE_TABS = [
     { id: 'performance', label: 'portfolio.performance' },
@@ -27,13 +41,42 @@ const animationConfig = {
     transition: { duration: 0.2 },
 };
 
+const MetricsDisplay = React.memo(function MetricsDisplay({
+    title,
+    subtitle,
+    metrics,
+}: {
+    title: string;
+    subtitle: string;
+    metrics: PerformanceMetric[];
+}) {
+    return (
+        <div id={'metricsContainer'} className={styles.metricsContainer}>
+            <div className={styles.accountOverviewHeader}>
+                <div className={styles.accountOverviewTitle}>{title}</div>
+                <div className={styles.accountOverviewSubtitle}>{subtitle}</div>
+            </div>
+            {metrics.map((metric) => (
+                <div className={styles.metricRow} key={metric.label}>
+                    <span>{metric.label}</span>
+                    {metric.value}
+                </div>
+            ))}
+        </div>
+    );
+});
+
 export default function PerformancePanel({
     userData,
     panelHeight,
     isMobile,
 }: PerformancePanelProps) {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState('performance');
+    const { portfolioPerformanceTab, setPortfolioPerformanceTab } =
+        useAppSettings();
+    const [activeTab, setActiveTab] = useState<PerformanceTab>(
+        portfolioPerformanceTab,
+    );
     const chartStageRef = useRef<HTMLDivElement>(null);
 
     const { formatNum } = useNumFormatter();
@@ -81,7 +124,7 @@ export default function PerformancePanel({
             ? formatNum(userData.collateral)
             : DASH_PLACEHOLDER;
 
-    const PERFORMANCE_METRICS = [
+    const PERFORMANCE_METRICS: PerformanceMetric[] = [
         { label: t('portfolio.pnl'), value: pnlFormatted },
         { label: t('portfolio.realizedPnl'), value: realizedPnlFormatted },
         { label: t('portfolio.unrealizedPnl'), value: unrealizedPnlFormatted },
@@ -91,19 +134,6 @@ export default function PerformancePanel({
         { label: t('portfolio.accountEquity'), value: accountEquityFormatted },
         // { label: 'Vault Equity', value: vaultEquityFormatted },
     ];
-
-    const MetricsDisplay = React.memo(() => (
-        <div id={'metricsContainer'} className={styles.metricsContainer}>
-            {PERFORMANCE_METRICS.map((metric) => (
-                <div className={styles.metricRow} key={metric.label}>
-                    <span>{metric.label}</span>
-                    {metric.value}
-                </div>
-            ))}
-        </div>
-    ));
-
-    const [isLineDataFetched, setIsLineDataFetched] = useState(false);
 
     const [accountValueHistory, setAccountValueHistory] = useState<
         { time: number; value: number }[] | undefined
@@ -115,13 +145,17 @@ export default function PerformancePanel({
 
     const [userProfileLineData, setUserProfileLineData] = useState<any>();
 
-    const handleTabChange = useCallback((tab: string) => {
-        setActiveTab(tab);
-    }, []);
+    useEffect(() => {
+        setActiveTab(portfolioPerformanceTab);
+    }, [portfolioPerformanceTab]);
 
-    const handleLineDataFetched = (isDataFetched: boolean) => {
-        setIsLineDataFetched(() => isDataFetched);
-    };
+    const handleTabChange = useCallback(
+        (tab: string) => {
+            setActiveTab(tab as PerformanceTab);
+            setPortfolioPerformanceTab(tab as PerformanceTab);
+        },
+        [setPortfolioPerformanceTab],
+    );
 
     const LoadingContent = useMemo(
         () => (
@@ -141,7 +175,8 @@ export default function PerformancePanel({
     const [selectedPeriod, setSelectedPeriod] = useState<{
         label: string;
         value: string;
-    }>({ label: t('portfolio.allTime'), value: 'AllTime' });
+        timeframe: number;
+    }>({ label: t('portfolio.allTime'), value: 'AllTime', timeframe: 0 });
 
     const TabContent_ = !activeTab ? (
         LoadingContent
@@ -150,21 +185,43 @@ export default function PerformancePanel({
             id={'performanceContainer'}
             className={styles.performanceContainer}
         >
-            <MetricsDisplay />
+            <MetricsDisplay
+                title={t('portfolio.accountOverview')}
+                subtitle={t('portfolio.updateFrequencyInMinutes', {
+                    numMinutes: 30,
+                })}
+                metrics={PERFORMANCE_METRICS}
+            />
             <motion.div {...animationConfig} className={styles.perfChart}>
-                <PortfolioChartHeader
-                    selectedVault={selectedVault}
-                    setSelectedVault={setSelectedVault}
-                    selectedPeriod={selectedPeriod}
-                    setSelectedPeriod={setSelectedPeriod}
-                />
+                <div
+                    id={'performanceChartControls'}
+                    className={styles.chartControls}
+                >
+                    <div className={styles.chartControlsTabsRow}>
+                        <Tabs
+                            tabs={AVAILABLE_TABS}
+                            defaultTab={activeTab}
+                            onTabChange={handleTabChange}
+                            wrapperId='performanceTabs'
+                            layoutIdPrefix='performanceTabIndicator'
+                        />
+                    </div>
+                    {activeTab !== 'collateral' && (
+                        <div className={styles.chartControlsFiltersRow}>
+                            <PortfolioChartHeader
+                                selectedVault={selectedVault}
+                                setSelectedVault={setSelectedVault}
+                                selectedPeriod={selectedPeriod}
+                                setSelectedPeriod={setSelectedPeriod}
+                            />
+                        </div>
+                    )}
+                </div>
 
                 <TabChartContext
                     activeTab={activeTab}
                     selectedVault={selectedVault}
                     selectedPeriod={selectedPeriod}
-                    handleLineDataFetched={handleLineDataFetched}
-                    isLineDataFetched={isLineDataFetched}
                     setAccountValueHistory={setAccountValueHistory}
                     setPnlHistory={setPnlHistory}
                     pnlHistory={pnlHistory}
@@ -182,18 +239,7 @@ export default function PerformancePanel({
 
     return (
         <div className={styles.container}>
-            <Tabs
-                tabs={AVAILABLE_TABS}
-                defaultTab={activeTab}
-                onTabChange={handleTabChange}
-                wrapperId='performanceTabs'
-                layoutIdPrefix='performanceTabIndicator'
-            />
-            <AnimatePresence mode='wait'>
-                <div className={styles.tableContent} key={activeTab}>
-                    {TabContent_}
-                </div>
-            </AnimatePresence>
+            <div className={styles.tableContent}>{TabContent_}</div>
         </div>
     );
 }
