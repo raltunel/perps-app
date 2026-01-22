@@ -86,18 +86,12 @@
     color: var(--text2);
     text-transform: uppercase;
     letter-spacing: 0.3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .value {
-    font-size: var(--font-size-m);
+    font-size: var(--font-size-s, 13px);
     font-weight: 500;
     color: var(--text1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 /* ============================================

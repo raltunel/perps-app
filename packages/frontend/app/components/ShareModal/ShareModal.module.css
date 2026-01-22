@@ -10,7 +10,7 @@
     background-size: cover;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
     padding: var(--padding-m);
 }
 
@@ -25,8 +25,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
+    min-height: auto;
+    overflow: visible;
 }
 
 /* Market info for share view */
@@ -126,6 +126,7 @@
     display: flex;
     flex-direction: row;
     gap: var(--gap-m);
+    flex-wrap: wrap;
 }
 
 .price {
@@ -196,6 +197,22 @@
     background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }
 
+.button_bank > button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Copy button - secondary style */
+.copyButton {
+    background: transparent !important;
+    border: 1px solid var(--accent1) !important;
+    color: var(--accent1) !important;
+}
+
+.copyButton:hover:not(:disabled) {
+    background: rgba(115, 113, 252, 0.1) !important;
+}
+
 /* ============================================
    RESPONSIVE STYLES
    ============================================ */
@@ -205,13 +222,13 @@
         min-width: 500px;
         display: grid;
         grid-template-columns: 1fr 205px;
-        height: 400px;
+        height: auto;
         gap: var(--gap-m);
     }
 
     .leftSide {
-        height: 100%;
-        max-height: 400px;
+        height: auto;
+        max-height: none;
     }
 }
 
@@ -264,7 +281,7 @@
     }
 
     .leftSide {
-        min-height: 400px;
+        min-height: auto;
         max-height: none;
         padding: var(--padding-s);
     }
