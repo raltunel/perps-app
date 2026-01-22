@@ -467,7 +467,7 @@
         "toCustomizeAffiliateCode": "アフィリエイトコードはデフォルトでウォレットアドレスの最初の6文字になります。取引高が100万ドルを超えるユーザーはアフィリエイトコードをカスタマイズできます。",
         "claimRewardsWithAmount": "{{amount}} の報酬を請求",
         "selectATabToViewData": "データ表示するタブを選択してください",
-        "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{affiliatePercent}}</0> を受け取り、そのユーザーは <1>{{userPercent}}</1> の割引を受けられます。",
+        "trackingLinkExplanation": "紹介されたユーザーの手数料の <0>{{referrerPercent}}</0> を受け取り、そのユーザーは <1>{{inviteePercent}}</1> の割引を受けられます。",
         "claim": "請求する"
     },
     "deposit": {

@@ -58,6 +58,12 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(
         new Map(),
     );
+    const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
+    const reconnectAttemptsRef = useRef(0);
+    const connectWebSocketRef = useRef<() => void>(() => {});
+    const scheduleReconnectRef = useRef<(reason?: string) => void>(() => {});
 
     const { isWsSleepMode } = useDebugStore();
     const { isTabActive, setWsReconnecting } = useAppStateStore();
@@ -65,6 +71,10 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     sleepModeRef.current = isWsSleepMode;
 
     const { internetConnected } = useAppStateStore();
+    const internetConnectedRef = useRef(internetConnected);
+    internetConnectedRef.current = internetConnected;
+    const isTabActiveRef = useRef(isTabActive);
+    isTabActiveRef.current = isTabActive;
 
     const shouldReconnect = useRef(false);
     const shouldReconnectForTabActive = useRef(false);
@@ -74,13 +84,21 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         return match ? match[1] : '';
     }
 
-    const connectWebSocket = () => {
+    const connectWebSocket = useCallback(() => {
         if (!isClient) {
             return;
         } // ✅ Ensure WebSocket only runs on client side
 
+        if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+            reconnectTimeoutRef.current = null;
+        }
+
         // Close the previous WebSocket if it exists
-        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
+        if (
+            socketRef.current &&
+            socketRef.current.readyState !== WebSocketReadyState.CLOSED
+        ) {
             socketRef.current.close();
         }
 
@@ -91,6 +109,11 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         socket.onopen = () => {
             setReadyState(WebSocketReadyState.OPEN);
             setWsReconnecting(false);
+            reconnectAttemptsRef.current = 0;
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null;
+            }
         };
 
         socket.onmessage = (event) => {
@@ -125,13 +148,68 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         };
 
         socket.onclose = () => {
+            if (socketRef.current !== socket) {
+                return;
+            }
             setReadyState(WebSocketReadyState.CLOSED);
+            scheduleReconnectRef.current('close');
         };
 
         socket.onerror = (error) => {
+            if (socketRef.current !== socket) {
+                return;
+            }
             socket.close();
         };
-    };
+    }, [isClient, setWsReconnecting, url]);
+
+    const scheduleReconnect = useCallback(
+        (reason?: string) => {
+            if (!isClient) return;
+
+            if (!internetConnectedRef.current) {
+                shouldReconnect.current = true;
+                return;
+            }
+
+            if (!isTabActiveRef.current || sleepModeRef.current) {
+                shouldReconnectForTabActive.current = true;
+                return;
+            }
+
+            const state = socketRef.current?.readyState;
+            if (
+                state === WebSocketReadyState.OPEN ||
+                state === WebSocketReadyState.CONNECTING
+            ) {
+                return;
+            }
+
+            if (reconnectTimeoutRef.current) {
+                return;
+            }
+
+            setWsReconnecting(true);
+            const delay = Math.min(
+                1000 * Math.pow(2, reconnectAttemptsRef.current),
+                10000,
+            );
+            reconnectTimeoutRef.current = setTimeout(() => {
+                reconnectTimeoutRef.current = null;
+                reconnectAttemptsRef.current += 1;
+                connectWebSocketRef.current();
+            }, delay);
+        },
+        [isClient, setWsReconnecting],
+    );
+
+    useEffect(() => {
+        connectWebSocketRef.current = connectWebSocket;
+    }, [connectWebSocket]);
+
+    useEffect(() => {
+        scheduleReconnectRef.current = scheduleReconnect;
+    }, [scheduleReconnect]);
 
     useEffect(() => {
         if (isClient) {
@@ -139,6 +217,10 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         }
 
         return () => {
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null;
+            }
             // console.log('>>>> socket closed!!!!!!!!!!!!!');
             // socketRef.current?.close();
         };
@@ -223,6 +305,10 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
 
             // add subscription through websocket context
             registerWsSubscription(key, config.payload || {});
+
+            if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
+                scheduleReconnectRef.current('subscribe');
+            }
         },
         [],
     );
