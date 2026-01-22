@@ -3,20 +3,37 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type {
     OrderBookTradeIF,
     OrderBookRowIF,
+    OrderBookMode,
+    OrderBookLiqIF,
     OrderRowResolutionIF,
 } from '~/utils/orderbook/OrderBookIFs';
+import { TableState } from '~/utils/CommonIFs';
 
 interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
+    setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => void;
+    setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) => void;
+    selectedResolution: OrderRowResolutionIF | null;
+    selectedMode: OrderBookMode;
     orderBook: OrderBookRowIF[];
     setOrderBook: (
         buys: OrderBookRowIF[],
         sells: OrderBookRowIF[],
         setMid?: boolean,
     ) => void;
+    orderBookState: TableState;
+    setSelectedResolution: (resolution: OrderRowResolutionIF | null) => void;
+    setSelectedMode: (mode: OrderBookMode) => void;
+    setOrderBookState: (state: TableState) => void;
     trades: OrderBookTradeIF[];
     setTrades: (trades: OrderBookTradeIF[]) => void;
+    setLiqBuys: (liqBuys: OrderBookLiqIF[]) => void;
+    setLiqSells: (liqSells: OrderBookLiqIF[]) => void;
+    orderCount: number;
+    setOrderCount: (orderCount: number) => void;
+    activeOrderTab: string;
+    setActiveOrderTab: (activeOrderTab: string) => void;
     resolutionPairs: Record<string, OrderRowResolutionIF>;
     addToResolutionPair: (
         symbol: string,
@@ -26,6 +43,27 @@ interface OrderBookStore {
     setMidPrice: (midPrice: number) => void;
     usualResolution: OrderRowResolutionIF | null;
     setUsualResolution: (resolution: OrderRowResolutionIF) => void;
+
+    hrBuys: OrderBookRowIF[];
+    hrSells: OrderBookRowIF[];
+    setHrBuys: (hrBuys: OrderBookRowIF[]) => void;
+    setHrSells: (hrSells: OrderBookRowIF[]) => void;
+    inpBuys: OrderBookRowIF[];
+    inpSells: OrderBookRowIF[];
+    setInpBuys: (inpBuys: OrderBookRowIF[]) => void;
+    setInpSells: (inpSells: OrderBookRowIF[]) => void;
+    liqBuys: OrderBookLiqIF[];
+    liqSells: OrderBookLiqIF[];
+    hrLiqBuys: OrderBookLiqIF[];
+    hrLiqSells: OrderBookLiqIF[];
+    obMaxSell: number;
+    obMinBuy: number;
+    setObMaxSell: (obMaxSell: number) => void;
+    setObMinBuy: (obMinBuy: number) => void;
+    obMaxBuy: number;
+    setObMaxBuy: (obMaxBuy: number) => void;
+    obMinSell: number;
+    setObMinSell: (obMinSell: number) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>()(
@@ -34,6 +72,9 @@ export const useOrderBookStore = create<OrderBookStore>()(
             orderBook: [],
             buys: [],
             sells: [],
+            selectedResolution: null,
+            selectedMode: 'symbol',
+            orderBookState: TableState.LOADING,
             trades: [],
             setOrderBook: (
                 buys: OrderBookRowIF[],
@@ -53,7 +94,19 @@ export const useOrderBookStore = create<OrderBookStore>()(
                     });
                 }
             },
+            setSelectedResolution: (
+                selectedResolution: OrderRowResolutionIF | null,
+            ) => set({ selectedResolution }),
+            setSelectedMode: (selectedMode: OrderBookMode) =>
+                set({ selectedMode }),
+            setOrderBookState: (orderBookState: TableState) =>
+                set({ orderBookState }),
             setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
+            orderCount: 9,
+            setOrderCount: (orderCount: number) => set({ orderCount }),
+            activeOrderTab: 'Book',
+            setActiveOrderTab: (activeOrderTab: string) =>
+                set({ activeOrderTab }),
             addToResolutionPair: (
                 symbol: string,
                 resolutionPair: OrderRowResolutionIF,
@@ -70,6 +123,31 @@ export const useOrderBookStore = create<OrderBookStore>()(
             usualResolution: null,
             setUsualResolution: (resolution: OrderRowResolutionIF) =>
                 set({ usualResolution: resolution }),
+            hrBuys: [],
+            hrSells: [],
+            setHrBuys: (hrBuys: OrderBookRowIF[]) => set({ hrBuys }),
+            setHrSells: (hrSells: OrderBookRowIF[]) => set({ hrSells }),
+            inpBuys: [],
+            inpSells: [],
+            setInpBuys: (inpBuys: OrderBookRowIF[]) => set({ inpBuys }),
+            setInpSells: (inpSells: OrderBookRowIF[]) => set({ inpSells }),
+            liqBuys: [],
+            liqSells: [],
+            setLiqBuys: (liqBuys: OrderBookLiqIF[]) => set({ liqBuys }),
+            setLiqSells: (liqSells: OrderBookLiqIF[]) => set({ liqSells }),
+            hrLiqBuys: [],
+            hrLiqSells: [],
+            setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => set({ hrLiqBuys }),
+            setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) =>
+                set({ hrLiqSells }),
+            obMaxSell: 0,
+            setObMaxSell: (obMaxSell: number) => set({ obMaxSell }),
+            obMinBuy: 0,
+            setObMinBuy: (obMinBuy: number) => set({ obMinBuy }),
+            obMaxBuy: 0,
+            setObMaxBuy: (obMaxBuy: number) => set({ obMaxBuy }),
+            obMinSell: 0,
+            setObMinSell: (obMinSell: number) => set({ obMinSell }),
         }),
         {
             name: 'ORDERBOOK',

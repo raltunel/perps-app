@@ -8,7 +8,10 @@ export type LabelLocationData = {
 };
 
 export const mousePositionRef = { current: { x: 0, y: 0 } };
-
+export type CanvasSize = {
+    width: number;
+    height: number;
+};
 export function findLimitLabelAtPosition(
     x: number,
     y: number,
@@ -57,10 +60,20 @@ export function findLimitLabelAtPosition(
 export function getXandYLocationForChartDrag(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any,
-    rect: DOMRect,
+    dpr: number,
 ) {
-    let offsetY = event.sourceEvent.clientY - rect?.top;
-    let offsetX = event.sourceEvent.clientX - rect?.left;
+    let offsetY = event.y * dpr;
+    let offsetX = event.x * dpr;
+
+    // BACKUP : LIQUIDATION
+
+    //if (
+    //    typeof TouchEvent !== 'undefined' &&
+    //    event.sourceEvent instanceof TouchEvent
+    //) {
+    //  offsetY = event.sourceEvent.touches[0].clientY * dpr;
+    // offsetX = event.sourceEvent.touches[0].clientX * dpr;
+    //}
 
     if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
         offsetY = event.sourceEvent.touches[0].clientY - rect.top;
@@ -260,3 +273,19 @@ export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
             priceAxisContainers.length > 0 ? priceAxisContainers : null,
     };
 }
+
+export const updateOverlayCanvasSize = (
+    canvas: HTMLCanvasElement,
+    canvasSize: CanvasSize,
+) => {
+    const dpr = window.devicePixelRatio || 1;
+
+    const width = canvasSize.width;
+    const height = canvasSize.height;
+
+    canvas.width = width;
+    canvas.style.width = `${width / dpr}px`;
+
+    canvas.height = height;
+    canvas.style.height = `${height / dpr}px`;
+};
