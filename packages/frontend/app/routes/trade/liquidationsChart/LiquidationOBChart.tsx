@@ -12,6 +12,7 @@ import type {
 } from '~/tv/charting_library';
 import { LiqChartTooltipType, useLiqChartStore } from '~/stores/LiqChartStore';
 import type { LiqLevel } from './LiquidationUtils';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 interface LiquidationsChartProps {
     buyData: LiqLevel[];
     sellData: LiqLevel[];
@@ -53,6 +54,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = useLiqChartStore();
     const focusSourceRef = useRef(focusSource);
     focusSourceRef.current = focusSource;
+
+    const { symbolInfo } = useTradeDataStore();
+    const symbolInfoRef = useRef(symbolInfo);
+    symbolInfoRef.current = symbolInfo;
 
     const chartModeRef = useRef(chartMode);
     chartModeRef.current = chartMode;
@@ -1040,7 +1045,20 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         formatNum(percentage) +
                         '%</p>' +
                         '<p>' +
+                        'Cumulative Liq: ' +
                         formatNum(amount, 2) +
+                        ' ' +
+                        symbolInfoRef.current?.coin +
+                        ' </p>' +
+                        '<p>' +
+                        'Price: ' +
+                        formatNum(snappedPricePoint.px) +
+                        ' </p>' +
+                        '<p>' +
+                        'Size: ' +
+                        formatNum(snappedPricePoint.sz, 2) +
+                        ' ' +
+                        symbolInfoRef.current?.coin +
                         ' </p>',
                 );
             } else {
