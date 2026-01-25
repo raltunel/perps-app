@@ -36,13 +36,14 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 
     const [isPaneChanged, setIsPaneChanged] = useState(false);
 
-    const [zoomChanged, setZoomChanged] = useState(false);
     const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
 
     const animationFrameRef = useRef<number>(0);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
     const scaleDataRef = useChartScaleStore((state) => state.scaleDataRef);
+    const setZoomChanged = useChartScaleStore((state) => state.setZoomChanged);
+    const setPriceDomain = useChartScaleStore((state) => state.setPriceDomain);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [canvasSize, setCanvasSize] = useState<any>();
@@ -82,6 +83,10 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 
                 if (hasChanged) {
                     prevRangeRef.current = currentRange;
+                    setPriceDomain({
+                        min: currentRange.min,
+                        max: currentRange.max,
+                    });
 
                     if (!isZoomingRef.current) {
                         isZoomingRef.current = true;

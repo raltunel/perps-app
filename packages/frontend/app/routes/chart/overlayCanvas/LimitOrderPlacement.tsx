@@ -9,6 +9,7 @@ import {
 import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
 import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -20,14 +21,12 @@ interface LimitOrderPlacementProps {
         x: number;
         y: number;
     }>;
-    zoomChanged: boolean;
 }
 
 const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     overlayCanvasRef,
     scaleData,
     canvasSize,
-    zoomChanged,
     overlayCanvasMousePositionRef,
 }) => {
     const [clickedOrder, setClickedOrder] = useState<{
@@ -64,6 +63,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         clearPreparedOrder,
         openQuickModeConfirm,
     } = useOrderPlacementStore();
+    const { zoomChanged } = useChartScaleStore();
 
     const progressAnimationRef = React.useRef<number | null>(null);
 
