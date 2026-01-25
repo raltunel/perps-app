@@ -5,15 +5,15 @@ import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradin
 import { useAppStateStore } from '~/stores/AppStateStore';
 import styles from './chartLoading.module.css';
 import YaxisOverlayCanvas from '~/routes/chart/overlayCanvas/yAxisOverlayCanvas';
+import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
+import LimitOrderPlacementCanvas from '~/routes/chart/overlayCanvas/LimitOrderPlacementCanvas';
+import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
+import { QuickModeConfirmModal } from '~/routes/chart/components/QuickModeConfirmModal';
 import type { TabType } from '~/routes/trade';
 
 interface TradingViewWrapperProps {
     switchTab?: (tab: TabType) => void;
 }
-import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
-import LimitOrderPlacementCanvas from '~/routes/chart/overlayCanvas/LimitOrderPlacementCanvas';
-import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
-import { QuickModeConfirmModal } from '~/routes/chart/components/QuickModeConfirmModal';
 
 const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
     switchTab,
@@ -93,8 +93,8 @@ const TradingViewWrapper: React.FC<TradingViewWrapperProps> = ({
                 >
                     <TradingViewChart />
                     <OrderLinesOverlayCanvas />
-                    <YaxisOverlayCanvas />
                     <LimitOrderPlacementCanvas />
+                    <YaxisOverlayCanvas />
                 </TradingViewProvider>
             )}
 

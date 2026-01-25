@@ -4,19 +4,12 @@ import OverlayCanvasLayer from './overlayCanvasLayer';
 const OverlayCanvas: React.FC = () => {
     return (
         <OverlayCanvasLayer id='order-overlay' zIndex={5}>
-            {({
-                canvasRef,
-                canvasSize,
-                scaleData,
-                mousePositionRef,
-                zoomChanged,
-            }) => (
+            {({ canvasRef, canvasSize, scaleData, mousePositionRef }) => (
                 <OrderLines
                     overlayCanvasRef={canvasRef}
                     canvasSize={canvasSize}
                     scaleData={scaleData}
                     overlayCanvasMousePositionRef={mousePositionRef}
-                    zoomChanged={zoomChanged}
                 />
             )}
         </OverlayCanvasLayer>

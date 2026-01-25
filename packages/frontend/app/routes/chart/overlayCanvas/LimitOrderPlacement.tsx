@@ -196,6 +196,27 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             const side: 'buy' | 'sell' =
                 markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
 
+            if (!activeOrder?.bypassConfirmation) {
+                useTradeDataStore.getState().setOrderInputPriceValue({
+                    value: price,
+                    changeType: 'quickTradeMode',
+                });
+                useTradeDataStore.getState().setTradeDirection(side);
+                useTradeDataStore.getState().setMarketOrderType('limit');
+                useTradeDataStore.getState().setIsMidModeActive(false);
+
+                // Convert currency string to OrderBookMode
+                const currency = activeOrder?.currency || 'USD';
+                const upperSymbol = symbolInfo?.coin?.toUpperCase() ?? 'BTC';
+                const denom = currency === upperSymbol ? 'symbol' : 'usd';
+
+                useTradeDataStore.getState().setOrderInputSizeValue({
+                    value: activeOrder?.size || 0,
+                    denom: denom,
+                });
+
+                return;
+            }
             // Set prepared order immediately on click
             if (mousePrice && activeOrder) {
                 setPreparedOrder({
