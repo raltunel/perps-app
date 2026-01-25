@@ -10,6 +10,7 @@ import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
 import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 import { useChartScaleStore } from '~/stores/ChartScaleStore';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -64,6 +65,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         openQuickModeConfirm,
     } = useOrderPlacementStore();
     const { zoomChanged } = useChartScaleStore();
+    const { showPlusButton, setShowPlusButton } = useChartLinesStore();
 
     const progressAnimationRef = React.useRef<number | null>(null);
 
@@ -115,20 +117,28 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 setMousePrice(parseFloat(price.toFixed(3)));
             });
 
-        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
-        if (!iframeDoc) return;
+        const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+        if (!iframeDoc || !paneCanvas) return;
 
-        if (iframeDoc) {
-            const handleMouseLeave = () => {
+        const handleMouseMove = (e: MouseEvent) => {
+            const rect = paneCanvas.getBoundingClientRect();
+            const isOutside =
+                e.clientX < rect.left ||
+                e.clientX > rect.right ||
+                e.clientY < rect.top ||
+                e.clientY > rect.bottom;
+
+            if (isOutside) {
                 setMousePrice(null);
-            };
+                setShowPlusButton(false);
+            }
+        };
 
-            iframeDoc.addEventListener('mouseleave', handleMouseLeave);
+        iframeDoc.addEventListener('mousemove', handleMouseMove);
 
-            return () => {
-                iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
-            };
-        }
+        return () => {
+            iframeDoc.removeEventListener('mousemove', handleMouseMove);
+        };
     }, [chart, scaleData, overlayCanvasMousePositionRef, quickMode]);
 
     // Listen for clicks on TradingView chart
@@ -273,16 +283,10 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 requestAnimationFrame(animateProgress);
         };
 
-        const handleMouseLeave = () => {
-            setMousePrice(null);
-        };
-
         iframeDoc.addEventListener('click', handleChartClick);
-        iframeDoc.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
             iframeDoc.removeEventListener('click', handleChartClick);
-            iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
         };
     }, [
         chart,
@@ -328,7 +332,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
         let animationFrameId: number | null = null;
 
-        const drawAddButton = (
+        const drawPlusButton = (
             ctx: CanvasRenderingContext2D,
             canvas: HTMLCanvasElement,
             mouseY: number,
@@ -502,9 +506,9 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             labelX + labelWidth / 2,
                             labelY + labelHeight / 2,
                         );
-                    } else {
+                    } else if (showPlusButton) {
                         const mouseY = overlayCanvasMousePositionRef.current.y;
-                        drawAddButton(ctx, canvas, mouseY, dpr);
+                        drawPlusButton(ctx, canvas, mouseY, dpr);
                     }
                 };
 
@@ -520,10 +524,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     drawLineAtPrice(mousePrice, false);
                 } else if (
                     !clickedOrder &&
+                    showPlusButton &&
                     (mousePrice || (showDropdown && dropdownPosition))
                 ) {
                     const mouseY = overlayCanvasMousePositionRef.current.y;
-                    drawAddButton(ctx, canvas, mouseY, dpr);
+                    drawPlusButton(ctx, canvas, mouseY, dpr);
                 }
             }
         };
@@ -555,6 +560,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         processingProgress,
         showDropdown,
         dropdownPosition,
+        showPlusButton,
     ]);
 
     // Listen for preparedOrder changes and trigger animation

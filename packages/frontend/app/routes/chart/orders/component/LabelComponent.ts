@@ -91,6 +91,7 @@ const LabelComponent = ({
         selectedOrderLine,
         shouldConfirmOrder,
         setShouldConfirmOrder,
+        setShowPlusButton,
     } = useChartLinesStore();
 
     const priceDomain = useChartScaleStore((state) => state.priceDomain);
@@ -618,10 +619,12 @@ const LabelComponent = ({
                         isLiqPriceLineDraggable)) &&
                 isLabel.label?.type !== 'Cancel'
             ) {
+                setShowPlusButton(false);
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
                 }
             } else {
+                setShowPlusButton(true);
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
                     overlayCanvasRef.current.style.pointerEvents = 'none';
@@ -678,6 +681,7 @@ const LabelComponent = ({
                                     '.chart-markup-table.pane',
                                 );
                                 if (isLabel) {
+                                    setShowPlusButton(false);
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
                                             if (
@@ -728,6 +732,7 @@ const LabelComponent = ({
                                         }
                                     }
                                 } else {
+                                    setShowPlusButton(true);
                                     if (pane) {
                                         (pane as HTMLElement).style.cursor =
                                             'crosshair';
