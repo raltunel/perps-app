@@ -577,7 +577,13 @@
         "xCTA": "𝕏에 공유",
         "copyLinkCTA": "링크 복사",
         "textPlaceholder": "지금 {{twitter}}에서 {{fogo}} 테스트넷 {{coin}} 선물 거래를 시작해 보세요",
-        "sharePosition": "PnL {{pnl}} 포지션 공유"
+        "sharePosition": "PnL {{pnl}} 포지션 공유",
+
+        "pnl": "PnL",
+        "details": "세부 정보",
+        "copyImageCTA": "이미지 복사",
+        "copying": "복사 중…",
+        "copied": "복사됨!"
     },
     "colors": {
         "default": "기본",

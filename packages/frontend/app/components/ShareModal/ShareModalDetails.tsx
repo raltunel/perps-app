@@ -8,20 +8,15 @@ import { t } from 'i18next';
 
 interface ShareModalDetailsProps {
     position: PositionIF;
-    coinIconBase64?: string | null;
+    coinIcon: string;
 }
 
 export default function ShareModalDetails({
     position,
-    coinIconBase64,
+    coinIcon,
 }: ShareModalDetailsProps) {
     const { formatNum } = useNumFormatter();
     const { coinPriceMap } = useTradeDataStore();
-
-    const symbolFileName = useMemo<string>(() => {
-        const match = position.coin.match(/^k([A-Z]+)$/);
-        return match ? match[1] : position.coin;
-    }, [position.coin]);
 
     const bgType = tokenBackgroundMap[position.coin.toUpperCase()] || 'light';
 
@@ -30,10 +25,6 @@ export default function ShareModalDetails({
     const fundingToShow = position.cumFunding?.sinceOpen
         ? position.cumFunding.sinceOpen * -1
         : 0;
-
-    // Use base64 version if provided, otherwise fall back to URL
-    const coinIconUrl = `https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`;
-    const displayCoinIcon = coinIconBase64 || coinIconUrl;
 
     const detailsData = useMemo(
         () => [
@@ -104,11 +95,11 @@ export default function ShareModalDetails({
                 <div className={styles.headerLeft}>
                     <div
                         className={styles.symbolIcon}
-                        style={{
-                            background: `var(--${bgType === 'light' ? 'text1' : 'bg-dark1'})`,
-                        }}
+                        // style={{
+                        //     background: `var(--${bgType === 'light' ? 'text1' : 'bg-dark1'})`,
+                        // }}
                     >
-                        <img src={displayCoinIcon} alt={symbolFileName} />
+                        <img src={coinIcon} alt={position.coin} />
                     </div>
                     <span className={styles.coin}>{position.coin}</span>
                     <div

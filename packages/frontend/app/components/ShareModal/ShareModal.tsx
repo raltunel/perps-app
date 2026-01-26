@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { RiTwitterFill } from 'react-icons/ri';
-import { LuCopy, LuInfo, LuShare2 } from 'react-icons/lu';
-import html2canvas from 'html2canvas';
+import { LuCopy, LuInfo, LuShare2, LuCheck } from 'react-icons/lu';
 import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
+import { tokenIconMap } from '~/assets/tokens/tokenIconMap';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import useClipboard from '~/hooks/useClipboard';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import {
@@ -15,8 +16,10 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 import Modal from '../Modal/Modal';
 import ShareModalDetails from './ShareModalDetails';
 import perpsLogo from './perpsLogo.png';
+import btcIcon from '~/assets/tokens/btc.png';
 import styles from './ShareModal.module.css';
 import { t } from 'i18next';
+import { printDomToImage } from '~/utils/functions/printDomToImage';
 
 type ViewMode = 'share' | 'details';
 
@@ -26,78 +29,29 @@ interface propsIF {
     initialTab?: ViewMode;
 }
 
-// Convert image to base64 with CORS proxy fallback
-async function getImageAsBase64(url: string): Promise<string | null> {
-    // Skip if already base64 or data URL
-    if (url.startsWith('data:') || url.startsWith('blob:')) {
-        return url;
-    }
-
-    // Try direct fetch first
-    try {
-        const response = await fetch(url, { mode: 'cors' });
-        if (response.ok) {
-            const blob = await response.blob();
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            });
-        }
-    } catch {
-        // Direct fetch failed, try CORS proxy
-    }
-
-    // Try with CORS proxy
-    try {
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-        const response = await fetch(proxyUrl);
-        if (response.ok) {
-            const blob = await response.blob();
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-            });
-        }
-    } catch {
-        // CORS proxy also failed
-    }
-
-    return null;
-}
-
 export default function ShareModal(props: propsIF) {
     const { close, position, initialTab = 'share' } = props;
 
     const [viewMode, setViewMode] = useState<ViewMode>(initialTab);
     const [isCopying, setIsCopying] = useState(false);
-    const [coinIconBase64, setCoinIconBase64] = useState<string | null>(null);
+    const [showCopied, setShowCopied] = useState(false);
 
     const memPosition = useMemo<PositionIF>(() => position, []);
 
     const { formatNum } = useNumFormatter();
     const { coinPriceMap } = useTradeDataStore();
     const notifications = useNotificationStore();
+    const [_, copy] = useClipboard();
 
     const TEXTAREA_ID_FOR_DOM = 'share_card_custom_text';
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const cardRef = useRef<HTMLElement>(null);
+    const copiedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const symbolFileName = useMemo<string>(() => {
-        const match = position.coin.match(/^k([A-Z]+)$/);
-        return match ? match[1] : position.coin;
-    }, [position]);
-
-    const coinIconUrl = `https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`;
-
-    // Pre-fetch and convert coin icon to base64 on mount
-    useEffect(() => {
-        getImageAsBase64(coinIconUrl).then(setCoinIconBase64);
-    }, [coinIconUrl]);
+    const coinIcon = useMemo<string>(() => {
+        return tokenIconMap[memPosition.coin.toUpperCase()] || btcIcon;
+    }, [memPosition.coin]);
 
     const bgType =
         tokenBackgroundMap[memPosition.coin.toUpperCase()] || 'light';
@@ -109,6 +63,15 @@ export default function ShareModal(props: propsIF) {
     }, [memPosition]);
 
     const markPrice = coinPriceMap.get(memPosition.coin) ?? 0;
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (copiedTimeoutRef.current) {
+                clearTimeout(copiedTimeoutRef.current);
+            }
+        };
+    }, []);
 
     function openShareOnX(text: string, referralLink: string) {
         const width = 550;
@@ -143,93 +106,65 @@ export default function ShareModal(props: propsIF) {
         setIsCopying(true);
 
         try {
-            const canvas = await html2canvas(cardRef.current, {
-                backgroundColor: '#0d0d14',
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                logging: false,
-                onclone: async (clonedDoc) => {
-                    // Replace all external images with base64 versions in the clone
-                    const images = clonedDoc.querySelectorAll('img');
+            const blob = await printDomToImage(cardRef.current, '#0d0d14');
 
-                    await Promise.all(
-                        Array.from(images).map(async (img) => {
-                            const src = img.getAttribute('src');
-                            if (src && !src.startsWith('data:')) {
-                                const base64 = await getImageAsBase64(src);
-                                if (base64) {
-                                    img.src = base64;
-                                }
-                            }
-                        }),
-                    );
-
-                    // Wait a bit for images to settle
-                    await new Promise((resolve) => setTimeout(resolve, 50));
-                },
-            });
-
-            canvas.toBlob(async (blob) => {
-                if (!blob) {
-                    notifications.add({
-                        title: t('share.copyFailed') || 'Copy Failed',
-                        message:
-                            t('share.copyFailedMessage') ||
-                            'Failed to generate image',
-                        icon: 'error',
-                    });
-                    setIsCopying(false);
-                    return;
-                }
-
-                try {
-                    await navigator.clipboard.write([
-                        new ClipboardItem({ 'image/png': blob }),
-                    ]);
-
-                    notifications.add({
-                        title: t('share.imageCopied') || 'Image Copied',
-                        message:
-                            t('share.imageCopiedMessage') ||
-                            'Position card copied to clipboard. Paste it into your tweet!',
-                        icon: 'check',
-                    });
-
-                    if (typeof plausible === 'function') {
-                        plausible('Share Action', {
-                            props: {
-                                actionType: 'Copy Image',
-                                success: true,
-                            },
-                        });
-                    }
-                } catch (err) {
-                    console.warn(
-                        'Clipboard API not supported, downloading instead:',
-                        err,
-                    );
-
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${memPosition.coin}-position.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-
-                    notifications.add({
-                        title: t('share.imageDownloaded') || 'Image Downloaded',
-                        message:
-                            t('share.imageDownloadedMessage') ||
-                            'Position card saved to your downloads',
-                        icon: 'check',
-                    });
-                }
-
+            if (!blob) {
+                notifications.add({
+                    title: t('share.copyFailed') || 'Copy Failed',
+                    message:
+                        t('share.copyFailedMessage') ||
+                        'Failed to generate image',
+                    icon: 'error',
+                });
                 setIsCopying(false);
-            }, 'image/png');
+                return;
+            }
+
+            const success = await copy(blob);
+
+            if (success) {
+                // Show "Copied" state
+                setShowCopied(true);
+
+                // Clear any existing timeout
+                if (copiedTimeoutRef.current) {
+                    clearTimeout(copiedTimeoutRef.current);
+                }
+
+                // Reset to "Copy Image" after 2 seconds
+                copiedTimeoutRef.current = setTimeout(() => {
+                    setShowCopied(false);
+                }, 2000);
+
+                if (typeof plausible === 'function') {
+                    plausible('Share Action', {
+                        props: {
+                            actionType: 'Copy Image',
+                            success: true,
+                        },
+                    });
+                }
+            } else {
+                // Fallback to download if clipboard fails
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${memPosition.coin}-position.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                notifications.add({
+                    title: t('share.imageDownloaded') || 'Image Downloaded',
+                    message:
+                        t('share.imageDownloadedMessage') ||
+                        'Position card saved to your downloads',
+                    icon: 'check',
+                });
+            }
+
+            setIsCopying(false);
         } catch (err) {
             console.error('Error capturing image:', err);
             notifications.add({
@@ -241,9 +176,6 @@ export default function ShareModal(props: propsIF) {
             setIsCopying(false);
         }
     }
-
-    // Use base64 version if available, otherwise fall back to URL
-    const displayCoinIcon = coinIconBase64 || coinIconUrl;
 
     return (
         <Modal title='' close={close}>
@@ -259,7 +191,7 @@ export default function ShareModal(props: propsIF) {
                         {viewMode === 'details' ? (
                             <ShareModalDetails
                                 position={memPosition}
-                                coinIconBase64={coinIconBase64}
+                                coinIcon={coinIcon}
                             />
                         ) : (
                             <div className={styles.marketInfoContainer}>
@@ -272,8 +204,8 @@ export default function ShareModal(props: propsIF) {
                                             }}
                                         >
                                             <img
-                                                src={displayCoinIcon}
-                                                alt={symbolFileName}
+                                                src={coinIcon}
+                                                alt={memPosition.coin}
                                             />
                                         </div>
                                         <div className={styles.symbol}>
@@ -330,7 +262,7 @@ export default function ShareModal(props: propsIF) {
                             onClick={() => setViewMode('share')}
                         >
                             <LuShare2 size={16} />
-                            {t('share.share') || 'Share'}
+                            {t('share.pnl') || 'Share'}
                         </button>
                         <button
                             className={`${styles.toggle_btn} ${viewMode === 'details' ? styles.active : ''}`}
@@ -362,13 +294,17 @@ export default function ShareModal(props: propsIF) {
                         <button
                             className={styles.copyButton}
                             onClick={copyAsImage}
-                            disabled={isCopying}
+                            disabled={isCopying || showCopied}
                         >
                             {isCopying ? (
                                 t('share.copying') || 'Copying...'
+                            ) : showCopied ? (
+                                <>
+                                    {t('share.copied') || 'Copied'} <LuCheck />
+                                </>
                             ) : (
                                 <>
-                                    {t('share.copyImage') || 'Copy Image'}{' '}
+                                    {t('share.copyImageCTA') || 'Copy Image'}{' '}
                                     <LuCopy />
                                 </>
                             )}

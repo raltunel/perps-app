@@ -577,7 +577,12 @@
         "xCTA": "Share on 𝕏",
         "copyLinkCTA": "Copy Link",
         "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now",
-        "sharePosition": "Share position with PnL {{pnl}}"
+        "sharePosition": "Share position with PnL {{pnl}}",
+        "pnl": "PnL",
+        "details": "Details",
+        "copyImageCTA": "Copy Image",
+        "copying": "Copying...",
+        "copied": "Copied!"
     },
     "colors": {
         "default": "Default",

@@ -17,7 +17,7 @@
     padding: 8px 12px;
     background-color: rgba(0, 0, 0, 0.5);
     border-radius: var(--radius-s);
-    border-left: 2px solid var(--accent1);
+    /* border-left: 2px solid var(--accent1); */
     flex-shrink: 0;
 }
 
@@ -28,8 +28,8 @@
 }
 
 .symbolIcon {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--radius-s);
     flex-shrink: 0;
 }

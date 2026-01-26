@@ -577,7 +577,13 @@
         "xCTA": "Compartir en 𝕏",
         "copyLinkCTA": "Copiar enlace",
         "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora",
-        "sharePosition": "Compartir posición con PnL {{pnl}}"
+        "sharePosition": "Compartir posición con PnL {{pnl}}",
+
+        "pnl": "PnL",
+        "details": "Detalles",
+        "copyImageCTA": "Copiar imagen",
+        "copying": "Copiando…",
+        "copied": "¡Copiado!"
     },
     "colors": {
         "default": "Predeterminado",

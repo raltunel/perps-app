@@ -97,6 +97,9 @@
     width: 30px;
     height: 30px;
     border-radius: var(--radius-m);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .symbol_icon img {
@@ -107,6 +110,9 @@
 
 .symbol {
     font-size: var(--font-size-l);
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .yield {
@@ -114,8 +120,11 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    height: 40px;
+    width: 70px;
     padding: var(--padding-xs);
     border-radius: var(--radius-s);
+    /* line-height: 1; */
 }
 
 .market_pct {
@@ -138,11 +147,13 @@
 .price > div:first-child {
     font-size: var(--text-size-m);
     color: var(--text2);
+    line-height: 1.2;
 }
 
 .price > div:last-child {
     font-size: var(--text-size-m);
     color: var(--text1);
+    line-height: 1.2;
 }
 
 /* Custom text area */
@@ -242,6 +253,14 @@
     .perpsLogo {
         width: 220px;
     }
+
+    .market_tkn {
+        height: 30px !important;
+
+        display: flex;
+        align-items: center;
+        bottom: 0;
+    }
 }
 
 @media screen and (min-width: 1280px) {
@@ -277,7 +296,8 @@
 
 @media screen and (max-width: 480px) {
     .container {
-        height: auto;
+        height: 500px;
+        overflow-y: scroll;
     }
 
     .leftSide {
