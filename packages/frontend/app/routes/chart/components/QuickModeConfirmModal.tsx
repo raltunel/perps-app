@@ -173,13 +173,19 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
                     <div>
                         <h3 className={styles.title}>Quick Trade Mode</h3>
-                        <p className={styles.description}>
-                            Configure quick trade settings for faster order
-                            placement
+                        <p className={`${styles.infoText} ${styles.active}`}>
+                            Click on the chart to place an order instantly when
+                            enabled.
                         </p>
                     </div>
                 </div>
-
+                <div className={styles.horizontal_divider} />
+                <div>
+                    <p className={styles.description}>
+                        Configure quick trade settings for faster order
+                        placement
+                    </p>
+                </div>
                 <div className={styles.tradeTypeWrapper} ref={tradeTypeRef}>
                     <button
                         onClick={() => setDropdownTradeOpen(!dropdownTradeOpen)}
