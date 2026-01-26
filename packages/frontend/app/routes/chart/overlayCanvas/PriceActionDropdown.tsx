@@ -125,6 +125,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
                             label={item.label}
                             shortcut={item.shortcut}
                             onClick={item.onClick}
+                            disabled={item.label.includes('stop')}
                         />
                     ))}
                 </div>
@@ -148,7 +149,8 @@ const MenuItem: React.FC<{
     label: string;
     shortcut?: string;
     onClick: () => void;
-}> = ({ label, shortcut, onClick }) => {
+    disabled?: boolean;
+}> = ({ label, shortcut, onClick, disabled }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -159,20 +161,26 @@ const MenuItem: React.FC<{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                cursor: 'pointer',
-                backgroundColor: isHovered ? '#313030' : 'transparent',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                backgroundColor:
+                    isHovered && !disabled ? '#313030' : 'transparent',
                 transition: 'background-color 0.15s',
                 fontFamily:
                     '-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif',
+                opacity: disabled ? 0.5 : 1,
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            onClick={onClick}
+            onClick={disabled ? undefined : onClick}
         >
             <span
                 style={{
                     flex: '1 1 auto',
-                    color: isHovered ? '#bebdbd' : '#cbcaca',
+                    color: disabled
+                        ? '#6b6a6a'
+                        : isHovered
+                          ? '#bebdbd'
+                          : '#cbcaca',
                     fontSize: '14px',
                     overflowX: 'hidden',
                     paddingLeft: '2px',
@@ -181,7 +189,19 @@ const MenuItem: React.FC<{
             >
                 {label}
             </span>
-            {shortcut && (
+            {disabled && (
+                <span
+                    style={{
+                        color: '#7c5e00',
+                        fontSize: '11px',
+                        fontWeight: 500,
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    Coming Soon
+                </span>
+            )}
+            {shortcut && !disabled && (
                 <span
                     style={{
                         color: '#525050',
