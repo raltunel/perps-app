@@ -9,19 +9,12 @@ const LimitOrderPlacementCanvas: React.FC = () => {
             zIndex={10}
             pointerEvents='none'
         >
-            {({
-                canvasRef,
-                canvasSize,
-                scaleData,
-                mousePositionRef,
-                zoomChanged,
-            }) => (
+            {({ canvasRef, canvasSize, scaleData, mousePositionRef }) => (
                 <LimitOrderPlacement
                     overlayCanvasRef={canvasRef}
                     canvasSize={canvasSize}
                     scaleData={scaleData}
                     overlayCanvasMousePositionRef={mousePositionRef}
-                    zoomChanged={zoomChanged}
                 />
             )}
         </OverlayCanvasLayer>

@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
     isEstablished,
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     useOrderPlacementStore,
     type TradeType,
 } from '../hooks/useOrderPlacement';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './QuickModeConfirmModal.module.css';
 
 interface QuickModeConfirmModalProps {
@@ -36,15 +38,18 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     const session = useSession();
     const isSessionEstablished = isEstablished(session);
 
-    const { symbol } = useTradeDataStore();
+    const { symbol, symbolInfo } = useTradeDataStore();
     const upperSymbol = symbol?.toUpperCase() ?? 'BTC';
+    const markPx = symbolInfo?.markPx;
+
+    const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     const activeOrder = useOrderPlacementStore((state) => state.activeOrder);
     const quickMode = useOrderPlacementStore((state) => state.quickMode);
 
     const [size, setSize] = useState<string>('');
     const [tradeType, setTradeType] = useState<TradeType>('Limit');
-    const [denom, setDenom] = useState<'USD' | string>('USD');
+    const [denom, setDenom] = useState<OrderBookMode>('usd');
 
     const [dropdownTradeOpen, setDropdownTradeOpen] = useState(false);
     const [dropdownDenomOpen, setDropdownDenomOpen] = useState(false);
@@ -52,19 +57,61 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
     const tradeTypeRef = useRef<HTMLDivElement>(null);
     const denomRef = useRef<HTMLDivElement>(null);
+    const prevDenomRef = useRef<OrderBookMode | null>(null);
 
     const isDisabled = !size || parseFloat(size) <= 0;
 
     const tradeTypes: TradeType[] = ['Limit'];
 
+    // Memoized denomination options (same as SizeInput.tsx)
+    const denomOptions = useMemo(() => [upperSymbol, 'USD'], [upperSymbol]);
+
+    // Memoized denomination change handler (same logic as SizeInput.tsx)
+    const handleDenomChange = useCallback(
+        (val: string) => {
+            setDenom(val === upperSymbol ? 'symbol' : 'usd');
+        },
+        [upperSymbol],
+    );
+
     useEffect(() => {
         if (activeOrder) {
             setSize(activeOrder.size.toString());
             setTradeType(activeOrder.tradeType);
-            setDenom(activeOrder.currency);
+            // Convert currency string to internal format (same logic as SizeInput.tsx)
+            const newDenom =
+                activeOrder.currency === upperSymbol ? 'symbol' : 'usd';
+            setDenom(newDenom);
+            // Reset prevDenom when loading from activeOrder
+            prevDenomRef.current = newDenom;
             setSaveAsDefault(activeOrder.bypassConfirmation);
         }
-    }, [activeOrder]);
+    }, [activeOrder, upperSymbol]);
+
+    // Convert size value when denomination changes (same as OrderInput.tsx)
+    useEffect(() => {
+        // Only convert if we have a previous denom and it's different from current
+        if (prevDenomRef.current === null || prevDenomRef.current === denom) {
+            prevDenomRef.current = denom;
+            return;
+        }
+
+        if (!size || !markPx) return;
+        const parsedQty = parseFloat(size);
+        if (isNaN(parsedQty)) return;
+
+        // Determine conversion direction based on previous and current denom (same as OrderInput.tsx)
+        if (prevDenomRef.current === 'symbol' && denom === 'usd') {
+            // Symbol to USD: multiply by markPx
+            setSize(formatNumWithOnlyDecimals(parsedQty * markPx, 2));
+        } else if (prevDenomRef.current === 'usd' && denom === 'symbol') {
+            // USD to Symbol: divide by markPx
+            setSize(formatNumWithOnlyDecimals(parsedQty / markPx, 6, true));
+        }
+
+        // Update previous denom
+        prevDenomRef.current = denom;
+    }, [denom, size, markPx, formatNumWithOnlyDecimals]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -94,7 +141,8 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
             onSave({
                 size: parsed,
                 tradeType,
-                currency: denom,
+                // Convert internal format to display format (same logic as SizeInput.tsx)
+                currency: denom === 'usd' ? 'USD' : upperSymbol,
                 bypassConfirmation: saveAsDefault,
             });
             onClose();
@@ -107,7 +155,8 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
             onSaveAndEnable({
                 size: parsed,
                 tradeType,
-                currency: denom,
+                // Convert internal format to display format (same logic as SizeInput.tsx)
+                currency: denom === 'usd' ? 'USD' : upperSymbol,
                 bypassConfirmation: saveAsDefault,
             });
             onClose();
@@ -124,13 +173,19 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
                     <div>
                         <h3 className={styles.title}>Quick Trade Mode</h3>
-                        <p className={styles.description}>
-                            Configure quick trade settings for faster order
-                            placement
+                        <p className={`${styles.infoText} ${styles.active}`}>
+                            Click on the chart to place an order instantly when
+                            enabled.
                         </p>
                     </div>
                 </div>
-
+                <div className={styles.horizontal_divider} />
+                <div>
+                    <p className={styles.description}>
+                        Configure quick trade settings for faster order
+                        placement
+                    </p>
+                </div>
                 <div className={styles.tradeTypeWrapper} ref={tradeTypeRef}>
                     <button
                         onClick={() => setDropdownTradeOpen(!dropdownTradeOpen)}
@@ -184,17 +239,17 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                             }}
                             className={styles.denomButton}
                         >
-                            {denom}
+                            {denom === 'usd' ? 'USD' : upperSymbol}
                             <span className={styles.denomArrow}>▼</span>
                         </button>
 
                         {dropdownDenomOpen && (
                             <div className={styles.denomDropdown}>
-                                {[upperSymbol, 'USD'].map((opt) => (
+                                {denomOptions.map((opt) => (
                                     <div
                                         key={opt}
                                         onClick={() => {
-                                            setDenom(opt);
+                                            handleDenomChange(opt);
                                             setDropdownDenomOpen(false);
                                         }}
                                         className={styles.denomDropdownItem}

@@ -21,17 +21,44 @@
 .header {
     display: flex;
     gap: 12px;
-    margin-bottom: 18px;
 }
 
 .iconWrapper {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.1);
+
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.infoText {
+    margin: 0 0 4px 0;
+    font-size: 11px;
+    line-height: 1.4;
+    display: inline-block;
+    color: #b6b4b4;
+}
+
+.infoText.active {
+    animation: textGlow 5s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+    0% {
+        color: #b6b4b4;
+    }
+    90% {
+        color: #8d8b8b;
+    }
+    100% {
+        color: #b6b4b4;
+    }
 }
 
 .icon {
@@ -52,6 +79,12 @@
     color: #888;
     font-size: 11px;
     line-height: 1.4;
+    margin-bottom: 5px;
+}
+.horizontal_divider {
+    height: 1px;
+    background-color: var(--bg-dark6);
+    margin-bottom: 2px;
 }
 
 .tradeTypeWrapper {

@@ -9,6 +9,8 @@ import {
 import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
 import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
+import { useChartScaleStore } from '~/stores/ChartScaleStore';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -20,14 +22,12 @@ interface LimitOrderPlacementProps {
         x: number;
         y: number;
     }>;
-    zoomChanged: boolean;
 }
 
 const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     overlayCanvasRef,
     scaleData,
     canvasSize,
-    zoomChanged,
     overlayCanvasMousePositionRef,
 }) => {
     const [clickedOrder, setClickedOrder] = useState<{
@@ -64,6 +64,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         clearPreparedOrder,
         openQuickModeConfirm,
     } = useOrderPlacementStore();
+    const { zoomChanged } = useChartScaleStore();
+    const { showPlusButton, setShowPlusButton } = useChartLinesStore();
 
     const progressAnimationRef = React.useRef<number | null>(null);
 
@@ -115,20 +117,28 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 setMousePrice(parseFloat(price.toFixed(3)));
             });
 
-        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
-        if (!iframeDoc) return;
+        const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+        if (!iframeDoc || !paneCanvas) return;
 
-        if (iframeDoc) {
-            const handleMouseLeave = () => {
+        const handleMouseMove = (e: MouseEvent) => {
+            const rect = paneCanvas.getBoundingClientRect();
+            const isOutside =
+                e.clientX < rect.left ||
+                e.clientX > rect.right ||
+                e.clientY < rect.top ||
+                e.clientY > rect.bottom;
+
+            if (isOutside) {
                 setMousePrice(null);
-            };
+                setShowPlusButton(false);
+            }
+        };
 
-            iframeDoc.addEventListener('mouseleave', handleMouseLeave);
+        iframeDoc.addEventListener('mousemove', handleMouseMove);
 
-            return () => {
-                iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
-            };
-        }
+        return () => {
+            iframeDoc.removeEventListener('mousemove', handleMouseMove);
+        };
     }, [chart, scaleData, overlayCanvasMousePositionRef, quickMode]);
 
     // Listen for clicks on TradingView chart
@@ -196,6 +206,27 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             const side: 'buy' | 'sell' =
                 markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
 
+            if (!activeOrder?.bypassConfirmation) {
+                useTradeDataStore.getState().setOrderInputPriceValue({
+                    value: price,
+                    changeType: 'quickTradeMode',
+                });
+                useTradeDataStore.getState().setTradeDirection(side);
+                useTradeDataStore.getState().setMarketOrderType('limit');
+                useTradeDataStore.getState().setIsMidModeActive(false);
+
+                // Convert currency string to OrderBookMode
+                const currency = activeOrder?.currency || 'USD';
+                const upperSymbol = symbolInfo?.coin?.toUpperCase() ?? 'BTC';
+                const denom = currency === upperSymbol ? 'symbol' : 'usd';
+
+                useTradeDataStore.getState().setOrderInputSizeValue({
+                    value: activeOrder?.size || 0,
+                    denom: denom,
+                });
+
+                return;
+            }
             // Set prepared order immediately on click
             if (mousePrice && activeOrder) {
                 setPreparedOrder({
@@ -252,16 +283,10 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 requestAnimationFrame(animateProgress);
         };
 
-        const handleMouseLeave = () => {
-            setMousePrice(null);
-        };
-
         iframeDoc.addEventListener('click', handleChartClick);
-        iframeDoc.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
             iframeDoc.removeEventListener('click', handleChartClick);
-            iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
         };
     }, [
         chart,
@@ -284,11 +309,19 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             // Alt/Option + Shift + B for Buy (Windows: Alt, Mac: Option)
             if (e.altKey && e.shiftKey && e.code === 'KeyB') {
                 e.preventDefault();
+                if (!activeOrder) {
+                    openQuickModeConfirm();
+                    return;
+                }
                 handleBuyLimit(mousePrice);
             }
             // Alt/Option + Shift + S for Sell (Windows: Alt, Mac: Option)
             else if (e.altKey && e.shiftKey && e.code === 'KeyS') {
                 e.preventDefault();
+                if (!activeOrder) {
+                    openQuickModeConfirm();
+                    return;
+                }
                 handleSellStop(mousePrice);
             }
         };
@@ -300,14 +333,14 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             iframeDoc.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [chart, mousePrice]);
+    }, [chart, mousePrice, activeOrder, openQuickModeConfirm]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !canvasSize) return;
 
         let animationFrameId: number | null = null;
 
-        const drawAddButton = (
+        const drawPlusButton = (
             ctx: CanvasRenderingContext2D,
             canvas: HTMLCanvasElement,
             mouseY: number,
@@ -398,7 +431,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 if (!mousePrice && !clickedOrder && !showDropdown) return;
 
                 const drawLineAtPrice = (price: number, isClicked: boolean) => {
-                    const { chartHeight } = getPricetoPixel(
+                    const { chartHeight, rawPixel } = getPricetoPixel(
                         chart,
                         price,
                         'LIMIT',
@@ -419,7 +452,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         let labelX: number;
 
                         const clickX = clickedOrder.mousePos.x;
-                        const clickY = clickedOrder.mousePos.y;
+
+                        const clickY = rawPixel;
 
                         if (isProcessing) {
                             const blinkProgress =
@@ -481,9 +515,9 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             labelX + labelWidth / 2,
                             labelY + labelHeight / 2,
                         );
-                    } else {
+                    } else if (showPlusButton) {
                         const mouseY = overlayCanvasMousePositionRef.current.y;
-                        drawAddButton(ctx, canvas, mouseY, dpr);
+                        drawPlusButton(ctx, canvas, mouseY, dpr);
                     }
                 };
 
@@ -499,10 +533,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     drawLineAtPrice(mousePrice, false);
                 } else if (
                     !clickedOrder &&
+                    showPlusButton &&
                     (mousePrice || (showDropdown && dropdownPosition))
                 ) {
                     const mouseY = overlayCanvasMousePositionRef.current.y;
-                    drawAddButton(ctx, canvas, mouseY, dpr);
+                    drawPlusButton(ctx, canvas, mouseY, dpr);
                 }
             }
         };
@@ -534,6 +569,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         processingProgress,
         showDropdown,
         dropdownPosition,
+        showPlusButton,
+        JSON.stringify(scaleData?.yScale.domain()),
     ]);
 
     // Listen for preparedOrder changes and trigger animation
@@ -592,6 +629,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     ]);
 
     const handleBuyLimit = (price: number) => {
+        if (!activeOrder) {
+            openQuickModeConfirm();
+            return;
+        }
+
         const side = 'buy';
 
         // Set prepared order immediately
@@ -659,6 +701,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     };
 
     const handleSellStop = (price: number) => {
+        if (!activeOrder) {
+            openQuickModeConfirm();
+            return;
+        }
+
         const side = 'sell';
 
         setClickedOrder({

@@ -704,11 +704,11 @@ export const TradingViewProvider: React.FC<{
 
                 const bottomOrder = isAbove
                     ? {
-                          text: `Buy @ ${formattedPrice} stop`,
+                          text: `Buy @ ${formattedPrice} stop (Coming Soon)`,
                           side: 'buy' as const,
                       }
                     : {
-                          text: `Sell @ ${formattedPrice} stop`,
+                          text: `Sell @ ${formattedPrice} stop (Coming Soon)`,
                           side: 'sell' as const,
                       };
 
@@ -723,9 +723,7 @@ export const TradingViewProvider: React.FC<{
                     {
                         position: 'top' as const,
                         text: bottomOrder.text,
-                        click: () => {
-                            openQuickModeConfirm();
-                        },
+                        click: () => {},
                     },
                     {
                         position: 'top' as const,
@@ -751,12 +749,12 @@ export const TradingViewProvider: React.FC<{
 
             const bottomOrder = isAbove
                 ? {
-                      text: `Buy ${displaySize} @ ${formattedPrice} stop`,
+                      text: `Buy ${displaySize} @ ${formattedPrice} stop (Coming Soon)`,
                       side: 'buy' as const,
                       type: 'Stop' as const,
                   }
                 : {
-                      text: `Sell ${displaySize} @ ${formattedPrice} stop`,
+                      text: `Sell ${displaySize} @ ${formattedPrice} stop (Coming Soon)`,
                       side: 'sell' as const,
                       type: 'Stop' as const,
                   };
@@ -779,16 +777,7 @@ export const TradingViewProvider: React.FC<{
                 {
                     position: 'top' as const,
                     text: bottomOrder.text,
-                    click: () => {
-                        confirmOrder({
-                            price: formattedPrice,
-                            side: bottomOrder.side,
-                            type: activeOrder.tradeType,
-                            size: activeOrder.size,
-                            currency: activeOrder.currency,
-                            timestamp: Date.now(),
-                        });
-                    },
+                    click: () => {},
                 },
                 {
                     position: 'top' as const,
