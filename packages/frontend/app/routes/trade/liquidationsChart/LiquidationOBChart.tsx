@@ -430,9 +430,28 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const dpr = window.devicePixelRatio || 1;
 
+        // Calculate max ratio in data based on chart mode
+        const getRatioValue = (d: LiqLevel) =>
+            chartModeRef.current === 'distribution'
+                ? getMinRatio(d.ratio)
+                : getMinRatio(d.cumulativeRatio);
+
+        const maxBuyRatio =
+            currentBuyData.length > 0
+                ? Math.max(...currentBuyData.map(getRatioValue))
+                : 0;
+        const maxSellRatio =
+            currentSellData.length > 0
+                ? Math.max(...currentSellData.map(getRatioValue))
+                : 0;
+        const maxRatio = Math.max(maxBuyRatio, maxSellRatio);
+
+        // Scale width of chart to fit 50% of area if ratio is below 50%
+        const domainMax = maxRatio > 0 && maxRatio < 0.5 ? maxRatio * 2 : 1;
+
         const xScale = d3
             .scaleLinear()
-            .domain([0, 1])
+            .domain([0, domainMax])
             .range([widthRef.current * dpr, 0]);
 
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
