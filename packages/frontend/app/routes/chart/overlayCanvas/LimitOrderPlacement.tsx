@@ -309,11 +309,19 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             // Alt/Option + Shift + B for Buy (Windows: Alt, Mac: Option)
             if (e.altKey && e.shiftKey && e.code === 'KeyB') {
                 e.preventDefault();
+                if (!activeOrder) {
+                    openQuickModeConfirm();
+                    return;
+                }
                 handleBuyLimit(mousePrice);
             }
             // Alt/Option + Shift + S for Sell (Windows: Alt, Mac: Option)
             else if (e.altKey && e.shiftKey && e.code === 'KeyS') {
                 e.preventDefault();
+                if (!activeOrder) {
+                    openQuickModeConfirm();
+                    return;
+                }
                 handleSellStop(mousePrice);
             }
         };
@@ -325,7 +333,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             iframeDoc.removeEventListener('keydown', handleKeyDown);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [chart, mousePrice]);
+    }, [chart, mousePrice, activeOrder, openQuickModeConfirm]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !canvasSize) return;
@@ -621,6 +629,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     ]);
 
     const handleBuyLimit = (price: number) => {
+        if (!activeOrder) {
+            openQuickModeConfirm();
+            return;
+        }
+
         const side = 'buy';
 
         // Set prepared order immediately
@@ -688,6 +701,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     };
 
     const handleSellStop = (price: number) => {
+        if (!activeOrder) {
+            openQuickModeConfirm();
+            return;
+        }
+
         const side = 'sell';
 
         setClickedOrder({
