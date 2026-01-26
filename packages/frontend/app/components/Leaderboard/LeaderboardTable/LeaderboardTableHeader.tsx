@@ -43,7 +43,7 @@ function LeaderboardTableHeader({
                 className: 'accountValueCell',
             },
             {
-                name: 'PNL (30D)',
+                name: 'PnL (30D)',
                 key: 'pnl',
                 sortable: true,
                 className: 'pnlCell',

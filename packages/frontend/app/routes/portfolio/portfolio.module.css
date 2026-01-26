@@ -250,10 +250,29 @@
 .totalNetDisplay {
     height: 100%;
     display: flex;
-    flex-direction: column;
-    gap: var(--gap-m);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-l);
     font-size: var(--font-size-m, 18px);
-    text-align: center;
+    text-align: left;
+}
+
+.totalNetValue {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+}
+
+.totalNetValue h6 {
+    font-size: var(--font-size-xl, 36px);
+    margin: 0;
+}
+
+.totalNetActions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    min-width: 180px;
 }
 
 .buttonContainer {

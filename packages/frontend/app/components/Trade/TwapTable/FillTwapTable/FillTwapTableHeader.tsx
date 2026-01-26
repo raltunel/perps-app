@@ -65,7 +65,7 @@ export default function FillTwapTableHeader({
             className: 'feeCell',
         },
         {
-            name: 'Closed PNL',
+            name: 'Closed PnL',
             key: 'closedPnl',
             sortable: true,
             className: 'closedPnlCell',

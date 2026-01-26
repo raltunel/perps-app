@@ -21,6 +21,11 @@ interface PerformancePanelProps {
     isMobile: boolean;
 }
 
+interface PerformanceMetric {
+    label: string;
+    value: string;
+}
+
 type PerformanceTab = 'performance' | 'accountValue' | 'collateral';
 
 const AVAILABLE_TABS = [
@@ -35,6 +40,31 @@ const animationConfig = {
     exit: { opacity: 0 },
     transition: { duration: 0.2 },
 };
+
+const MetricsDisplay = React.memo(function MetricsDisplay({
+    title,
+    subtitle,
+    metrics,
+}: {
+    title: string;
+    subtitle: string;
+    metrics: PerformanceMetric[];
+}) {
+    return (
+        <div id={'metricsContainer'} className={styles.metricsContainer}>
+            <div className={styles.accountOverviewHeader}>
+                <div className={styles.accountOverviewTitle}>{title}</div>
+                <div className={styles.accountOverviewSubtitle}>{subtitle}</div>
+            </div>
+            {metrics.map((metric) => (
+                <div className={styles.metricRow} key={metric.label}>
+                    <span>{metric.label}</span>
+                    {metric.value}
+                </div>
+            ))}
+        </div>
+    );
+});
 
 export default function PerformancePanel({
     userData,
@@ -94,7 +124,7 @@ export default function PerformancePanel({
             ? formatNum(userData.collateral)
             : DASH_PLACEHOLDER;
 
-    const PERFORMANCE_METRICS = [
+    const PERFORMANCE_METRICS: PerformanceMetric[] = [
         { label: t('portfolio.pnl'), value: pnlFormatted },
         { label: t('portfolio.realizedPnl'), value: realizedPnlFormatted },
         { label: t('portfolio.unrealizedPnl'), value: unrealizedPnlFormatted },
@@ -104,27 +134,6 @@ export default function PerformancePanel({
         { label: t('portfolio.accountEquity'), value: accountEquityFormatted },
         // { label: 'Vault Equity', value: vaultEquityFormatted },
     ];
-
-    const MetricsDisplay = React.memo(() => (
-        <div id={'metricsContainer'} className={styles.metricsContainer}>
-            <div className={styles.accountOverviewHeader}>
-                <div className={styles.accountOverviewTitle}>
-                    {t('portfolio.accountOverview')}
-                </div>
-                <div className={styles.accountOverviewSubtitle}>
-                    {t('portfolio.updateFrequencyInMinutes', {
-                        numMinutes: 30,
-                    })}
-                </div>
-            </div>
-            {PERFORMANCE_METRICS.map((metric) => (
-                <div className={styles.metricRow} key={metric.label}>
-                    <span>{metric.label}</span>
-                    {metric.value}
-                </div>
-            ))}
-        </div>
-    ));
 
     const [accountValueHistory, setAccountValueHistory] = useState<
         { time: number; value: number }[] | undefined
@@ -176,7 +185,13 @@ export default function PerformancePanel({
             id={'performanceContainer'}
             className={styles.performanceContainer}
         >
-            <MetricsDisplay />
+            <MetricsDisplay
+                title={t('portfolio.accountOverview')}
+                subtitle={t('portfolio.updateFrequencyInMinutes', {
+                    numMinutes: 30,
+                })}
+                metrics={PERFORMANCE_METRICS}
+            />
             <motion.div {...animationConfig} className={styles.perfChart}>
                 <div
                     id={'performanceChartControls'}

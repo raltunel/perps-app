@@ -696,7 +696,7 @@
         "fogoChainLogo": "Fogo 链标志",
         "accountValue": "账户价值",
         "collateral": "保证金",
-        "pnl": "盈亏 (PNL)",
+        "pnl": "盈亏 (PnL)",
         "realizedPnl": "已实现盈亏",
         "unrealizedPnl": "未实现盈亏",
         "volume": "交易量",
