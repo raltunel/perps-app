@@ -178,7 +178,7 @@ export default function ShareModal(props: propsIF) {
     }
 
     return (
-        <Modal title='' close={close}>
+        <Modal title='' close={close} noHeader>
             <div className={styles.container}>
                 <section className={styles.leftSide} ref={cardRef}>
                     <img
@@ -310,16 +310,22 @@ export default function ShareModal(props: propsIF) {
                             )}
                         </button>
                         <button
-                            onClick={() => {
+                            onClick={async () => {
                                 if (!inputRef.current) return;
+                                await copyAsImage();
                                 openShareOnX(
                                     inputRef.current.value,
                                     referralLink,
                                 );
                             }}
+                            disabled={isCopying}
                         >
                             {t('share.xCTA')} <RiTwitterFill />
                         </button>
+                        <p className={styles.shareHint}>
+                            {t('share.shareHint') ||
+                                'Clicking Share on X also copies the image to your clipboard'}
+                        </p>
                     </div>
                 </section>
             </div>

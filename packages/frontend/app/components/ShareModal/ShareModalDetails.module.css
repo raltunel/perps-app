@@ -219,3 +219,48 @@
         height: 22px;
     }
 }
+@media screen and (min-width: 769px) {
+    .container {
+        gap: 12px;
+        padding-top: 12px;
+    }
+
+    .header {
+        padding: 12px 16px;
+    }
+
+    .symbolIcon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .coin {
+        font-size: calc(var(--font-size-m) * 1.4);
+    }
+
+    .badge {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+
+    .pnl {
+        font-size: var(--font-size-xl);
+    }
+
+    .grid {
+        gap: 8px;
+    }
+
+    .stat {
+        padding: 12px 14px;
+        gap: 4px;
+    }
+
+    .label {
+        font-size: var(--font-size-m);
+    }
+
+    .value {
+        font-size: var(--font-size-l);
+    }
+}

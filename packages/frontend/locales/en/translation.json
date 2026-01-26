@@ -582,7 +582,8 @@
         "details": "Details",
         "copyImageCTA": "Copy Image",
         "copying": "Copying...",
-        "copied": "Copied!"
+        "copied": "Copied!",
+        "shareHint": "Clicking Share on X also copies the image to your clipboard"
     },
     "colors": {
         "default": "Default",

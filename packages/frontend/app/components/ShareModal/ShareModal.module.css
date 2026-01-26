@@ -68,6 +68,7 @@
     font-size: var(--font-size-s);
     cursor: pointer;
     transition: all 0.2s ease;
+    flex: 1;
 }
 
 .toggle_btn:hover {
@@ -223,6 +224,11 @@
 .copyButton:hover:not(:disabled) {
     background: rgba(115, 113, 252, 0.1) !important;
 }
+.shareHint {
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    text-align: center;
+}
 
 /* ============================================
    RESPONSIVE STYLES
@@ -243,10 +249,11 @@
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 769px) {
     .container {
-        min-width: 70vw;
-        max-width: 1000px;
+        width: 1000px;
+        min-height: 60vh;
+        /* max-width: 1200px; */
         grid-template-columns: 1fr 245px;
     }
 
@@ -256,18 +263,81 @@
 
     .market_tkn {
         height: 30px !important;
-
         display: flex;
         align-items: center;
         bottom: 0;
     }
+
+    /* Scale up icon */
+    .symbol_icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Scale up fonts */
+    .symbol {
+        font-size: calc(var(--font-size-l) * 1.2);
+    }
+
+    .market_pct {
+        font-size: calc(var(--font-size-xxl) * 1.2);
+    }
+
+    .yield {
+        height: 48px;
+        width: 84px;
+        font-size: calc(var(--font-size-s) * 1.15);
+    }
+
+    .price > div:first-child {
+        font-size: var(--font-size-m);
+    }
+
+    .price > div:last-child {
+        font-size: var(--font-size-l);
+    }
+
+    /* Scale up custom text area */
+    .custom_text > label {
+        font-size: calc(var(--font-size-m) * 1.1);
+    }
+
+    .custom_text > textarea {
+        height: 180px;
+        width: 100%;
+        font-size: calc(var(--font-size-s) * 1.15) !important;
+        padding: var(--padding-m);
+    }
+
+    /* Scale up buttons */
+    .button_bank > button {
+        height: 48px;
+        font-size: calc(var(--font-size-m) * 1.1);
+    }
+
+    .toggle_btn {
+        padding: 10px 18px;
+        font-size: calc(var(--font-size-s) * 1.1);
+    }
+
+    /* Adjust spacing */
+    .leftContent {
+        gap: var(--gap-m);
+    }
+
+    .prices {
+        gap: calc(var(--gap-m) * 1.2);
+    }
+    .view_toggle {
+        width: 100%;
+    }
 }
 
-@media screen and (min-width: 1280px) {
+/* @media screen and (min-width: 1280px) {
     .container {
         min-width: 900px;
     }
-}
+} */
 
 @media screen and (max-width: 768px) {
     .view_toggle {
