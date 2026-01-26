@@ -423,7 +423,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 if (!mousePrice && !clickedOrder && !showDropdown) return;
 
                 const drawLineAtPrice = (price: number, isClicked: boolean) => {
-                    const { chartHeight } = getPricetoPixel(
+                    const { chartHeight, rawPixel } = getPricetoPixel(
                         chart,
                         price,
                         'LIMIT',
@@ -444,7 +444,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         let labelX: number;
 
                         const clickX = clickedOrder.mousePos.x;
-                        const clickY = clickedOrder.mousePos.y;
+
+                        const clickY = rawPixel;
 
                         if (isProcessing) {
                             const blinkProgress =
@@ -561,6 +562,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         showDropdown,
         dropdownPosition,
         showPlusButton,
+        JSON.stringify(scaleData?.yScale.domain()),
     ]);
 
     // Listen for preparedOrder changes and trigger animation
