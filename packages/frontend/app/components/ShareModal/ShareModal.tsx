@@ -16,7 +16,7 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 import Modal from '../Modal/Modal';
 import ShareModalDetails from './ShareModalDetails';
 import perpsLogo from './perpsLogo.png';
-import btcIcon from '~/assets/tokens/btc.png';
+import btcIcon from '~/assets/tokens/btc.svg';
 import styles from './ShareModal.module.css';
 import { t } from 'i18next';
 import { printDomToImage } from '~/utils/functions/printDomToImage';
