@@ -43,6 +43,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         addToResolutionPair,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
+    const symbolInfoRef = useRef(symbolInfo);
+    symbolInfoRef.current = symbolInfo;
     const { loadingState } = useLiquidationStore();
 
     const obMinSellRef = useRef<number>(obMinSell);
@@ -77,10 +79,10 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             obMinSellRef.current > 0 &&
             obMaxBuyRef.current > 0
         ) {
-            const midPx = (obMinSellRef.current + obMaxBuyRef.current) / 2;
+            const markPx = symbolInfoRef.current?.markPx || 0;
             filteredBuyLiqs = [
                 {
-                    px: midPx,
+                    px: markPx,
                     sz: 0,
                     type: 'buy',
                     ratio: 0,
@@ -101,10 +103,10 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             obMinSellRef.current > 0 &&
             obMaxBuyRef.current > 0
         ) {
-            const midPx = (obMinSellRef.current + obMaxBuyRef.current) / 2;
+            const markPx = symbolInfoRef.current?.markPx || 0;
             filteredSellLiqs = [
                 {
-                    px: midPx,
+                    px: markPx,
                     sz: 0,
                     type: 'sell',
                     ratio: 0,
