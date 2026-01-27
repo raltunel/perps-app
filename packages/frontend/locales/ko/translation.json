@@ -655,6 +655,13 @@
     "chart": {
         "liqPrice": "청산 가격"
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo 무기한 선물",
         "description": "Ambient Finance로 Fogo에서 무기한 선물을 거래하세요. 테이커 수수료 제로, 최대 100배 레버리지, 초고속 체결.",

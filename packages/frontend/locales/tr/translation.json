@@ -655,6 +655,13 @@
     "chart": {
         "liqPrice": "Lik. fiyatı"
     },
+    "quickTrade": {
+        "title": "Hızlı İşlem Modu",
+        "infoText": "Etkinleştirildiğinde grafiğe tıklayarak anında emir verebilirsiniz.",
+        "description": "Daha hızlı emir girişi için hızlı işlem ayarlarını yapılandırın",
+        "enableConfirmationBypass": "Onay adımını atla",
+        "saveAndEnable": "Kaydet ve Etkinleştir"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo Süresiz Vadeli İşlemler",
         "description": "Ambient Finance ile Fogo'da süresiz vadeli işlem yapın. Taker ücreti yok, 100x kaldıraç imkanı ve yıldırım hızında işlem.",

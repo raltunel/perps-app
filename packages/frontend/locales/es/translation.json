@@ -655,6 +655,13 @@
     "chart": {
         "liqPrice": "Precio liq."
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Futuros perpetuos en Fogo",
         "description": "Opera futuros perpetuos en Fogo con Ambient Finance. Sin comisiones taker, hasta 100x de apalancamiento y ejecución ultrarrápida.",

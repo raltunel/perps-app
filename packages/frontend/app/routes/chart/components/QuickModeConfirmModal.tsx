@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { t } from 'i18next';
 import {
     isEstablished,
     SessionButton,
@@ -172,18 +173,18 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                     </div>
 
                     <div>
-                        <h3 className={styles.title}>Quick Trade Mode</h3>
+                        <h3 className={styles.title}>
+                            {t('quickTrade.title')}
+                        </h3>
                         <p className={`${styles.infoText} ${styles.active}`}>
-                            Click on the chart to place an order instantly when
-                            enabled.
+                            {t('quickTrade.infoText')}
                         </p>
                     </div>
                 </div>
                 <div className={styles.horizontal_divider} />
                 <div>
                     <p className={styles.description}>
-                        Configure quick trade settings for faster order
-                        placement
+                        {t('quickTrade.description')}
                     </p>
                 </div>
                 <div className={styles.tradeTypeWrapper} ref={tradeTypeRef}>
@@ -215,7 +216,9 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
                 {/* SIZE + DENOM */}
                 <div className={styles.sizeWrapper}>
-                    <span className={styles.sizeLabel}>Size</span>
+                    <span className={styles.sizeLabel}>
+                        {t('transactions.size')}
+                    </span>
 
                     <div className={styles.inputWrapper}>
                         <NumFormattedInput
@@ -225,7 +228,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                     typeof e === 'string' ? e : e.target.value,
                                 )
                             }
-                            placeholder='Enter Size'
+                            placeholder={t('transactions.enterSize')}
                             className='quick-mode-input size-input-padding'
                         />
                     </div>
@@ -288,13 +291,13 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                         )}
                     </div>
                     <span className={styles.checkboxLabel}>
-                        Enable Confirmation bypass
+                        {t('quickTrade.enableConfirmationBypass')}
                     </span>
                 </div>
 
                 <div className={styles.buttonGroup}>
                     <button className={styles.cancelButton} onClick={onClose}>
-                        Cancel
+                        {t('common.cancel')}
                     </button>
 
                     {!isSessionEstablished ? (
@@ -310,7 +313,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                     if (!isDisabled) handleSave();
                                 }}
                             >
-                                Save
+                                {t('common.save')}
                             </button>
 
                             {!quickMode && (
@@ -321,7 +324,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                         if (!isDisabled) handleSaveAndEnable();
                                     }}
                                 >
-                                    Save & Enable
+                                    {t('quickTrade.saveAndEnable')}
                                 </button>
                             )}
                         </>

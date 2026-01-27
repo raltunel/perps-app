@@ -655,6 +655,13 @@
     "chart": {
         "liqPrice": "清算价格"
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Fogo永续合约",
         "description": "在Ambient Finance上交易Fogo永续合约。零Taker费用，最高100倍杠杆，极速成交。",

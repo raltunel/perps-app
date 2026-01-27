@@ -655,6 +655,13 @@
     "chart": {
         "liqPrice": "Prix de liq."
     },
+    "quickTrade": {
+        "title": "Quick Trade Mode",
+        "infoText": "Click on the chart to place an order instantly when enabled.",
+        "description": "Configure quick trade settings for faster order placement",
+        "enableConfirmationBypass": "Enable Confirmation bypass",
+        "saveAndEnable": "Save & Enable"
+    },
     "meta": {
         "title": "Ambient Finance | Contrats perpétuels sur Fogo",
         "description": "Tradez des contrats perpétuels sur Fogo avec Ambient Finance. Zéro frais taker, jusqu'à 100x de levier et exécution ultra-rapide.",
