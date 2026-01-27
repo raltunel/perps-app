@@ -11,6 +11,13 @@ import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 import { useChartScaleStore } from '~/stores/ChartScaleStore';
 import { useChartLinesStore } from '~/stores/ChartLinesStore';
+import { useLimitOrderService } from '~/hooks/useLimitOrderService';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { t } from 'i18next';
+import { getTxLink } from '~/utils/Constants';
+import type { LimitOrderParams } from '~/services/limitOrderService';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -66,8 +73,15 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     } = useOrderPlacementStore();
     const { zoomChanged } = useChartScaleStore();
     const { showPlusButton, setShowPlusButton } = useChartLinesStore();
+    const { executeLimitOrder } = useLimitOrderService();
+    const notifications = useNotificationStore();
+    const { formatNum } = useNumFormatter();
 
     const progressAnimationRef = React.useRef<number | null>(null);
+
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
+    }
 
     // Cleanup animation
     useEffect(() => {
@@ -271,11 +285,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         requestAnimationFrame(animateProgress);
                 } else {
                     progressAnimationRef.current = null;
-                    setTimeout(() => {
-                        setClickedOrder(null);
-                        setIsProcessing(false);
-                        setProcessingProgress(0);
-                    }, 100);
                 }
             };
 
@@ -573,13 +582,16 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         JSON.stringify(scaleData?.yScale.domain()),
     ]);
 
-    // Listen for preparedOrder changes and trigger animation
+    // Listen for preparedOrder changes and trigger animation + order execution
     useEffect(() => {
         if (!preparedOrder) return;
 
-        console.log('preparedOrder:', preparedOrder);
+        const { price, side, size, currency } = preparedOrder;
 
-        const { price, side } = preparedOrder;
+        const currentSymbolInfo = useTradeDataStore.getState().symbolInfo;
+        const markPx = currentSymbolInfo?.markPx || 1;
+        const quantity = currency === 'USD' ? size / markPx : size;
+        const usdValue = currency === 'USD' ? size : size * markPx;
 
         setClickedOrder({
             price,
@@ -611,16 +623,176 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     requestAnimationFrame(animateProgress);
             } else {
                 progressAnimationRef.current = null;
-                setTimeout(() => {
-                    setClickedOrder(null);
-                    setIsProcessing(false);
-                    setProcessingProgress(0);
-                    clearPreparedOrder();
-                }, 100);
             }
         };
 
         progressAnimationRef.current = requestAnimationFrame(animateProgress);
+
+        const executeOrder = async () => {
+            const slug = makeSlug(10);
+            const symbol = currentSymbolInfo?.coin || 'BTC';
+            const usdValueOfOrderStr = formatNum(usdValue, 2, true, true);
+
+            notifications.add({
+                title:
+                    side === 'buy'
+                        ? t('transactions.buyLongLimitOrderPending')
+                        : t('transactions.sellShortLimitOrderPending'),
+                message:
+                    side === 'buy'
+                        ? t('transactions.placingBuyLongLimitOrderFor', {
+                              usdValueOfOrderStr,
+                              symbol,
+                              limitPrice: roundDownToTenth(price),
+                          })
+                        : t('transactions.placingLimitOrderFor', {
+                              usdValueOfOrderStr,
+                              symbol,
+                              limitPrice: roundDownToTenth(price),
+                          }),
+                icon: 'spinner',
+                slug,
+                removeAfter: 60000,
+            });
+
+            const orderParams: LimitOrderParams = {
+                price: roundDownToTenth(price),
+                side,
+                quantity,
+            };
+
+            const timeOfTxBuildStart = Date.now();
+            let isSuccess = false;
+
+            try {
+                const result = await executeLimitOrder(orderParams);
+
+                if (result.success) {
+                    notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action - Quick Trade', {
+                            props: {
+                                actionType: 'Limit Success',
+                                orderType: 'Limit',
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
+                                success: true,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    result.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: result.signature,
+                            },
+                        });
+                    }
+                    notifications.add({
+                        title:
+                            side === 'buy'
+                                ? t('transactions.buyLongLimitOrderPlaced')
+                                : t('transactions.sellShortLimitOrderPlaced'),
+                        message:
+                            side === 'buy'
+                                ? t(
+                                      'transactions.successfullyPlacedBuyOrderFor',
+                                      {
+                                          usdValueOfOrderStr,
+                                          symbol,
+                                          limitPrice: roundDownToTenth(price),
+                                      },
+                                  )
+                                : t(
+                                      'transactions.successfullyPlacedSellOrderFor',
+                                      {
+                                          usdValueOfOrderStr,
+                                          symbol,
+                                          limitPrice: roundDownToTenth(price),
+                                      },
+                                  ),
+                        icon: 'check',
+                        txLink: getTxLink(result.signature),
+                        removeAfter: 5000,
+                    });
+
+                    isSuccess = true;
+                } else {
+                    notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action - Quick Trade', {
+                            props: {
+                                actionType: 'Limit Fail',
+                                orderType: 'Limit',
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
+                                success: false,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
+                                txDuration: getDurationSegment(
+                                    result.timeOfSubmission,
+                                    Date.now(),
+                                ),
+                                txSignature: result.signature,
+                            },
+                        });
+                    }
+                    notifications.add({
+                        title: t('transactions.limitOrderFailed'),
+                        message:
+                            result.error ||
+                            t('transactions.failedToPlaceLimitOrder'),
+                        icon: 'error',
+                        removeAfter: 10000,
+                        txLink: getTxLink(result.signature),
+                    });
+                }
+            } catch (error) {
+                notifications.remove(slug);
+                notifications.add({
+                    title: t('transactions.limitOrderFailed'),
+                    message:
+                        error instanceof Error
+                            ? error.message
+                            : t('transactions.unknownErrorOccurred'),
+                    icon: 'error',
+                });
+                if (typeof plausible === 'function') {
+                    plausible('Offchain Failure - Quick Trade', {
+                        props: {
+                            actionType: 'Limit Fail',
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            success: false,
+                            errorMessage:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                        },
+                    });
+                }
+            } finally {
+                const cleanup = () => {
+                    if (progressAnimationRef.current) {
+                        cancelAnimationFrame(progressAnimationRef.current);
+                        progressAnimationRef.current = null;
+                    }
+                    setClickedOrder(null);
+                    setIsProcessing(false);
+                    setProcessingProgress(0);
+                    clearPreparedOrder();
+                };
+
+                if (isSuccess) {
+                    setTimeout(cleanup, 1000);
+                } else {
+                    cleanup();
+                }
+            }
+        };
+
+        executeOrder();
     }, [
         preparedOrder,
         colors,
@@ -678,22 +850,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     requestAnimationFrame(animateProgress);
             } else {
                 progressAnimationRef.current = null;
-                setTimeout(() => {
-                    setClickedOrder(null);
-                    setIsProcessing(false);
-                    setProcessingProgress(0);
-
-                    if (activeOrder) {
-                        setPreparedOrder({
-                            price: price,
-                            side: side,
-                            type: activeOrder.tradeType,
-                            size: activeOrder.size,
-                            currency: activeOrder.currency,
-                            timestamp: Date.now(),
-                        });
-                    }
-                }, 100);
             }
         };
 
@@ -739,22 +895,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     requestAnimationFrame(animateProgress);
             } else {
                 progressAnimationRef.current = null;
-                setTimeout(() => {
-                    setClickedOrder(null);
-                    setIsProcessing(false);
-                    setProcessingProgress(0);
-
-                    if (activeOrder) {
-                        setPreparedOrder({
-                            price: price,
-                            side: side,
-                            type: activeOrder.tradeType,
-                            size: activeOrder.size,
-                            currency: activeOrder.currency,
-                            timestamp: Date.now(),
-                        });
-                    }
-                }, 100);
             }
         };
 
