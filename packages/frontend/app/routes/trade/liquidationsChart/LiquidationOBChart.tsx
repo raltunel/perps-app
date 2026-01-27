@@ -1114,8 +1114,21 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 .style('top', verticalPosition + 'px')
                 .style(
                     'left',
-                    Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
+                    '10%',
+                    // Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
+                )
+                .style('width', '80%');
+
+            if (locationRef.current === 'liqMobile') {
+                liqTooltipRef.current.style('left', '0%');
+                liqTooltipRef.current.style('background', 'var(--bg-dark2)');
+                liqTooltipRef.current.style(
+                    'border',
+                    '1px solid var(--bg-dark6)',
                 );
+                liqTooltipRef.current.style('transform', 'translateX(-100%)');
+                liqTooltipRef.current.style('width', '12rem');
+            }
 
             highlightHoveredArea.current = true;
         },
