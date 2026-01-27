@@ -546,7 +546,7 @@ export const TradingViewProvider: React.FC<{
                 lightningIcon.style.color = 'inherit';
 
                 const quickText = document.createElement('span');
-                quickText.textContent = 'Quick Trade Mode';
+                quickText.textContent = i18n.t('quickTrade.title');
 
                 quickButton.appendChild(quickText);
                 quickButton.appendChild(lightningIcon);
@@ -576,22 +576,28 @@ export const TradingViewProvider: React.FC<{
                     const isNarrow = canvasWidth < 800;
 
                     if (isNarrow) {
-                        quickText.textContent = 'Quick';
+                        quickText.textContent = i18n.t('quickTrade.quick');
                     } else if (state.activeOrder) {
-                        quickText.textContent = `Quick ${state.activeOrder.tradeType}`;
+                        quickText.textContent = i18n.t(
+                            'quickTrade.quickWithType',
+                            { tradeType: state.activeOrder.tradeType },
+                        );
                     } else {
-                        quickText.textContent = 'Quick Trade Mode';
+                        quickText.textContent = i18n.t('quickTrade.title');
                     }
 
                     if (state.activeOrder) {
                         container.setAttribute(
                             'title',
-                            `Size: ${state.activeOrder.size} ${state.activeOrder.currency}`,
+                            i18n.t('quickTrade.sizeTooltip', {
+                                size: state.activeOrder.size,
+                                currency: state.activeOrder.currency,
+                            }),
                         );
                     } else {
                         container.setAttribute(
                             'title',
-                            'Click to enable quick trade mode',
+                            i18n.t('quickTrade.clickToEnable'),
                         );
                     }
 
@@ -694,21 +700,29 @@ export const TradingViewProvider: React.FC<{
             if (!activeOrder) {
                 const topOrder = isAbove
                     ? {
-                          text: `Sell @ ${formattedPrice} limit`,
+                          text: i18n.t('quickTrade.sellAtLimit', {
+                              price: formattedPrice,
+                          }),
                           side: 'sell' as const,
                       }
                     : {
-                          text: `Buy @ ${formattedPrice} limit`,
+                          text: i18n.t('quickTrade.buyAtLimit', {
+                              price: formattedPrice,
+                          }),
                           side: 'buy' as const,
                       };
 
                 const bottomOrder = isAbove
                     ? {
-                          text: `Buy @ ${formattedPrice} stop (Coming Soon)`,
+                          text: `${i18n.t('quickTrade.buyAtStop', {
+                              price: formattedPrice,
+                          })} (${i18n.t('common.comingSoon')})`,
                           side: 'buy' as const,
                       }
                     : {
-                          text: `Sell @ ${formattedPrice} stop (Coming Soon)`,
+                          text: `${i18n.t('quickTrade.sellAtStop', {
+                              price: formattedPrice,
+                          })} (${i18n.t('common.comingSoon')})`,
                           side: 'sell' as const,
                       };
 
@@ -737,24 +751,36 @@ export const TradingViewProvider: React.FC<{
 
             const topOrder = isAbove
                 ? {
-                      text: `Sell ${displaySize} @ ${formattedPrice} limit`,
+                      text: i18n.t('quickTrade.sellSizeAtLimit', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      }),
                       side: 'sell' as const,
                       type: 'Limit' as const,
                   }
                 : {
-                      text: `Buy ${displaySize} @ ${formattedPrice} limit`,
+                      text: i18n.t('quickTrade.buySizeAtLimit', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      }),
                       side: 'buy' as const,
                       type: 'Limit' as const,
                   };
 
             const bottomOrder = isAbove
                 ? {
-                      text: `Buy ${displaySize} @ ${formattedPrice} stop (Coming Soon)`,
+                      text: i18n.t('quickTrade.buySizeAtStop', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      }),
                       side: 'buy' as const,
                       type: 'Stop' as const,
                   }
                 : {
-                      text: `Sell ${displaySize} @ ${formattedPrice} stop (Coming Soon)`,
+                      text: i18n.t('quickTrade.sellSizeAtStop', {
+                          size: displaySize,
+                          price: formattedPrice,
+                      }),
                       side: 'sell' as const,
                       type: 'Stop' as const,
                   };

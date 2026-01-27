@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
+import { t } from 'i18next';
 
 interface PriceActionDropdownProps {
     position: {
@@ -39,13 +40,14 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
     const topOrder = isAbove
         ? {
               label: activeOrder
-                  ? `Sell ${displaySize} @ ${position.price.toFixed(2)} limit`
-                  : `Sell @ ${position.price.toFixed(2)} limit`,
+                  ? `${t('quickTrade.sellSizeAtLimit', { size: displaySize, price: position.price.toFixed(2) })}`
+                  : `${t('quickTrade.sellAtLimit', { price: position.price.toFixed(2) })}`,
               shortcut: showSellShortcut
                   ? isMac
                       ? '⌥ ⇧ S'
                       : 'Alt + Shift + S'
                   : undefined,
+              disabled: false,
               onClick: () => {
                   onSellStop(position.price);
                   onClose();
@@ -54,13 +56,14 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
           }
         : {
               label: activeOrder
-                  ? `Buy ${displaySize} @ ${position.price.toFixed(2)} limit`
-                  : `Buy @ ${position.price.toFixed(2)} limit`,
+                  ? `${t('quickTrade.buySizeAtLimit', { size: displaySize, price: position.price.toFixed(2) })}`
+                  : `${t('quickTrade.buyAtLimit', { price: position.price.toFixed(2) })}`,
               shortcut: showBuyShortcut
                   ? isMac
                       ? '⌥ ⇧ B'
                       : 'Alt + Shift + B'
                   : undefined,
+              disabled: false,
               onClick: () => {
                   onBuyLimit(position.price);
                   onClose();
@@ -71,13 +74,14 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
     const bottomOrder = isAbove
         ? {
               label: activeOrder
-                  ? `Buy ${displaySize} @ ${position.price.toFixed(2)} stop`
-                  : `Buy @ ${position.price.toFixed(2)} stop`,
+                  ? `${t('quickTrade.buySizeAtStop', { size: displaySize, price: position.price.toFixed(2) })}`
+                  : `${t('quickTrade.buyAtStop', { price: position.price.toFixed(2) })}`,
               shortcut: showBuyShortcut
                   ? isMac
                       ? '⌥ ⇧ B'
                       : 'Alt + Shift + B'
                   : undefined,
+              disabled: true,
               onClick: () => {
                   onBuyLimit(position.price);
                   onClose();
@@ -86,13 +90,14 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
           }
         : {
               label: activeOrder
-                  ? `Sell ${displaySize} @ ${position.price.toFixed(2)} stop`
-                  : `Sell @ ${position.price.toFixed(2)} stop`,
+                  ? `${t('quickTrade.sellSizeAtStop', { size: displaySize, price: position.price.toFixed(2) })}`
+                  : `${t('quickTrade.sellAtStop', { price: position.price.toFixed(2) })}`,
               shortcut: showSellShortcut
                   ? isMac
                       ? '⌥ ⇧ S'
                       : 'Alt + Shift + S'
                   : undefined,
+              disabled: true,
               onClick: () => {
                   onSellStop(position.price);
                   onClose();
@@ -125,7 +130,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
                             label={item.label}
                             shortcut={item.shortcut}
                             onClick={item.onClick}
-                            disabled={item.label.includes('stop')}
+                            disabled={item.disabled}
                         />
                     ))}
                 </div>
@@ -198,7 +203,7 @@ const MenuItem: React.FC<{
                         whiteSpace: 'nowrap',
                     }}
                 >
-                    Coming Soon
+                    {t('common.comingSoon')}
                 </span>
             )}
             {shortcut && !disabled && (
