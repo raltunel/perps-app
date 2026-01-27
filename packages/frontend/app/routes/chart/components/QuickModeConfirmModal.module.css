@@ -150,6 +150,7 @@
 .sizeLabel {
     font-size: 12px;
     color: #b3b3b3;
+    max-width: 20px;
 }
 
 .inputWrapper {
@@ -283,7 +284,7 @@
 
 .confirmButton {
     flex: 1;
-    min-width: 110px;
+    min-width: 130px;
     height: 36px;
     border-radius: 6px;
     border: none;
@@ -291,7 +292,7 @@
     background-color: var(--accent1, #4a8bd3);
     color: #fff;
     font-size: 12px;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .confirmButton:hover:not(:disabled) {
