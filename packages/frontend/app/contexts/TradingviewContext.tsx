@@ -61,6 +61,7 @@ import type { TabType } from '~/routes/trade';
 
 import i18n from 'i18next';
 import { useLiqChartStore } from '~/stores/LiqChartStore';
+import { useLiquidationStore } from '~/stores/LiquidationStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -109,6 +110,8 @@ export const TradingViewProvider: React.FC<{
 
     const { showLiqOptions, setShowLiqOptions } = useLiqChartStore();
 
+    const { setBuyLiqs, setSellLiqs } = useLiquidationStore();
+
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
     const { userAddress } = useUserDataStore();
@@ -142,6 +145,8 @@ export const TradingViewProvider: React.FC<{
     }, [i18n.language]);
 
     const { liquidationsActive, setLiquidationsActive } = useAppStateStore();
+    const liquidationsActiveRef = useRef(liquidationsActive);
+    liquidationsActiveRef.current = liquidationsActive;
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -764,6 +769,24 @@ export const TradingViewProvider: React.FC<{
             dataFeedRef.current.updateUserFills(userFills);
         }
     }, [userFills]);
+
+    // reset liq data after 10 secs
+    useEffect(() => {
+        let liqResetTimeout: NodeJS.Timeout;
+        if (!liquidationsActive) {
+            liqResetTimeout = setTimeout(() => {
+                if (!liquidationsActiveRef.current) {
+                    setBuyLiqs([]);
+                    setSellLiqs([]);
+                }
+            }, 10000);
+        }
+        return () => {
+            if (liqResetTimeout) {
+                clearTimeout(liqResetTimeout);
+            }
+        };
+    }, [liquidationsActive]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady, switchTab }}>

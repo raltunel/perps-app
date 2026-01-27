@@ -1,15 +1,13 @@
+import { motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { useMobile } from '~/hooks/useMediaQuery';
 import LiquidationsChart from '~/routes/trade/liquidationsChart/LiquidationOBChart';
+import { useAppStateStore } from '~/stores/AppStateStore';
+import { LiqChartTabType, useLiqChartStore } from '~/stores/LiqChartStore';
+import { useLiquidationStore } from '~/stores/LiquidationStore';
 import { useLiqudationLines } from './hooks/useLiquidationLines';
 import LiqLineTooltip from './LiqLinesTooltip';
 import LiqudationLines from './LiqudationLines';
-import { useOrderBookStore } from '~/stores/OrderBookStore';
-import { useEffect, useRef, useState } from 'react';
-import { LiqChartTabType, useLiqChartStore } from '~/stores/LiqChartStore';
-import { useMobile } from '~/hooks/useMediaQuery';
-import { motion } from 'framer-motion';
-import { useLiquidationStore } from '~/stores/LiquidationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useAppStateStore } from '~/stores/AppStateStore';
 
 export interface LiqProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -33,8 +31,7 @@ const LiqComponent = ({
     const { activeTab, showLiqOverlayAlways } = useLiqChartStore();
     const isMobile = useMobile();
 
-    const { buyLiqs, sellLiqs, setBuyLiqs, setSellLiqs } =
-        useLiquidationStore();
+    const { buyLiqs, sellLiqs } = useLiquidationStore();
     const { liquidationsActive } = useAppStateStore();
     const liquidationsActiveRef = useRef(liquidationsActive);
     liquidationsActiveRef.current = liquidationsActive;

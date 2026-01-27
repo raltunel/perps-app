@@ -1037,6 +1037,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     : item.px > priceOnMousePoint,
             );
 
+            let nextNearest: LiqLevel | undefined = undefined;
+
+            if (hoveredArray.length > nearest.length) {
+                nextNearest =
+                    hoveredArray[hoveredArray.length - nearest.length + 1];
+            }
+
             const snappedPricePoint =
                 nearest.length > 0
                     ? nearest.reduce((closest: LiqLevel, item: LiqLevel) => {
@@ -1047,6 +1054,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                               : closest;
                       })
                     : hoveredArray[hoveredArray.length - 1];
+
+            let priceText = formatNum(snappedPricePoint.px);
+            if (nextNearest) {
+                priceText = priceText + ' ~ ' + formatNum(nextNearest.px);
+            }
 
             const amount =
                 snappedPricePoint && snappedPricePoint.cumulativeSz
@@ -1071,7 +1083,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         ' </p>' +
                         '<p>' +
                         'Price: ' +
-                        formatNum(snappedPricePoint.px) +
+                        priceText +
                         ' </p>' +
                         '<p>' +
                         'Size: ' +
