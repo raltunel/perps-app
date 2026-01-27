@@ -78,6 +78,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const { formatNum } = useNumFormatter();
 
     const progressAnimationRef = React.useRef<number | null>(null);
+    const isExecutingRef = React.useRef(false);
 
     function roundDownToTenth(value: number) {
         return Math.floor(value * 10) / 10;
@@ -212,6 +213,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             }
 
             if (!quickMode) return;
+            if (isExecutingRef.current) return;
 
             const y = e.clientY - canvas.getBoundingClientRect().top;
 
@@ -585,6 +587,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     // Listen for preparedOrder changes and trigger animation + order execution
     useEffect(() => {
         if (!preparedOrder) return;
+        if (isExecutingRef.current) return;
 
         const { price, side, size, currency } = preparedOrder;
 
@@ -629,6 +632,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         progressAnimationRef.current = requestAnimationFrame(animateProgress);
 
         const executeOrder = async () => {
+            isExecutingRef.current = true;
+
             const slug = makeSlug(10);
             const symbol = currentSymbolInfo?.coin || 'BTC';
             const usdValueOfOrderStr = formatNum(usdValue, 2, true, true);
@@ -782,6 +787,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     setIsProcessing(false);
                     setProcessingProgress(0);
                     clearPreparedOrder();
+                    isExecutingRef.current = false;
                 };
 
                 if (isSuccess) {
