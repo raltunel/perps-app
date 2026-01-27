@@ -266,8 +266,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             setIsProcessing(true);
             setProcessingProgress(0);
 
-            console.log('Limit order placement at price:', price);
-
             if (progressAnimationRef.current) {
                 cancelAnimationFrame(progressAnimationRef.current);
                 progressAnimationRef.current = null;
