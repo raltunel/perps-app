@@ -1173,16 +1173,21 @@ const LabelComponent = ({
             }
 
             window.dispatchEvent(new CustomEvent('orderLineDragStart'));
-
             const rect = canvas.getBoundingClientRect();
+
             const { offsetY, offsetX } = getXandYLocationForChartDrag(
                 event,
                 rect,
             );
 
+            console.log('>>>> offsetX', offsetX);
+            console.log('>>>> offsetY', offsetY);
+
+            console.log('>>>> drawnLabelsRef.current', drawnLabelsRef.current);
+
             const isLabel = findLimitLabelAtPosition(
-                offsetX * dpr,
-                offsetY * dpr,
+                offsetX,
+                offsetY,
                 drawnLabelsRef.current,
             );
 
@@ -1192,6 +1197,8 @@ const LabelComponent = ({
                 ? isLabel?.matchType === 'onLabel' ||
                   isLabel?.matchType === 'onLine'
                 : isLabel?.matchType === 'onLabel';
+
+            console.log('>>>> parentLine', isLabel?.parentLine);
 
             const shouldStartDrag =
                 isLabel &&
@@ -1274,9 +1281,11 @@ const LabelComponent = ({
                 return;
             }
 
+            const rect = canvas.getBoundingClientRect();
+
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
-                dpr,
+                rect,
             );
 
             let advancedValue = scaleData?.yScale.invert(clientY);

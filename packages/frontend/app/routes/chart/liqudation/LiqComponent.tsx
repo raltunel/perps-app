@@ -3,10 +3,13 @@ import { useLiqudationLines } from './hooks/useLiquidationLines';
 import LiqLineTooltip from './LiqLinesTooltip';
 import LiqudationLines from './LiqudationLines';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LiqChartTabType, useLiqChartStore } from '~/stores/LiqChartStore';
 import { useMobile } from '~/hooks/useMediaQuery';
 import { motion } from 'framer-motion';
+import { useLiquidationStore } from '~/stores/LiquidationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 export interface LiqProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -27,9 +30,14 @@ const LiqComponent = ({
 }: LiqProps) => {
     const lines = useLiqudationLines(scaleData);
 
-    const { hrBuys, hrSells, hrLiqBuys, hrLiqSells } = useOrderBookStore();
     const { activeTab, showLiqOverlayAlways } = useLiqChartStore();
     const isMobile = useMobile();
+
+    const { buyLiqs, sellLiqs, setBuyLiqs, setSellLiqs } =
+        useLiquidationStore();
+    const { liquidationsActive } = useAppStateStore();
+    const liquidationsActiveRef = useRef(liquidationsActive);
+    liquidationsActiveRef.current = liquidationsActive;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [overlayLiqCanvasAttr, setOverlayLiqCanvasAttr] = useState<any>();
@@ -88,10 +96,11 @@ const LiqComponent = ({
                             transition={{ duration: 0.2, ease: 'easeInOut' }}
                         >
                             <LiquidationsChart
-                                buyData={hrBuys}
-                                sellData={hrSells}
-                                liqBuys={hrLiqBuys}
-                                liqSells={hrLiqSells}
+                                chartMode={'distribution'}
+                                buyData={buyLiqs}
+                                sellData={sellLiqs}
+                                liqBuys={[]}
+                                liqSells={[]}
                                 width={overlayLiqCanvasAttr.width}
                                 height={overlayLiqCanvasAttr.height}
                                 scaleData={scaleData}

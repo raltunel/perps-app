@@ -12,14 +12,6 @@ const MIN_SLOT_HEIGHT_PX = 4;
 // Maximum number of slots to create (controls granularity)
 const MAX_SLOT_COUNT = 200;
 
-interface SlottedLiq {
-    px: number; // center price of slot
-    sz: number; // total size in slot
-    minPx: number; // slot lower bound
-    maxPx: number; // slot upper bound
-    ratio: number; // ratio to max size
-}
-
 export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
     const { buyLiqs, sellLiqs, liqThresholds } = useLiquidationStore();
 

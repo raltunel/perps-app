@@ -60,10 +60,16 @@ export function findLimitLabelAtPosition(
 export function getXandYLocationForChartDrag(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any,
-    dpr: number,
+    // dpr: number,
+    rect: DOMRect,
 ) {
-    let offsetY = event.y * dpr;
-    let offsetX = event.x * dpr;
+    const dpr = window.devicePixelRatio || 1;
+
+    let evtY;
+    let evtX;
+
+    let retY = 0;
+    let retX = 0;
 
     // BACKUP : LIQUIDATION
 
@@ -76,11 +82,19 @@ export function getXandYLocationForChartDrag(
     //}
 
     if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
-        offsetY = event.sourceEvent.touches[0].clientY - rect.top;
-        offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
+        evtY = event.sourceEvent.touches[0].clientY * dpr;
+        evtX = event.sourceEvent.touches[0].clientX * dpr;
+    } else if (event.x && event.y) {
+        evtY = event.y * dpr;
+        evtX = event.x * dpr;
     }
 
-    return { offsetX: offsetX, offsetY: offsetY };
+    if (evtY && evtX) {
+        retY = evtY - rect.top;
+        retX = evtX - rect.left;
+    }
+
+    return { offsetX: retX, offsetY: retY };
 }
 
 export const getPixelToPrice = (

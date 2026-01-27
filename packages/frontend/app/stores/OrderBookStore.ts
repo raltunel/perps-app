@@ -12,8 +12,6 @@ import { TableState } from '~/utils/CommonIFs';
 interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
-    setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => void;
-    setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) => void;
     selectedResolution: OrderRowResolutionIF | null;
     selectedMode: OrderBookMode;
     orderBook: OrderBookRowIF[];
@@ -28,8 +26,6 @@ interface OrderBookStore {
     setOrderBookState: (state: TableState) => void;
     trades: OrderBookTradeIF[];
     setTrades: (trades: OrderBookTradeIF[]) => void;
-    setLiqBuys: (liqBuys: OrderBookLiqIF[]) => void;
-    setLiqSells: (liqSells: OrderBookLiqIF[]) => void;
     orderCount: number;
     setOrderCount: (orderCount: number) => void;
     activeOrderTab: string;
@@ -43,19 +39,6 @@ interface OrderBookStore {
     setMidPrice: (midPrice: number) => void;
     usualResolution: OrderRowResolutionIF | null;
     setUsualResolution: (resolution: OrderRowResolutionIF) => void;
-
-    hrBuys: OrderBookRowIF[];
-    hrSells: OrderBookRowIF[];
-    setHrBuys: (hrBuys: OrderBookRowIF[]) => void;
-    setHrSells: (hrSells: OrderBookRowIF[]) => void;
-    inpBuys: OrderBookRowIF[];
-    inpSells: OrderBookRowIF[];
-    setInpBuys: (inpBuys: OrderBookRowIF[]) => void;
-    setInpSells: (inpSells: OrderBookRowIF[]) => void;
-    liqBuys: OrderBookLiqIF[];
-    liqSells: OrderBookLiqIF[];
-    hrLiqBuys: OrderBookLiqIF[];
-    hrLiqSells: OrderBookLiqIF[];
     obMaxSell: number;
     obMinBuy: number;
     setObMaxSell: (obMaxSell: number) => void;
@@ -123,23 +106,6 @@ export const useOrderBookStore = create<OrderBookStore>()(
             usualResolution: null,
             setUsualResolution: (resolution: OrderRowResolutionIF) =>
                 set({ usualResolution: resolution }),
-            hrBuys: [],
-            hrSells: [],
-            setHrBuys: (hrBuys: OrderBookRowIF[]) => set({ hrBuys }),
-            setHrSells: (hrSells: OrderBookRowIF[]) => set({ hrSells }),
-            inpBuys: [],
-            inpSells: [],
-            setInpBuys: (inpBuys: OrderBookRowIF[]) => set({ inpBuys }),
-            setInpSells: (inpSells: OrderBookRowIF[]) => set({ inpSells }),
-            liqBuys: [],
-            liqSells: [],
-            setLiqBuys: (liqBuys: OrderBookLiqIF[]) => set({ liqBuys }),
-            setLiqSells: (liqSells: OrderBookLiqIF[]) => set({ liqSells }),
-            hrLiqBuys: [],
-            hrLiqSells: [],
-            setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => set({ hrLiqBuys }),
-            setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) =>
-                set({ hrLiqSells }),
             obMaxSell: 0,
             setObMaxSell: (obMaxSell: number) => set({ obMaxSell }),
             obMinBuy: 0,

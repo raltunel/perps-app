@@ -20,6 +20,8 @@ const SCALE_POINTS = [
     { value: 100_000_000, position: 100 },
 ];
 
+const MIN_GAP = 10_000;
+
 const valueToPosition = (value: number): number => {
     if (value <= 0) return 0;
     if (value >= LIQ_THRESHOLD_MAX) return 100;
@@ -95,14 +97,14 @@ export const LiqLevelsSlider = () => {
                 const snappedValue = snapToNiceValue(rawValue);
 
                 if (draggingRef.current === 'low') {
-                    const maxLow = Math.max(0, liqThresholds[2] - 100000);
+                    const maxLow = Math.max(0, liqThresholds[2] - MIN_GAP);
                     const clampedValue = Math.max(
                         LIQ_THRESHOLD_MIN,
                         Math.min(maxLow, snappedValue),
                     );
                     setLiqThresholdLow(clampedValue);
                 } else {
-                    const minHigh = liqThresholds[0] + 100000;
+                    const minHigh = liqThresholds[0] + MIN_GAP;
                     const clampedValue = Math.max(
                         minHigh,
                         Math.min(LIQ_THRESHOLD_MAX, snappedValue),

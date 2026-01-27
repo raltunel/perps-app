@@ -556,8 +556,7 @@ const YAxisOverlayCanvas: React.FC = () => {
 
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
-                window.devicePixelRatio || 1,
-                // canvas.getBoundingClientRect()
+                canvas.getBoundingClientRect(),
             );
 
             const scaleData = scaleDataRef.current;
