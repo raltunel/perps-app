@@ -63,38 +63,55 @@ export function getXandYLocationForChartDrag(
     // dpr: number,
     rect: DOMRect,
 ) {
-    const dpr = window.devicePixelRatio || 1;
+    // let evtY;
+    // let evtX;
 
-    let evtY;
-    let evtX;
+    // let retY = 0;
+    // let retX = 0;
 
-    let retY = 0;
-    let retX = 0;
+    // // BACKUP : LIQUIDATION
 
-    // BACKUP : LIQUIDATION
+    // //if (
+    // //    typeof TouchEvent !== 'undefined' &&
+    // //    event.sourceEvent instanceof TouchEvent
+    // //) {
+    // //  offsetY = event.sourceEvent.touches[0].clientY * dpr;
+    // // offsetX = event.sourceEvent.touches[0].clientX * dpr;
+    // //}
 
-    //if (
-    //    typeof TouchEvent !== 'undefined' &&
-    //    event.sourceEvent instanceof TouchEvent
-    //) {
-    //  offsetY = event.sourceEvent.touches[0].clientY * dpr;
-    // offsetX = event.sourceEvent.touches[0].clientX * dpr;
-    //}
+    // if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
+    //     evtY = event.sourceEvent.touches[0].clientY * dpr;
+    //     evtX = event.sourceEvent.touches[0].clientX * dpr;
+
+    //     console.log('>>>> evtY', evtY);
+    //     console.log('>>>> evtX', evtX);
+    // } else if (event.x && event.y) {
+    //     evtY = event.y * dpr;
+    //     evtX = event.x * dpr;
+    //     console.log('>>>> evtY 2', evtY);
+    //     console.log('>>>> evtX 2', evtX);
+    //     console.log('>>>> rect.top', rect.top);
+    //     console.log('>>>> rect.left', rect.left);
+    // }
+
+    // if (evtY && evtX) {
+    //     retY = evtY - rect.top;
+    //     retX = evtX - rect.left;
+    // }
+
+    // return { offsetX: retX, offsetY: retY };
+
+    let offsetY = event.sourceEvent.clientY - rect?.top;
+    let offsetX = event.sourceEvent.clientX - rect?.left;
 
     if (event.sourceEvent.touches && event.sourceEvent.touches.length > 0) {
-        evtY = event.sourceEvent.touches[0].clientY * dpr;
-        evtX = event.sourceEvent.touches[0].clientX * dpr;
-    } else if (event.x && event.y) {
-        evtY = event.y * dpr;
-        evtX = event.x * dpr;
+        offsetY = event.sourceEvent.touches[0].clientY - rect.top;
+        offsetX = event.sourceEvent.touches[0].clientX - rect?.left;
     }
 
-    if (evtY && evtX) {
-        retY = evtY - rect.top;
-        retX = evtX - rect.left;
-    }
-
-    return { offsetX: retX, offsetY: retY };
+    // return { offsetX, offsetY };
+    const dpr = window.devicePixelRatio || 1;
+    return { offsetX: offsetX * dpr, offsetY: offsetY * dpr };
 }
 
 export const getPixelToPrice = (

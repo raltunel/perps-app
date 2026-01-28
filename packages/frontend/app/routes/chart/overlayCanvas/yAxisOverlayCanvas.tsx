@@ -396,7 +396,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         });
 
         const handleCanvasMouseMove = (e: MouseEvent) => {
-            ensureCanvasSize();
+            // ensureCanvasSize();
 
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
@@ -406,7 +406,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         };
 
         const handleYAxisMouseMove = (e: MouseEvent) => {
-            ensureCanvasSize();
+            // ensureCanvasSize();
 
             const dpr = window.devicePixelRatio || 1;
             const rect = yAxisCanvas.getBoundingClientRect();
@@ -463,7 +463,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         // BACKUP - LIQ BRANCH
         // const tolerance = 30;
         // const isNearOrderPrice = Math.abs(mouseY - adjustedPixel) <= tolerance;
-        const tolerance = 10;
+        const tolerance = 30;
         const pixelToCheck = isMobile ? originalPixel : adjustedPixel;
         const isNearOrderPrice = Math.abs(mouseY - pixelToCheck) <= tolerance;
 

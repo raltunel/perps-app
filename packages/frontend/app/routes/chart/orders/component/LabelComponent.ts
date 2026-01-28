@@ -1180,11 +1180,6 @@ const LabelComponent = ({
                 rect,
             );
 
-            console.log('>>>> offsetX', offsetX);
-            console.log('>>>> offsetY', offsetY);
-
-            console.log('>>>> drawnLabelsRef.current', drawnLabelsRef.current);
-
             const isLabel = findLimitLabelAtPosition(
                 offsetX,
                 offsetY,
@@ -1197,8 +1192,6 @@ const LabelComponent = ({
                 ? isLabel?.matchType === 'onLabel' ||
                   isLabel?.matchType === 'onLine'
                 : isLabel?.matchType === 'onLabel';
-
-            console.log('>>>> parentLine', isLabel?.parentLine);
 
             const shouldStartDrag =
                 isLabel &&
