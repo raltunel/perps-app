@@ -359,12 +359,20 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [orderInputPriceValue.value]);
 
     useEffect(() => {
-        if (buys.length > 0 && buys.length > orderCount) {
-            setObMinBuy(buys[orderCount - 1].px);
+        if (buys.length > 0) {
+            if (buys.length > orderCount) {
+                setObMinBuy(buys[orderCount - 1].px);
+            } else {
+                setObMinBuy(buys[buys.length - 1].px);
+            }
             setObMaxBuy(buys[0].px);
         }
-        if (sells.length > 0 && sells.length > orderCount) {
-            setObMaxSell(sells[orderCount - 1].px);
+        if (sells.length > 0) {
+            if (sells.length > orderCount) {
+                setObMaxSell(sells[orderCount - 1].px);
+            } else {
+                setObMaxSell(sells[sells.length - 1].px);
+            }
             setObMinSell(sells[0].px);
         }
     }, [buys, sells, orderCount]);
@@ -745,7 +753,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const assignSelectedResolution = useCallback(
         (resolution: OrderRowResolutionIF) => {
-            console.log('>>>> addToResolutionPair', symbol, resolution);
             setSelectedResolution(resolution);
             addToResolutionPair(symbol, resolution);
         },
