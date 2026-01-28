@@ -252,7 +252,7 @@
 @media screen and (min-width: 769px) {
     .container {
         width: 80vw;
-        min-height: 70vh;
+        min-height: 500px;
         /* max-width: 1200px; */
         grid-template-columns: 1fr 245px;
     }

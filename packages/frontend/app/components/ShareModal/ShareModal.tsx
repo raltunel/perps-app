@@ -303,6 +303,10 @@ export default function ShareModal(props: PropsIF) {
                         >
                             {t('share.xCTA')} <RiTwitterFill />
                         </button>
+                        <p className={styles.shareHint}>
+                            {t('share.shareHint') ||
+                                'Clicking Share on X also copies the image to your clipboard'}
+                        </p>
                     </div>
                 </section>
             </div>
