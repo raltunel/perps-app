@@ -251,8 +251,8 @@
 
 @media screen and (min-width: 769px) {
     .container {
-        width: 1000px;
-        min-height: 60vh;
+        width: 80vw;
+        min-height: 70vh;
         /* max-width: 1200px; */
         grid-template-columns: 1fr 245px;
     }
@@ -262,16 +262,12 @@
     }
 
     .market_tkn {
-        height: 30px !important;
-        display: flex;
-        align-items: center;
-        bottom: 0;
+        height: auto !important;
     }
 
-    /* Scale up icon */
     .symbol_icon {
-        width: 36px;
-        height: 36px;
+        width: 50px;
+        height: 50px;
     }
 
     /* Scale up fonts */
@@ -333,11 +329,11 @@
     }
 }
 
-/* @media screen and (min-width: 1280px) {
+@media screen and (min-width: 1080px) {
     .container {
-        min-width: 900px;
+        width: 1000px;
     }
-} */
+}
 
 @media screen and (max-width: 768px) {
     .view_toggle {
@@ -414,4 +410,26 @@
         padding: 6px 12px;
         font-size: 12px;
     }
+}
+
+.twitterCapture {
+    background-image: url('./shareCardBackground.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding-left: var(--padding-l);
+}
+.twitterCapture .prices {
+    gap: var(--gap-l);
+}
+.twitterCapture .prices > .price > div:first-child {
+    font-size: var(--font-size-xl);
+}
+
+.twitterCapture .prices > .price > div:last-child {
+    font-size: var(--font-size-xxl);
+}
+
+.twitterCapture .market_tkn {
+    padding: var(--padding-s) 0;
 }

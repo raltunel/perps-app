@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { RiTwitterFill } from 'react-icons/ri';
 import { LuCopy, LuInfo, LuShare2, LuCheck } from 'react-icons/lu';
-import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
 import { tokenIconMap } from '~/assets/tokens/tokenIconMap';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import useClipboard from '~/hooks/useClipboard';
@@ -23,48 +22,38 @@ import { printDomToImage } from '~/utils/functions/printDomToImage';
 
 type ViewMode = 'share' | 'details';
 
-interface propsIF {
+interface PropsIF {
     close: () => void;
     position: PositionIF;
     initialTab?: ViewMode;
 }
 
-export default function ShareModal(props: propsIF) {
+export default function ShareModal(props: PropsIF) {
     const { close, position, initialTab = 'share' } = props;
 
     const [viewMode, setViewMode] = useState<ViewMode>(initialTab);
     const [isCopying, setIsCopying] = useState(false);
     const [showCopied, setShowCopied] = useState(false);
 
-    const memPosition = useMemo<PositionIF>(() => position, []);
-
+    const memPosition = useMemo(() => position, []);
     const { formatNum } = useNumFormatter();
     const { coinPriceMap } = useTradeDataStore();
     const notifications = useNotificationStore();
     const [_, copy] = useClipboard();
 
-    const TEXTAREA_ID_FOR_DOM = 'share_card_custom_text';
-
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const cardRef = useRef<HTMLElement>(null);
     const copiedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const coinIcon = useMemo<string>(() => {
-        return tokenIconMap[memPosition.coin.toUpperCase()] || btcIcon;
-    }, [memPosition.coin]);
-
-    const bgType =
-        tokenBackgroundMap[memPosition.coin.toUpperCase()] || 'light';
+    const coinIcon = useMemo(
+        () => tokenIconMap[memPosition.coin.toUpperCase()] || btcIcon,
+        [memPosition.coin],
+    );
 
     const referralLink = 'https://perps.ambient.finance';
-
-    const returnOnEquity = useMemo(() => {
-        return memPosition.returnOnEquity;
-    }, [memPosition]);
-
+    const returnOnEquity = memPosition.returnOnEquity;
     const markPrice = coinPriceMap.get(memPosition.coin) ?? 0;
 
-    // Cleanup timeout on unmount
     useEffect(() => {
         return () => {
             if (copiedTimeoutRef.current) {
@@ -74,30 +63,14 @@ export default function ShareModal(props: propsIF) {
     }, []);
 
     function openShareOnX(text: string, referralLink: string) {
-        const width = 550;
-        const height = 420;
-
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
-
         window.open(
             'https://x.com/intent/tweet?text=' +
                 encodeURIComponent(text) +
                 ' ' +
                 encodeURIComponent(referralLink),
             'tweetWindow',
-            `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`,
+            'width=550,height=420,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes',
         );
-
-        if (typeof plausible === 'function') {
-            plausible('External Link Clicked', {
-                props: {
-                    location: 'share-modal',
-                    linkType: 'Share on Twitter',
-                    url: 'https://x.com/intent/tweet',
-                },
-            });
-        }
     }
 
     async function copyAsImage() {
@@ -106,73 +79,59 @@ export default function ShareModal(props: propsIF) {
         setIsCopying(true);
 
         try {
-            const blob = await printDomToImage(cardRef.current, '#0d0d14');
+            const clone = cardRef.current.cloneNode(true) as HTMLElement;
 
-            if (!blob) {
-                notifications.add({
-                    title: t('share.copyFailed') || 'Copy Failed',
-                    message:
-                        t('share.copyFailedMessage') ||
-                        'Failed to generate image',
-                    icon: 'error',
-                });
-                setIsCopying(false);
-                return;
-            }
+            // add twitter-only styling hook
+            clone.classList.add(styles.twitterCapture);
+
+            Object.assign(clone.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '1200px',
+                height: '628px',
+                // background: '#0d0d14',
+                zIndex: '-99999',
+            });
+
+            document.body.appendChild(clone);
+
+            // 4. Wait for paint
+            await new Promise((r) => requestAnimationFrame(r));
+            await new Promise((r) => requestAnimationFrame(r));
+
+            // 5. Capture the CLONE
+            const blob = await printDomToImage(clone, '#0d0d14');
+
+            // 6. Cleanup immediately
+            document.body.removeChild(clone);
+
+            if (!blob) throw new Error('Failed to generate image');
 
             const success = await copy(blob);
 
             if (success) {
-                // Show "Copied" state
                 setShowCopied(true);
-
-                // Clear any existing timeout
                 if (copiedTimeoutRef.current) {
                     clearTimeout(copiedTimeoutRef.current);
                 }
-
-                // Reset to "Copy Image" after 2 seconds
-                copiedTimeoutRef.current = setTimeout(() => {
-                    setShowCopied(false);
-                }, 2000);
-
-                if (typeof plausible === 'function') {
-                    plausible('Share Action', {
-                        props: {
-                            actionType: 'Copy Image',
-                            success: true,
-                        },
-                    });
-                }
-            } else {
-                // Fallback to download if clipboard fails
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${memPosition.coin}-position.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                notifications.add({
-                    title: t('share.imageDownloaded') || 'Image Downloaded',
-                    message:
-                        t('share.imageDownloadedMessage') ||
-                        'Position card saved to your downloads',
-                    icon: 'check',
-                });
+                copiedTimeoutRef.current = setTimeout(
+                    () => setShowCopied(false),
+                    2000,
+                );
             }
 
             setIsCopying(false);
         } catch (err) {
-            console.error('Error capturing image:', err);
+            console.error(err);
+
             notifications.add({
                 title: t('share.copyFailed') || 'Copy Failed',
                 message:
                     t('share.copyFailedMessage') || 'Failed to capture image',
                 icon: 'error',
             });
+
             setIsCopying(false);
         }
     }
@@ -180,7 +139,8 @@ export default function ShareModal(props: propsIF) {
     return (
         <Modal title='' close={close} noHeader>
             <div className={styles.container}>
-                <section className={styles.leftSide} ref={cardRef}>
+                {/* LIVE CARD (SOURCE OF TRUTH) */}
+                <section ref={cardRef} className={styles.leftSide}>
                     <img
                         src={perpsLogo}
                         alt='Perps logo'
@@ -197,12 +157,7 @@ export default function ShareModal(props: propsIF) {
                             <div className={styles.marketInfoContainer}>
                                 <div className={styles.market}>
                                     <div className={styles.market_tkn}>
-                                        <div
-                                            className={styles.symbol_icon}
-                                            style={{
-                                                background: 'transparent',
-                                            }}
-                                        >
+                                        <div className={styles.symbol_icon}>
                                             <img
                                                 src={coinIcon}
                                                 alt={memPosition.coin}
@@ -214,8 +169,16 @@ export default function ShareModal(props: propsIF) {
                                         <div
                                             className={styles.yield}
                                             style={{
-                                                color: `var(--${memPosition.szi > 0 ? 'green' : 'red'})`,
-                                                backgroundColor: `var(--${memPosition.szi > 0 ? 'green' : 'red'}-dark)`,
+                                                color: `var(--${
+                                                    memPosition.szi > 0
+                                                        ? 'green'
+                                                        : 'red'
+                                                })`,
+                                                backgroundColor: `var(--${
+                                                    memPosition.szi > 0
+                                                        ? 'green'
+                                                        : 'red'
+                                                }-dark)`,
                                             }}
                                         >
                                             {(memPosition.szi > 0
@@ -228,26 +191,38 @@ export default function ShareModal(props: propsIF) {
                                             x
                                         </div>
                                     </div>
+
                                     <div
                                         className={styles.market_pct}
                                         style={{
-                                            color: `var(--${returnOnEquity > 0 ? 'green' : 'red'})`,
+                                            color: `var(--${
+                                                returnOnEquity > 0
+                                                    ? 'green'
+                                                    : 'red'
+                                            })`,
                                         }}
                                     >
                                         {returnOnEquity > 0 && '+'}
                                         {formatNum(returnOnEquity * 100, 1)}%
                                     </div>
                                 </div>
+
                                 <div className={styles.prices}>
                                     <div className={styles.price}>
-                                        <div>{t('tradeTable.entryPrice')}</div>
-                                        <div>
+                                        <div className={styles.priceLabel}>
+                                            {t('tradeTable.entryPrice')}
+                                        </div>
+                                        <div className={styles.priceValue}>
                                             {formatNum(memPosition.entryPx)}
                                         </div>
                                     </div>
                                     <div className={styles.price}>
-                                        <div>{t('tradeTable.markPrice')}</div>
-                                        <div>{formatNum(markPrice)}</div>
+                                        <div className={styles.priceLabel}>
+                                            {t('tradeTable.markPrice')}
+                                        </div>
+                                        <div className={styles.priceValue}>
+                                            {formatNum(markPrice)}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -255,17 +230,23 @@ export default function ShareModal(props: propsIF) {
                     </div>
                 </section>
 
+                {/* RIGHT SIDE */}
                 <section className={styles.rightSide}>
                     <div className={styles.view_toggle}>
                         <button
-                            className={`${styles.toggle_btn} ${viewMode === 'share' ? styles.active : ''}`}
+                            className={`${styles.toggle_btn} ${
+                                viewMode === 'share' ? styles.active : ''
+                            }`}
                             onClick={() => setViewMode('share')}
                         >
                             <LuShare2 size={16} />
                             {t('share.pnl') || 'Share'}
                         </button>
+
                         <button
-                            className={`${styles.toggle_btn} ${viewMode === 'details' ? styles.active : ''}`}
+                            className={`${styles.toggle_btn} ${
+                                viewMode === 'details' ? styles.active : ''
+                            }`}
                             onClick={() => setViewMode('details')}
                         >
                             <LuInfo size={16} />
@@ -274,14 +255,13 @@ export default function ShareModal(props: propsIF) {
                     </div>
 
                     <div className={styles.custom_text}>
-                        <label htmlFor={TEXTAREA_ID_FOR_DOM}>
+                        <label htmlFor='share_card_custom_text'>
                             {t('share.prompt')}
                         </label>
                         <textarea
-                            id={TEXTAREA_ID_FOR_DOM}
+                            id='share_card_custom_text'
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
-                            autoComplete='false'
                             defaultValue={t('share.textPlaceholder', {
                                 coin: memPosition.coin,
                                 twitter: PERPS_TWITTER,
@@ -309,6 +289,7 @@ export default function ShareModal(props: propsIF) {
                                 </>
                             )}
                         </button>
+
                         <button
                             onClick={async () => {
                                 if (!inputRef.current) return;
@@ -322,10 +303,6 @@ export default function ShareModal(props: propsIF) {
                         >
                             {t('share.xCTA')} <RiTwitterFill />
                         </button>
-                        <p className={styles.shareHint}>
-                            {t('share.shareHint') ||
-                                'Clicking Share on X also copies the image to your clipboard'}
-                        </p>
                     </div>
                 </section>
             </div>
