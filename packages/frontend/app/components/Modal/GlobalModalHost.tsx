@@ -23,6 +23,8 @@ type Payload = {
     /** called only when user closes from the host (backdrop/close/drag) */
     onRequestClose?: () => void;
     noHeader?: boolean;
+    /** when true, clicking outside the modal will not close it */
+    stopOutsideClick?: boolean;
 };
 
 type Ctx = {
@@ -227,6 +229,7 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     onClick={(e) => {
                         e.stopPropagation();
                         if (
+                            !payload.stopOutsideClick &&
                             backdropPointerDownOnSelf.current &&
                             e.target === e.currentTarget
                         ) {

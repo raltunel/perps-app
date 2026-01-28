@@ -13,6 +13,7 @@ interface ModalProps {
     forceBottomSheet?: boolean;
     noHeader?: boolean;
     title: string;
+    stopOutsideClick?: boolean;
 }
 
 /** Proxy component that forwards its content to the GlobalModalHost. */
@@ -25,6 +26,7 @@ export default function Modal(props: ModalProps) {
         forceBottomSheet = false,
         title,
         noHeader = false,
+        stopOutsideClick = false,
     } = props;
 
     const isMobile = useMobile(mobileBreakpoint);
@@ -46,6 +48,7 @@ export default function Modal(props: ModalProps) {
             content: children,
             noHeader,
             onRequestClose: close, // host closes → call caller's close()
+            stopOutsideClick,
         });
 
         return () => {
@@ -59,11 +62,12 @@ export default function Modal(props: ModalProps) {
     useEffect(() => {
         update({
             title,
+            noHeader,
             position: actualPosition,
             content: children,
-            noHeader,
+            stopOutsideClick,
         });
-    }, [title, actualPosition, children, noHeader, update]);
+    }, [title, actualPosition, children, noHeader, stopOutsideClick, update]);
 
     // Nothing is rendered locally; global host handles it.
     return null;
