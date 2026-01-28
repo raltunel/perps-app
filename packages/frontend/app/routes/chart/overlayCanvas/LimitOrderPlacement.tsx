@@ -79,6 +79,9 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
     const progressAnimationRef = React.useRef<number | null>(null);
     const isExecutingRef = React.useRef(false);
+    const lastCursorToolRef = React.useRef<'cursor' | 'dot' | 'arrow_cursor'>(
+        'cursor',
+    );
 
     function roundDownToTenth(value: number) {
         return Math.floor(value * 10) / 10;
@@ -93,6 +96,65 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             }
         };
     }, []);
+
+    // Initialize last cursor tool from current selection
+    useEffect(() => {
+        if (!chart || !isChartReady) return;
+
+        const selectedTool = chart.selectedLineTool();
+        const cursorTools = ['cursor', 'dot', 'arrow_cursor'];
+
+        if (cursorTools.includes(selectedTool)) {
+            lastCursorToolRef.current = selectedTool as
+                | 'cursor'
+                | 'dot'
+                | 'arrow_cursor';
+        }
+    }, [chart, isChartReady]);
+
+    // Disable quick mode when a non-cursor drawing tool is selected
+    useEffect(() => {
+        if (!chart || !isChartReady) return;
+
+        const handleLineToolChanged = () => {
+            const selectedTool = chart.selectedLineTool();
+            const cursorTools = ['cursor', 'dot', 'arrow_cursor'];
+
+            if (cursorTools.includes(selectedTool)) {
+                lastCursorToolRef.current = selectedTool as
+                    | 'cursor'
+                    | 'dot'
+                    | 'arrow_cursor';
+            } else {
+                useOrderPlacementStore.setState({ quickMode: false });
+            }
+        };
+
+        chart.subscribe('onSelectedLineToolChanged', handleLineToolChanged);
+
+        return () => {
+            chart.unsubscribe(
+                'onSelectedLineToolChanged',
+                handleLineToolChanged,
+            );
+        };
+    }, [chart, isChartReady]);
+
+    // Switch to last cursor tool when quick mode is enabled
+    useEffect(() => {
+        if (!chart || !isChartReady || !quickMode) return;
+
+        try {
+            const selectedTool = chart.selectedLineTool();
+            const cursorTools = ['cursor', 'dot', 'arrow_cursor'];
+
+            if (!cursorTools.includes(selectedTool)) {
+                chart.selectLineTool(lastCursorToolRef.current);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }, [chart, isChartReady, quickMode]);
 
     // Listen for crosshair movement to track price
     useEffect(() => {
@@ -323,15 +385,26 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     return;
                 }
                 handleBuyLimit(mousePrice);
+                return;
             }
             // Alt/Option + Shift + S for Sell (Windows: Alt, Mac: Option)
-            else if (e.altKey && e.shiftKey && e.code === 'KeyS') {
+            if (e.altKey && e.shiftKey && e.code === 'KeyS') {
                 e.preventDefault();
                 if (!activeOrder) {
                     openQuickModeConfirm();
                     return;
                 }
                 handleSellStop(mousePrice);
+                return;
+            }
+
+            // for demonstration cursor
+            if (e.altKey) {
+                try {
+                    chart.selectedLineTool();
+                } catch {
+                    useOrderPlacementStore.setState({ quickMode: false });
+                }
             }
         };
 
@@ -867,6 +940,17 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         }
 
         const side = 'sell';
+
+        if (activeOrder) {
+            setPreparedOrder({
+                price: price,
+                side: side,
+                type: activeOrder.tradeType,
+                size: activeOrder.size,
+                currency: activeOrder.currency,
+                timestamp: Date.now(),
+            });
+        }
 
         setClickedOrder({
             price: price,
