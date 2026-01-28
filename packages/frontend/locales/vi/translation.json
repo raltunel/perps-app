@@ -583,7 +583,8 @@
         "details": "Chi tiết",
         "copyImageCTA": "Sao chép hình ảnh",
         "copying": "Đang sao chép…",
-        "copied": "Đã sao chép!"
+        "copied": "Đã sao chép!",
+        "shareHint": "Nhấn Chia sẻ trên X cũng sẽ sao chép hình ảnh vào bộ nhớ tạm của bạn"
     },
     "colors": {
         "default": "Mặc định",

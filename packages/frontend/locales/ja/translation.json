@@ -583,7 +583,8 @@
         "details": "詳細",
         "copyImageCTA": "画像をコピー",
         "copying": "コピー中…",
-        "copied": "コピーしました！"
+        "copied": "コピーしました！",
+        "shareHint": "Xで共有すると、画像もクリップボードにコピーされます"
     },
     "colors": {
         "default": "デフォルト",

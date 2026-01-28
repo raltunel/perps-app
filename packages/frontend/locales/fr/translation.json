@@ -582,7 +582,8 @@
         "details": "Détails",
         "copyImageCTA": "Copier l’image",
         "copying": "Copie en cours…",
-        "copied": "Copié !"
+        "copied": "Copié !",
+        "shareHint": "Partager sur X copie aussi l’image dans votre presse-papiers"
     },
     "colors": {
         "default": "Par défaut",

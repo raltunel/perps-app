@@ -583,7 +583,8 @@
         "details": "Detaylar",
         "copyImageCTA": "Görseli kopyala",
         "copying": "Kopyalanıyor…",
-        "copied": "Kopyalandı!"
+        "copied": "Kopyalandı!",
+        "shareHint": "X’te Paylaş’a tıklamak, görseli panonuza da kopyalar"
     },
     "colors": {
         "default": "Varsayılan",

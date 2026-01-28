@@ -583,7 +583,8 @@
         "details": "Details",
         "copyImageCTA": "Bild kopieren",
         "copying": "Wird kopiert…",
-        "copied": "Kopiert!"
+        "copied": "Kopiert!",
+        "shareHint": "Teilen auf X kopiert das Bild auch in die Zwischenablage"
     },
 
     "colors": {

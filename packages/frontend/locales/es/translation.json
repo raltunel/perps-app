@@ -583,7 +583,8 @@
         "details": "Detalles",
         "copyImageCTA": "Copiar imagen",
         "copying": "Copiando…",
-        "copied": "¡Copiado!"
+        "copied": "¡Copiado!",
+        "shareHint": "Hacer clic en Compartir en 𝕏 y copiar la imagen a tu portapapeles"
     },
     "colors": {
         "default": "Predeterminado",
