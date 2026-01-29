@@ -478,26 +478,71 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
 
-        // mid gap
+        // Calculate total price range across all data
+        const minPrice = Math.min(bottomBoundaryBuy, bottomBoundarySell);
+        const maxPrice = Math.max(topBoundaryBuy, topBoundarySell);
+
+        // Mid price point (between buy and sell zones)
+        const midPrice = (topBoundaryBuy + bottomBoundarySell) / 2;
+
+        // Center Y position for the chart (may differ in overlay mode)
         const centerY = getCenterY();
-        const gapSize = rowGap / 2;
 
-        const buyYScale = d3
-            .scaleLinear()
-            .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([
-                heightRef.current * dpr,
-                (centerY + midHeaderHeight / 2 + gapSize + 1) * dpr,
-            ]);
+        // Middle gap size in pixels (excluded from scale calculations)
+        const midGapPx = 20;
 
+        // Calculate vertical positions with DPR for high-resolution displays
+        const totalHeightDpr = heightRef.current * dpr;
+        const centerYDpr = centerY * dpr;
+
+        // Define range boundaries for upper and lower sections
+        // Default values for liqMobile mode
+        let upperRangeTop = 0;
+        let upperRangeBottom = centerYDpr - midGapPx / 2;
+        let lowerRangeTop = centerYDpr + midGapPx / 2;
+        let lowerRangeBottom = totalHeightDpr;
+
+        // In non-mobile mode, use orderbook block positions as boundaries
+        if (locationRef.current !== 'liqMobile') {
+            const slotsWrapper = document.getElementById(
+                'orderBookSlotsWrapper',
+            );
+            const obSellBlock = document.getElementById('orderbook-sell-block');
+            const obBuyBlock = document.getElementById('orderbook-buy-block');
+
+            if (slotsWrapper && obSellBlock && obBuyBlock) {
+                const slotsRect = slotsWrapper.getBoundingClientRect();
+                const sellRect = obSellBlock.getBoundingClientRect();
+                const buyRect = obBuyBlock.getBoundingClientRect();
+
+                // Sell block boundaries (upper section)
+                upperRangeTop = (sellRect.top - slotsRect.top) * dpr;
+                upperRangeBottom = (sellRect.bottom - slotsRect.top) * dpr;
+
+                // Buy block boundaries (lower section)
+                lowerRangeTop = (buyRect.top - slotsRect.top) * dpr;
+                lowerRangeBottom = (buyRect.bottom - slotsRect.top) * dpr;
+
+                // Gap is naturally defined by the space between sellRect.bottom and buyRect.top
+            }
+        }
+
+        // Sell scale (upper half - high prices, inverted y-axis)
         const sellYScale = d3
             .scaleLinear()
-            .domain([bottomBoundarySell, topBoundarySell])
-            .range([(centerY - midHeaderHeight / 2 - 1) * dpr, 0]);
+            .domain([midPrice, maxPrice])
+            .range([upperRangeBottom, upperRangeTop]);
 
+        // Buy scale (lower half - low prices, inverted y-axis)
+        const buyYScale = d3
+            .scaleLinear()
+            .domain([minPrice, midPrice])
+            .range([lowerRangeBottom, lowerRangeTop]);
+
+        // Page scale for full price range (legacy compatibility)
         const pageYScale = d3
             .scaleLinear()
-            .domain([bottomBoundaryBuy, topBoundarySell])
+            .domain([minPrice, maxPrice])
             .range([heightRef.current, 0]);
 
         xScaleRef.current = xScale;
