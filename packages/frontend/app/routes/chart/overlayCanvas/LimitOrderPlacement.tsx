@@ -133,10 +133,14 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         chart.subscribe('onSelectedLineToolChanged', handleLineToolChanged);
 
         return () => {
-            chart.unsubscribe(
-                'onSelectedLineToolChanged',
-                handleLineToolChanged,
-            );
+            try {
+                chart.unsubscribe(
+                    'onSelectedLineToolChanged',
+                    handleLineToolChanged,
+                );
+            } catch {
+                // Chart may have been destroyed during navigation
+            }
         };
     }, [chart, isChartReady]);
 
