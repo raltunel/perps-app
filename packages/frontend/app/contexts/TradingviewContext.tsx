@@ -104,6 +104,19 @@ export const TradingViewProvider: React.FC<{
 
     const session = useSession();
     const isSessionEstablished = isEstablished(session);
+    const isSessionEstablishedRef = useRef(isSessionEstablished);
+
+    useEffect(() => {
+        isSessionEstablishedRef.current = isSessionEstablished;
+    }, [isSessionEstablished]);
+
+    const clickSessionButton = useCallback(() => {
+        const sessionWrap = document.querySelector('[class*="sessionWrap"]');
+        const sessionBtn = sessionWrap?.querySelector(
+            'button, [role="button"]',
+        ) as HTMLElement | null;
+        sessionBtn?.click();
+    }, []);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
@@ -618,6 +631,10 @@ export const TradingViewProvider: React.FC<{
                 });
 
                 quickButton.addEventListener('click', () => {
+                    if (!isSessionEstablishedRef.current) {
+                        clickSessionButton();
+                        return;
+                    }
                     toggleQuickMode();
                 });
 
@@ -855,6 +872,10 @@ export const TradingViewProvider: React.FC<{
             }
             if (e.code === 'KeyQ' && e.altKey) {
                 e.preventDefault();
+                if (!isSessionEstablishedRef.current) {
+                    clickSessionButton();
+                    return;
+                }
                 toggleQuickMode();
             }
             if (
