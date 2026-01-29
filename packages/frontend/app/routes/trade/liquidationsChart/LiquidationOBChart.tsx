@@ -13,6 +13,7 @@ import type {
 import { LiqChartTooltipType, useLiqChartStore } from '~/stores/LiqChartStore';
 import type { LiqLevel } from './LiquidationUtils';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 interface LiquidationsChartProps {
     buyData: LiqLevel[];
     sellData: LiqLevel[];
@@ -24,6 +25,7 @@ interface LiquidationsChartProps {
     scaleData?: any;
     location: string;
     chartMode: 'distribution' | 'cumulative';
+    obMode?: OrderBookMode;
 }
 
 interface LineData {
@@ -43,6 +45,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         scaleData,
         location,
         chartMode,
+        obMode,
     } = props;
 
     const {
@@ -54,6 +57,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = useLiqChartStore();
     const focusSourceRef = useRef(focusSource);
     focusSourceRef.current = focusSource;
+
+    const obModeRef = useRef(obMode);
+    obModeRef.current = obMode || 'symbol';
 
     const { symbolInfo } = useTradeDataStore();
     const symbolInfoRef = useRef(symbolInfo);
@@ -211,6 +217,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             )
                 return;
 
+            const dpr = window.devicePixelRatio || 1;
+
             const root = document.documentElement;
 
             const styles = getComputedStyle(root);
@@ -308,8 +316,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     const xEnd = widthRef.current;
 
                     context.beginPath();
-                    context.moveTo(xStart, yPos);
-                    context.lineTo(xEnd, yPos);
+                    context.moveTo(xStart * dpr, yPos * dpr);
+                    context.lineTo(xEnd * dpr, yPos * dpr);
                     context.stroke();
 
                     if (debugTexts && liq.sz > 0.01) {
@@ -359,8 +367,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     const xEnd = widthRef.current;
 
                     context.beginPath();
-                    context.moveTo(xStart, yPositionIndex);
-                    context.lineTo(xEnd, yPositionIndex);
+                    context.moveTo(xStart * dpr, yPositionIndex * dpr);
+                    context.lineTo(xEnd * dpr, yPositionIndex * dpr);
                     context.stroke();
 
                     if (debugTexts && liq.sz > 0.01) {
@@ -407,8 +415,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = liqLineWidth;
             context.setLineDash([4, 4]);
             context.beginPath();
-            context.moveTo(0, yPos);
-            context.lineTo(widthRef.current, yPos);
+            context.moveTo(0 * dpr, yPos * dpr);
+            context.lineTo(widthRef.current * dpr, yPos * dpr);
             context.stroke();
 
             context.restore();
@@ -681,7 +689,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const container = d3.select(d3CanvasLiqLines.current).node() as any;
         if (container) container.requestRedraw();
 
+        const dpr = window.devicePixelRatio || 1;
+
         d3.select(d3CanvasLiqLines.current).on('draw', () => {
+            canvas.width = scaleDataRef.current
+                ? widthRef.current * dpr
+                : widthRef.current * dpr;
+            canvas.height = scaleDataRef.current ? height * dpr : height * dpr;
+            canvas.style.width = `${widthRef.current}px`;
+            canvas.style.height = `${height}px`;
+
             // Draw liquidation lines using our custom function
             drawLiquidationLines(context);
         });
@@ -1070,26 +1087,47 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const percentage = (amount / finalTotal) * 100;
 
+            let szText = 'Size: ';
+            if (obModeRef.current === 'usd') {
+                szText +=
+                    formatNum(
+                        snappedPricePoint.sz *
+                            (symbolInfoRef.current?.markPx || 0),
+                        2,
+                    ) + ' USD';
+            } else {
+                szText +=
+                    formatNum(snappedPricePoint.sz, 2) +
+                    ' ' +
+                    symbolInfoRef.current?.coin;
+            }
+
+            let cumulativeLiqText = 'Cumulative Liq: ';
+            if (obModeRef.current === 'usd') {
+                cumulativeLiqText +=
+                    formatNum(
+                        amount * (symbolInfoRef.current?.markPx || 0),
+                        2,
+                    ) + ' USD';
+            } else {
+                cumulativeLiqText +=
+                    formatNum(amount, 2) + ' ' + symbolInfoRef.current?.coin;
+            }
+
             if (!hideTooltipRef.current) {
                 liqTooltipRef.current.html(
                     '<p>' +
                         formatNum(percentage) +
                         '%</p>' +
                         '<p>' +
-                        'Cumulative Liq: ' +
-                        formatNum(amount, 2) +
-                        ' ' +
-                        symbolInfoRef.current?.coin +
+                        cumulativeLiqText +
                         ' </p>' +
                         '<p>' +
                         'Price: ' +
                         priceText +
                         ' </p>' +
                         '<p>' +
-                        'Size: ' +
-                        formatNum(snappedPricePoint.sz, 2) +
-                        ' ' +
-                        symbolInfoRef.current?.coin +
+                        szText +
                         ' </p>',
                 );
             } else {

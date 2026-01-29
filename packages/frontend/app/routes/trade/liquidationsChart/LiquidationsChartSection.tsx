@@ -308,6 +308,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             height={dimensions.height}
                             location={'obBook'}
                             chartMode={chartMode}
+                            obMode={selectedMode}
                         />
                         {/* <button
                             className={styles.modeButton}
