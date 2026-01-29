@@ -72,6 +72,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqLines = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqContianer = useRef<HTMLDivElement | null>(null);
+    const d3CanvasLiqDebug = useRef<HTMLCanvasElement | null>(null);
     const gap = 4;
     const { d3, d3fc } = useLazyD3() ?? {};
 
@@ -80,6 +81,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const sellYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const pageYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
+
+    // Store range boundaries for split scale calculations in non-mobile mode
+    const rangeDataRef = useRef({
+        upperRangeBottom: 0,
+        lowerRangeTop: 0,
+        midPrice: 0,
+    });
 
     const [chartReady, setChartReady] = useState(false);
 
@@ -118,9 +126,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const highlightHoveredArea = useRef(false);
 
-    const { orderCount } = useOrderBookStore();
+    const { orderCount, obMinBuy, obMaxSell } = useOrderBookStore();
     const orderCountRef = useRef(0);
     orderCountRef.current = orderCount;
+
+    const obMinBuyRef = useRef(obMinBuy);
+    obMinBuyRef.current = obMinBuy;
+    const obMaxSellRef = useRef(obMaxSell);
+    obMaxSellRef.current = obMaxSell;
 
     const { bsColor, getBsColor } = useAppSettings();
 
@@ -510,40 +523,103 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const obSellBlock = document.getElementById('orderbook-sell-block');
             const obBuyBlock = document.getElementById('orderbook-buy-block');
 
-            if (slotsWrapper && obSellBlock && obBuyBlock) {
-                const slotsRect = slotsWrapper.getBoundingClientRect();
+            if (
+                slotsWrapper &&
+                obSellBlock &&
+                obBuyBlock &&
+                d3CanvasLiqContianer.current
+            ) {
                 const sellRect = obSellBlock.getBoundingClientRect();
                 const buyRect = obBuyBlock.getBoundingClientRect();
+                const canvasRect =
+                    d3CanvasLiqContianer.current.getBoundingClientRect();
 
-                // Sell block boundaries (upper section)
-                upperRangeTop = (sellRect.top - slotsRect.top) * dpr;
-                upperRangeBottom = (sellRect.bottom - slotsRect.top) * dpr;
+                // Calculate positions relative to canvas (not slotsWrapper)
+                // because offsetY in handleTooltip is relative to canvas
+                upperRangeTop = (sellRect.top - canvasRect.top) * dpr;
+                upperRangeBottom = (sellRect.bottom - canvasRect.top) * dpr;
 
-                // Buy block boundaries (lower section)
-                lowerRangeTop = (buyRect.top - slotsRect.top) * dpr;
-                lowerRangeBottom = (buyRect.bottom - slotsRect.top) * dpr;
+                lowerRangeTop = (buyRect.top - canvasRect.top) * dpr;
+                lowerRangeBottom = (buyRect.bottom - canvasRect.top) * dpr;
 
                 // Gap is naturally defined by the space between sellRect.bottom and buyRect.top
+            }
+        }
+
+        // Determine domain based on mode
+        let sellDomainMin = bottomBoundarySell;
+        let sellDomainMax = topBoundarySell;
+        let buyDomainMin = bottomBoundaryBuy;
+        let buyDomainMax = topBoundaryBuy;
+
+        if (locationRef.current !== 'liqMobile') {
+            // Use orderbook min/max for domain in obBook mode
+            if (
+                obMaxSellRef.current !== undefined &&
+                obMaxSellRef.current !== null
+            ) {
+                sellDomainMax = obMaxSellRef.current;
+            }
+            if (
+                obMinBuyRef.current !== undefined &&
+                obMinBuyRef.current !== null
+            ) {
+                buyDomainMin = obMinBuyRef.current;
             }
         }
 
         // Sell scale (upper half - high prices, inverted y-axis)
         const sellYScale = d3
             .scaleLinear()
-            .domain([midPrice, maxPrice])
+            .domain([sellDomainMin, sellDomainMax])
             .range([upperRangeBottom, upperRangeTop]);
 
         // Buy scale (lower half - low prices, inverted y-axis)
         const buyYScale = d3
             .scaleLinear()
-            .domain([minPrice, midPrice])
+            .domain([buyDomainMin, buyDomainMax])
             .range([lowerRangeBottom, lowerRangeTop]);
 
-        // Page scale for full price range (legacy compatibility)
-        const pageYScale = d3
-            .scaleLinear()
-            .domain([minPrice, maxPrice])
-            .range([heightRef.current, 0]);
+        // Store range data for split scale mouse calculations
+        rangeDataRef.current = {
+            upperRangeBottom,
+            lowerRangeTop,
+            midPrice,
+        };
+
+        // Create composite page scale for non-mobile mode that delegates to buy/sell scales
+        // For mobile mode, use simple linear scale
+        let pageYScale: any;
+        if (locationRef.current === 'liqMobile') {
+            pageYScale = d3
+                .scaleLinear()
+                .domain([minPrice, maxPrice])
+                .range([heightRef.current, 0]);
+        } else {
+            // Composite scale function that delegates to appropriate sub-scale
+            pageYScale = function (price: number) {
+                if (price >= midPrice) {
+                    return sellYScale(price);
+                } else {
+                    return buyYScale(price);
+                }
+            };
+
+            // Add invert method for reverse lookups
+            pageYScale.invert = function (y: number) {
+                if (y <= upperRangeBottom) {
+                    return sellYScale.invert(y);
+                } else if (y >= lowerRangeTop) {
+                    return buyYScale.invert(y);
+                } else {
+                    return midPrice;
+                }
+            };
+
+            // Add domain and range methods for d3fc compatibility
+            pageYScale.domain = () => [minPrice, maxPrice];
+            pageYScale.range = () => [lowerRangeBottom, upperRangeTop];
+        }
 
         xScaleRef.current = xScale;
         buyYScaleRef.current = scaleDataRef.current
@@ -1022,7 +1098,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         if (location === 'liqMobile') {
             yPoint = scaleDataRef.current.yScale(focusedPrice) / usedDpr;
         } else {
-            yPoint = pageYScaleRef.current(focusedPrice / usedDpr);
+            // Use split scale approach to get Y position from price
+            const { midPrice } = rangeDataRef.current;
+            if (focusedPrice >= midPrice) {
+                // Upper range (sell) - use sell scale
+                yPoint = sellYScaleRef.current!(focusedPrice) / usedDpr;
+            } else {
+                // Lower range (buy) - use buy scale
+                yPoint = buyYScaleRef.current!(focusedPrice) / usedDpr;
+            }
         }
         handleTooltip(0, yPoint, true);
     }, [focusedPrice, location]);
@@ -1055,9 +1139,31 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const centerY = getCenterY();
             const isBuy = centerY < offsetY * usedDpr;
 
-            const priceOnMousePoint = pageYScaleRef.current.invert(
-                offsetY * usedDpr,
-            );
+            // Calculate price from mouse Y position
+            let priceOnMousePoint: number;
+            if (locationRef.current === 'liqMobile') {
+                // Use simple linear scale for mobile mode
+                priceOnMousePoint = pageYScaleRef.current.invert(
+                    offsetY * usedDpr,
+                );
+            } else {
+                // For non-mobile mode, use buy/sell scales directly
+                // Use dpr (not usedDpr) because scale ranges are in DPR coordinates
+                const yPos = offsetY * dpr;
+                const { upperRangeBottom, lowerRangeTop, midPrice } =
+                    rangeDataRef.current;
+
+                if (yPos <= upperRangeBottom) {
+                    // Upper range (sell) - use sell scale
+                    priceOnMousePoint = sellYScaleRef.current!.invert(yPos);
+                } else if (yPos >= lowerRangeTop) {
+                    // Lower range (buy) - use buy scale
+                    priceOnMousePoint = buyYScaleRef.current!.invert(yPos);
+                } else {
+                    // In the gap - return midPrice
+                    priceOnMousePoint = midPrice;
+                }
+            }
 
             // chart is being updated from store, so we don't need to update the store
             if (!updateFromStore) {
@@ -1214,6 +1320,69 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             }
 
             highlightHoveredArea.current = true;
+
+            // Debug: Draw price on separate debug canvas
+            if (d3CanvasLiqDebug.current) {
+                const debugCanvas = d3CanvasLiqDebug.current;
+                const debugCtx = debugCanvas.getContext('2d');
+                if (debugCtx) {
+                    const dpr = window.devicePixelRatio || 1;
+                    // Clear canvas
+                    debugCtx.clearRect(
+                        0,
+                        0,
+                        debugCanvas.width,
+                        debugCanvas.height,
+                    );
+
+                    // Draw debug info
+                    debugCtx.save();
+                    debugCtx.scale(dpr, dpr);
+                    debugCtx.font = '12px Arial';
+                    debugCtx.fillStyle = 'yellow';
+                    debugCtx.strokeStyle = 'black';
+                    debugCtx.lineWidth = 2;
+
+                    const { upperRangeBottom, lowerRangeTop, midPrice } =
+                        rangeDataRef.current;
+                    const yPosDpr = offsetY * dpr;
+                    const isUpper = yPosDpr <= upperRangeBottom;
+
+                    // Calculate what the scales think
+                    let scalePrice = 0;
+                    let scaleDomain = '';
+                    let scaleRange = '';
+                    if (isUpper && sellYScaleRef.current) {
+                        scalePrice = sellYScaleRef.current.invert(yPosDpr);
+                        const domain = sellYScaleRef.current.domain();
+                        const range = sellYScaleRef.current.range();
+                        scaleDomain = `[${domain[0].toFixed(1)}, ${domain[1].toFixed(1)}]`;
+                        scaleRange = `[${(range[0] / dpr).toFixed(0)}, ${(range[1] / dpr).toFixed(0)}]px`;
+                    } else if (!isUpper && buyYScaleRef.current) {
+                        scalePrice = buyYScaleRef.current.invert(yPosDpr);
+                        const domain = buyYScaleRef.current.domain();
+                        const range = buyYScaleRef.current.range();
+                        scaleDomain = `[${domain[0].toFixed(1)}, ${domain[1].toFixed(1)}]`;
+                        scaleRange = `[${(range[0] / dpr).toFixed(0)}, ${(range[1] / dpr).toFixed(0)}]px`;
+                    }
+
+                    const debugLines = [
+                        `Price: ${priceOnMousePoint.toFixed(2)}`,
+                        `ScaleCalc: ${scalePrice.toFixed(2)}`,
+                        `Y: ${offsetY.toFixed(0)}px (${yPosDpr.toFixed(0)} dpr)`,
+                        `Area: ${isUpper ? 'SELL' : 'BUY'}`,
+                        `Domain: ${scaleDomain}`,
+                        `Range: ${scaleRange}`,
+                    ];
+
+                    debugLines.forEach((line, i) => {
+                        debugCtx.strokeText(line, 10, 20 + i * 18);
+                        debugCtx.fillText(line, 10, 20 + i * 18);
+                    });
+
+                    debugCtx.restore();
+                }
+            }
         },
         [getCenterY],
     );
@@ -1645,6 +1814,21 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     width: `${widthRef.current}px`,
                     height: `${heightRef.current}px`,
                 }}
+            />
+
+            <canvas
+                ref={d3CanvasLiqDebug}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: `${widthRef.current}px`,
+                    height: `${heightRef.current}px`,
+                    pointerEvents: 'none',
+                    zIndex: 1000,
+                }}
+                width={widthRef.current * (window.devicePixelRatio || 1)}
+                height={heightRef.current * (window.devicePixelRatio || 1)}
             />
         </div>
     );
