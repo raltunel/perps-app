@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useTradingView } from '~/contexts/TradingviewContext';
@@ -76,6 +77,17 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const { executeLimitOrder } = useLimitOrderService();
     const notifications = useNotificationStore();
     const { formatNum } = useNumFormatter();
+
+    const session = useSession();
+    const isSessionEstablished = isEstablished(session);
+
+    const clickSessionButton = useCallback(() => {
+        const sessionWrap = document.querySelector('[class*="sessionWrap"]');
+        const sessionBtn = sessionWrap?.querySelector(
+            'button, [role="button"]',
+        ) as HTMLElement | null;
+        sessionBtn?.click();
+    }, []);
 
     const progressAnimationRef = React.useRef<number | null>(null);
     const isExecutingRef = React.useRef(false);
@@ -886,6 +898,10 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             openQuickModeConfirm();
             return;
         }
+        if (!isSessionEstablished) {
+            clickSessionButton();
+            return;
+        }
 
         const side = 'buy';
 
@@ -940,6 +956,10 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const handleSellStop = (price: number) => {
         if (!activeOrder) {
             openQuickModeConfirm();
+            return;
+        }
+        if (!isSessionEstablished) {
+            clickSessionButton();
             return;
         }
 
@@ -1005,6 +1025,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         setShowDropdown(false);
                         if (!activeOrder) {
                             openQuickModeConfirm();
+                        } else if (!isSessionEstablished) {
+                            clickSessionButton();
                         } else {
                             confirmOrder({
                                 price,
@@ -1020,6 +1042,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         setShowDropdown(false);
                         if (!activeOrder) {
                             openQuickModeConfirm();
+                        } else if (!isSessionEstablished) {
+                            clickSessionButton();
                         } else {
                             confirmOrder({
                                 price,

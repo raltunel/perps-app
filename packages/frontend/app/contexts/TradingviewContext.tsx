@@ -631,6 +631,11 @@ export const TradingViewProvider: React.FC<{
                 });
 
                 quickButton.addEventListener('click', () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (!state.activeOrder) {
+                        openQuickModeConfirm();
+                        return;
+                    }
                     if (!isSessionEstablishedRef.current) {
                         clickSessionButton();
                         return;
@@ -786,18 +791,18 @@ export const TradingViewProvider: React.FC<{
 
             const bottomOrder = isAbove
                 ? {
-                      text: i18n.t('quickTrade.buySizeAtStop', {
+                      text: `${i18n.t('quickTrade.buySizeAtStop', {
                           size: displaySize,
                           price: formattedPrice,
-                      }),
+                      })} (${i18n.t('common.comingSoon')})`,
                       side: 'buy' as const,
                       type: 'Stop' as const,
                   }
                 : {
-                      text: i18n.t('quickTrade.sellSizeAtStop', {
+                      text: `${i18n.t('quickTrade.sellSizeAtStop', {
                           size: displaySize,
                           price: formattedPrice,
-                      }),
+                      })} (${i18n.t('common.comingSoon')})`,
                       side: 'sell' as const,
                       type: 'Stop' as const,
                   };
@@ -807,6 +812,10 @@ export const TradingViewProvider: React.FC<{
                     position: 'top' as const,
                     text: topOrder.text,
                     click: () => {
+                        if (!isSessionEstablishedRef.current) {
+                            clickSessionButton();
+                            return;
+                        }
                         confirmOrder({
                             price: formattedPrice,
                             side: topOrder.side,
@@ -872,6 +881,11 @@ export const TradingViewProvider: React.FC<{
             }
             if (e.code === 'KeyQ' && e.altKey) {
                 e.preventDefault();
+                const state = useOrderPlacementStore.getState();
+                if (!state.activeOrder) {
+                    openQuickModeConfirm();
+                    return;
+                }
                 if (!isSessionEstablishedRef.current) {
                     clickSessionButton();
                     return;
