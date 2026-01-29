@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+export const QUICK_MODE_SETTINGS_KEY = 'perps.tv.chart.quickModeSettings';
 
 // ============================================================================
 // Types & Interfaces
@@ -77,81 +80,87 @@ const initialQuickModeState: QuickModeState = {
 // Store Implementation
 // ============================================================================
 
-export const useOrderPlacementStore = create<OrderPlacementStore>(
-    (set, get) => ({
-        // Initial State
-        ...initialOrderState,
-        ...initialQuickModeState,
-        showModal: false,
+export const useOrderPlacementStore = create<OrderPlacementStore>()(
+    persist(
+        (set, get) => ({
+            // Initial State
+            ...initialOrderState,
+            ...initialQuickModeState,
+            showModal: false,
 
-        // Order Actions
-        setPreparedOrder: (order) => {
-            set({ preparedOrder: order });
-        },
+            // Order Actions
+            setPreparedOrder: (order) => {
+                set({ preparedOrder: order });
+            },
 
-        clearPreparedOrder: () => {
-            set({ preparedOrder: null });
-        },
+            clearPreparedOrder: () => {
+                set({ preparedOrder: null });
+            },
 
-        confirmOrder: (order) => {
-            set({
-                preparedOrder: order,
-                showModal: false,
-            });
-        },
+            confirmOrder: (order) => {
+                set({
+                    preparedOrder: order,
+                    showModal: false,
+                });
+            },
 
-        // Modal Actions
-        openModal: () => {
-            set({ showModal: true });
-        },
+            // Modal Actions
+            openModal: () => {
+                set({ showModal: true });
+            },
 
-        closeModal: () => {
-            set({ showModal: false });
-        },
+            closeModal: () => {
+                set({ showModal: false });
+            },
 
-        // Quick Mode Actions
-        toggleQuickMode: () => {
-            const { quickMode, activeOrder } = get();
+            // Quick Mode Actions
+            toggleQuickMode: () => {
+                const { quickMode, activeOrder } = get();
 
-            if (!quickMode && !activeOrder) {
+                if (!quickMode && !activeOrder) {
+                    set({ showQuickModeConfirm: true });
+                    return;
+                }
+
+                set({ quickMode: !quickMode });
+            },
+
+            openQuickModeConfirm: () => {
                 set({ showQuickModeConfirm: true });
-                return;
-            }
+            },
 
-            set({ quickMode: !quickMode });
-        },
+            closeQuickModeConfirm: () => {
+                set({ showQuickModeConfirm: false });
+            },
 
-        openQuickModeConfirm: () => {
-            set({ showQuickModeConfirm: true });
-        },
+            saveQuickModeSettings: (data) => {
+                set({
+                    showQuickModeConfirm: false,
+                    activeOrder: data,
+                });
+            },
 
-        closeQuickModeConfirm: () => {
-            set({ showQuickModeConfirm: false });
-        },
+            saveAndEnableQuickMode: (data) => {
+                set({
+                    quickMode: true,
+                    showQuickModeConfirm: false,
+                    activeOrder: data,
+                });
+            },
 
-        saveQuickModeSettings: (data) => {
-            set({
-                showQuickModeConfirm: false,
-                activeOrder: data,
-            });
+            resetQuickModeState: () => {
+                set({
+                    quickMode: false,
+                    preparedOrder: null,
+                });
+            },
+        }),
+        {
+            name: QUICK_MODE_SETTINGS_KEY,
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({ activeOrder: state.activeOrder }),
         },
-
-        saveAndEnableQuickMode: (data) => {
-            set({
-                quickMode: true,
-                showQuickModeConfirm: false,
-                activeOrder: data,
-            });
-        },
-
-        resetQuickModeState: () => {
-            set({
-                quickMode: false,
-                activeOrder: null,
-                preparedOrder: null,
-            });
-        },
-    }),
+    ),
 );
 
 // ============================================================================
