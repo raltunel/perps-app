@@ -139,6 +139,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
     const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
 
+    const selectedResolutionRef = useRef(selectedResolution);
+    selectedResolutionRef.current = selectedResolution;
+
     // useEffect(() => {
     //     console.log('buys', buys);
     //     console.log('sells', sells);
@@ -369,9 +372,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
         if (sells.length > 0) {
             if (sells.length > orderCount) {
-                setObMaxSell(sells[orderCount - 1].px);
+                setObMaxSell(
+                    sells[orderCount - 1].px +
+                        (selectedResolutionRef.current?.val || 0),
+                );
             } else {
-                setObMaxSell(sells[sells.length - 1].px);
+                setObMaxSell(
+                    sells[sells.length - 1].px +
+                        (selectedResolutionRef.current?.val || 0),
+                );
             }
             setObMinSell(sells[0].px);
         }

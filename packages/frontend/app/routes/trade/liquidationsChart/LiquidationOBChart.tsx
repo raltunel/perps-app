@@ -86,7 +86,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const rangeDataRef = useRef({
         upperRangeBottom: 0,
         lowerRangeTop: 0,
-        midPrice: 0,
         buyDomainMin: 0,
         buyDomainMax: 0,
         sellDomainMin: 0,
@@ -130,7 +129,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const highlightHoveredArea = useRef(false);
 
-    const { orderCount, obMinBuy, obMaxSell } = useOrderBookStore();
+    const { orderCount, obMinBuy, obMaxSell, midPrice } = useOrderBookStore();
+    const midPriceRef = useRef(midPrice);
+    midPriceRef.current = midPrice;
+
     const orderCountRef = useRef(0);
     orderCountRef.current = orderCount;
 
@@ -166,8 +168,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const showLiqText = useRef(false);
     const showAreaText = useRef(false);
 
-    // Debug flag - set to true to show liq sizes on lines
-    const debugTexts = false;
+    const showDebugCanvas = false;
 
     const minLiqLine = 2;
     const baseLiqWidth = 6; // base width when slot has liq value
@@ -317,15 +318,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.lineTo(xEnd * dpr, yPos * dpr);
                     context.stroke();
 
-                    if (debugTexts && liq.sz > 0.01) {
-                        // Draw liq size and ratio text to the left of the line
-                        context.fillStyle = sellColorRef.current;
-                        context.font = '10px Arial';
-                        context.textAlign = 'right';
-                        const sizeText = `${liq.sz.toFixed(2)} (${((liq.ratio || 0) * 100).toFixed(1)}%)`;
-                        context.fillText(sizeText, xStart - 4, yPos + 3);
-                    }
-
                     if (showLiqText.current) {
                         // Draw px value text
                         context.fillStyle = sellColorRef.current;
@@ -367,19 +359,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.moveTo(xStart * dpr, yPositionIndex * dpr);
                     context.lineTo(xEnd * dpr, yPositionIndex * dpr);
                     context.stroke();
-
-                    if (debugTexts && liq.sz > 0.01) {
-                        // Draw liq size and ratio text to the left of the line
-                        context.fillStyle = buyColorRef.current;
-                        context.font = '10px Arial';
-                        context.textAlign = 'right';
-                        const sizeText = `${liq.sz.toFixed(2)} (${((liq.ratio || 0) * 100).toFixed(1)}%)`;
-                        context.fillText(
-                            sizeText,
-                            xStart - 4,
-                            yPositionIndex + 3,
-                        );
-                    }
 
                     if (showLiqText.current) {
                         // Draw px value text
@@ -555,9 +534,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const minPrice = Math.min(bottomBoundaryBuy, bottomBoundarySell);
         const maxPrice = Math.max(topBoundaryBuy, topBoundarySell);
 
-        // Mid price point (between buy and sell zones)
-        const midPrice = (topBoundaryBuy + bottomBoundarySell) / 2;
-
         // Center Y position for the chart (may differ in overlay mode)
         const centerY = getCenterY();
 
@@ -644,7 +620,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         rangeDataRef.current = {
             upperRangeBottom,
             lowerRangeTop,
-            midPrice,
             buyDomainMin,
             buyDomainMax,
             sellDomainMin,
@@ -662,7 +637,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         } else {
             // Composite scale function that delegates to appropriate sub-scale
             pageYScale = function (price: number) {
-                if (price >= midPrice) {
+                if (price >= (midPriceRef.current || 0)) {
                     return sellYScale(price);
                 } else {
                     return buyYScale(price);
@@ -676,7 +651,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 } else if (y >= lowerRangeTop) {
                     return buyYScale.invert(y);
                 } else {
-                    return midPrice;
+                    return midPriceRef.current || 0;
                 }
             };
 
@@ -1180,8 +1155,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             yPoint = scaleDataRef.current.yScale(focusedPrice) / usedDpr;
         } else {
             // Use split scale approach to get Y position from price
-            const { midPrice } = rangeDataRef.current;
-            if (focusedPrice >= midPrice) {
+            if (focusedPrice >= (midPriceRef.current || 0)) {
                 // Upper range (sell) - use sell scale
                 yPoint = sellYScaleRef.current!(focusedPrice) / usedDpr;
             } else {
@@ -1231,7 +1205,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 // For non-mobile mode, use buy/sell scales directly
                 // Use dpr (not usedDpr) because scale ranges are in DPR coordinates
                 const yPos = offsetY * dpr;
-                const { upperRangeBottom, lowerRangeTop, midPrice } =
+                const { upperRangeBottom, lowerRangeTop } =
                     rangeDataRef.current;
 
                 if (yPos <= upperRangeBottom) {
@@ -1242,7 +1216,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     priceOnMousePoint = buyYScaleRef.current!.invert(yPos);
                 } else {
                     // In the gap - return midPrice
-                    priceOnMousePoint = midPrice;
+                    priceOnMousePoint = midPriceRef.current || 0;
                 }
             }
 
@@ -1403,7 +1377,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             highlightHoveredArea.current = true;
 
             // Debug: Draw price on separate debug canvas
-            if (d3CanvasLiqDebug.current) {
+            if (showDebugCanvas && d3CanvasLiqDebug.current) {
                 const debugCanvas = d3CanvasLiqDebug.current;
                 const debugCtx = debugCanvas.getContext('2d');
                 if (debugCtx) {
@@ -1424,8 +1398,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     debugCtx.strokeStyle = 'black';
                     debugCtx.lineWidth = 2;
 
-                    const { upperRangeBottom, lowerRangeTop, midPrice } =
-                        rangeDataRef.current;
+                    const { upperRangeBottom } = rangeDataRef.current;
                     const yPosDpr = offsetY * dpr;
                     const isUpper = yPosDpr <= upperRangeBottom;
 

@@ -9,6 +9,7 @@ import {
     type LiqLevelMessage,
     parseLiqLevelRaw,
 } from './LiquidationUtils';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 
 interface OBLiqFetcherProps {}
 
@@ -26,6 +27,11 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
         buyLiqs,
         sellLiqs,
     } = useLiquidationStore();
+
+    const { midPrice } = useOrderBookStore();
+    const midPriceRef = useRef(midPrice);
+    midPriceRef.current = midPrice;
+
     const maxLiqUSDRef = useRef(maxLiqUSD);
     const minLiqUSDRef = useRef(minLiqUSD);
     const buyLiqsRef = useRef(buyLiqs);
@@ -61,14 +67,14 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
     }, [subscribe, unsubscribe]);
 
     const handleLiquidationLevels = useCallback((data: LiqLevelMessage) => {
-        const markPx = symbolInfoRef.current?.markPx;
-        if (!markPx) return;
+        const midPx = midPriceRef.current;
+        if (!midPx) return;
 
         setLoadingState(TableState.FILLED);
         const levels = data.market.aggregated.levels;
 
         const buys = levels
-            .filter((level) => level[0] / 1e6 <= markPx)
+            .filter((level) => level[0] / 1e6 <= midPx)
             .reverse();
 
         const buysMaxSz = buys.reduce(
@@ -86,7 +92,7 @@ const OBLiqFetcher: React.FC<OBLiqFetcherProps> = () => {
             0,
         );
 
-        const sells = levels.filter((level) => level[0] / 1e6 > markPx);
+        const sells = levels.filter((level) => level[0] / 1e6 > midPx);
         const sellsMaxSz = sells.reduce(
             (max, level) => Math.max(max, level[1] / 1e8),
             0,
