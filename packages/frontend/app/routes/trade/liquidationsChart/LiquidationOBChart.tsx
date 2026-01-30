@@ -72,6 +72,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqLines = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqContianer = useRef<HTMLDivElement | null>(null);
+    const d3CanvasLiqDebug = useRef<HTMLCanvasElement | null>(null);
     const gap = 4;
     const { d3, d3fc } = useLazyD3() ?? {};
 
@@ -80,6 +81,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const sellYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const pageYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
+
+    // Store range boundaries for split scale calculations in non-mobile mode
+    const rangeDataRef = useRef({
+        upperRangeBottom: 0,
+        lowerRangeTop: 0,
+        buyDomainMin: 0,
+        buyDomainMax: 0,
+        sellDomainMin: 0,
+        sellDomainMax: 0,
+    });
 
     const [chartReady, setChartReady] = useState(false);
 
@@ -118,9 +129,17 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const highlightHoveredArea = useRef(false);
 
-    const { orderCount } = useOrderBookStore();
+    const { orderCount, obMinBuy, obMaxSell, midPrice } = useOrderBookStore();
+    const midPriceRef = useRef(midPrice);
+    midPriceRef.current = midPrice;
+
     const orderCountRef = useRef(0);
     orderCountRef.current = orderCount;
+
+    const obMinBuyRef = useRef(obMinBuy);
+    obMinBuyRef.current = obMinBuy;
+    const obMaxSellRef = useRef(obMaxSell);
+    obMaxSellRef.current = obMaxSell;
 
     const { bsColor, getBsColor } = useAppSettings();
 
@@ -149,8 +168,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const showLiqText = useRef(false);
     const showAreaText = useRef(false);
 
-    // Debug flag - set to true to show liq sizes on lines
-    const debugTexts = false;
+    const showDebugCanvas = false;
 
     const minLiqLine = 2;
     const baseLiqWidth = 6; // base width when slot has liq value
@@ -161,26 +179,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const sellColorRef = useRef(getBsColor().sell);
 
     const hideTooltipRef = useRef(false);
-
-    // Helper to ensure minimum width for area chart ticks (using ref for stable reference)
-    const getMinRatioRef = useRef((ratio: number | undefined): number => {
-        if (!ratio || ratio === 0) return 0;
-        const minRatio = minAreaWidth / widthRef.current;
-        return Math.max(ratio, minRatio);
-    });
-
-    // Update the ref function when width changes
-    useEffect(() => {
-        getMinRatioRef.current = (ratio: number | undefined): number => {
-            if (!ratio || ratio === 0) return 0;
-            const minRatio = minAreaWidth / widthRef.current;
-            return Math.max(ratio, minRatio);
-        };
-    }, [width]);
-
-    const getMinRatio = (ratio: number | undefined): number => {
-        return getMinRatioRef.current(ratio);
-    };
 
     // calculates center y for liq chart (on overlay chart that center point is changed based on tv chart y axis positioning)
     const getCenterY = useCallback(() => {
@@ -320,15 +318,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.lineTo(xEnd * dpr, yPos * dpr);
                     context.stroke();
 
-                    if (debugTexts && liq.sz > 0.01) {
-                        // Draw liq size and ratio text to the left of the line
-                        context.fillStyle = sellColorRef.current;
-                        context.font = '10px Arial';
-                        context.textAlign = 'right';
-                        const sizeText = `${liq.sz.toFixed(2)} (${((liq.ratio || 0) * 100).toFixed(1)}%)`;
-                        context.fillText(sizeText, xStart - 4, yPos + 3);
-                    }
-
                     if (showLiqText.current) {
                         // Draw px value text
                         context.fillStyle = sellColorRef.current;
@@ -371,19 +360,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.lineTo(xEnd * dpr, yPositionIndex * dpr);
                     context.stroke();
 
-                    if (debugTexts && liq.sz > 0.01) {
-                        // Draw liq size and ratio text to the left of the line
-                        context.fillStyle = buyColorRef.current;
-                        context.font = '10px Arial';
-                        context.textAlign = 'right';
-                        const sizeText = `${liq.sz.toFixed(2)} (${((liq.ratio || 0) * 100).toFixed(1)}%)`;
-                        context.fillText(
-                            sizeText,
-                            xStart - 4,
-                            yPositionIndex + 3,
-                        );
-                    }
-
                     if (showLiqText.current) {
                         // Draw px value text
                         context.fillStyle = buyColorRef.current;
@@ -424,6 +400,82 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [],
     );
 
+    // Helper function to extend data to scale boundaries
+    const extendDataToBoundaries = useCallback(
+        (
+            data: LiqLevel[],
+            domainMin: number,
+            domainMax: number,
+            type: 'buy' | 'sell',
+        ): LiqLevel[] => {
+            if (!data || data.length === 0) return data;
+
+            const extended = [...data];
+            const firstPoint = extended[0];
+            const lastPoint = extended[extended.length - 1];
+
+            // Determine if data is in ascending (low to high) or descending (high to low) order
+            const isAscending = firstPoint.px < lastPoint.px;
+
+            // Get actual min/max prices in the data
+            const minPx = Math.min(firstPoint.px, lastPoint.px);
+            const maxPx = Math.max(firstPoint.px, lastPoint.px);
+
+            // Add point at domain min if data doesn't reach it
+            if (minPx > domainMin) {
+                const maxCumulativePoint =
+                    (firstPoint.cumulativeRatio || 0) >=
+                    (lastPoint.cumulativeRatio || 0)
+                        ? firstPoint
+                        : lastPoint;
+
+                const minPoint = {
+                    px: domainMin,
+                    ratio: 0,
+                    sz: 0,
+                    type: type,
+                    cumulativeRatio: maxCumulativePoint.cumulativeRatio || 0,
+                    cumulativeSz: maxCumulativePoint.cumulativeSz || 0,
+                };
+
+                if (isAscending) {
+                    extended.unshift(minPoint); // Add at beginning for ascending
+                } else {
+                    extended.push(minPoint); // Add at end for descending
+                }
+            }
+
+            // Add point at domain max if data doesn't reach it
+            if (maxPx < domainMax) {
+                // For cumulative values, always use the point with highest cumulative value
+                // (regardless of price order, cumulative values always increase)
+                const maxCumulativePoint =
+                    (firstPoint.cumulativeRatio || 0) >=
+                    (lastPoint.cumulativeRatio || 0)
+                        ? firstPoint
+                        : lastPoint;
+
+                const maxPoint = {
+                    px: domainMax,
+                    ratio: 0,
+                    sz: 0,
+                    type: type,
+                    cumulativeRatio: maxCumulativePoint.cumulativeRatio || 0,
+                    cumulativeSz: maxCumulativePoint.cumulativeSz || 0,
+                };
+
+                if (isAscending) {
+                    extended.push(maxPoint); // Add at end for ascending
+                } else {
+                    extended.unshift(maxPoint); // Add at beginning for descending
+                }
+            }
+
+            return extended;
+        },
+        [],
+    );
+
     const updateScales = useCallback(() => {
         const currentBuyData = currentBuyDataRef.current;
         const currentSellData = currentSellDataRef.current;
@@ -441,8 +493,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         // Calculate max ratio in data based on chart mode
         const getRatioValue = (d: LiqLevel) =>
             chartModeRef.current === 'distribution'
-                ? getMinRatio(d.ratio)
-                : getMinRatio(d.cumulativeRatio);
+                ? d.ratio || 0
+                : d.cumulativeRatio || 0;
 
         const maxBuyRatio =
             currentBuyData.length > 0
@@ -478,27 +530,135 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
 
-        // mid gap
+        // Calculate total price range across all data
+        const minPrice = Math.min(bottomBoundaryBuy, bottomBoundarySell);
+        const maxPrice = Math.max(topBoundaryBuy, topBoundarySell);
+
+        // Center Y position for the chart (may differ in overlay mode)
         const centerY = getCenterY();
-        const gapSize = rowGap / 2;
 
-        const buyYScale = d3
-            .scaleLinear()
-            .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([
-                heightRef.current * dpr,
-                (centerY + midHeaderHeight / 2 + gapSize + 1) * dpr,
-            ]);
+        // Middle gap size in pixels (excluded from scale calculations)
+        const midGapPx = 20;
 
+        // Calculate vertical positions with DPR for high-resolution displays
+        const totalHeightDpr = heightRef.current * dpr;
+        const centerYDpr = centerY * dpr;
+
+        // Define range boundaries for upper and lower sections
+        // Default values for liqMobile mode
+        let upperRangeTop = 0;
+        let upperRangeBottom = centerYDpr - midGapPx / 2;
+        let lowerRangeTop = centerYDpr + midGapPx / 2;
+        let lowerRangeBottom = totalHeightDpr;
+
+        // In non-mobile mode, use orderbook block positions as boundaries
+        if (locationRef.current !== 'liqMobile') {
+            const slotsWrapper = document.getElementById(
+                'orderBookSlotsWrapper',
+            );
+            const obSellBlock = document.getElementById('orderbook-sell-block');
+            const obBuyBlock = document.getElementById('orderbook-buy-block');
+
+            if (
+                slotsWrapper &&
+                obSellBlock &&
+                obBuyBlock &&
+                d3CanvasLiqContianer.current
+            ) {
+                const sellRect = obSellBlock.getBoundingClientRect();
+                const buyRect = obBuyBlock.getBoundingClientRect();
+                const canvasRect =
+                    d3CanvasLiqContianer.current.getBoundingClientRect();
+
+                // Calculate positions relative to canvas (not slotsWrapper)
+                // because offsetY in handleTooltip is relative to canvas
+                upperRangeTop = (sellRect.top - canvasRect.top) * dpr;
+                upperRangeBottom = (sellRect.bottom - canvasRect.top) * dpr;
+
+                lowerRangeTop = (buyRect.top - canvasRect.top) * dpr;
+                lowerRangeBottom = (buyRect.bottom - canvasRect.top) * dpr;
+
+                // Gap is naturally defined by the space between sellRect.bottom and buyRect.top
+            }
+        }
+
+        // Determine domain based on mode
+        let sellDomainMin = bottomBoundarySell;
+        let sellDomainMax = topBoundarySell;
+        let buyDomainMin = bottomBoundaryBuy;
+        let buyDomainMax = topBoundaryBuy;
+
+        if (locationRef.current !== 'liqMobile') {
+            // Use orderbook min/max for domain in obBook mode
+            if (
+                obMaxSellRef.current !== undefined &&
+                obMaxSellRef.current !== null
+            ) {
+                sellDomainMax = obMaxSellRef.current;
+            }
+            if (
+                obMinBuyRef.current !== undefined &&
+                obMinBuyRef.current !== null
+            ) {
+                buyDomainMin = obMinBuyRef.current;
+            }
+        }
+
+        // Sell scale (upper half - high prices, inverted y-axis)
         const sellYScale = d3
             .scaleLinear()
-            .domain([bottomBoundarySell, topBoundarySell])
-            .range([(centerY - midHeaderHeight / 2 - 1) * dpr, 0]);
+            .domain([sellDomainMin, sellDomainMax])
+            .range([upperRangeBottom, upperRangeTop]);
 
-        const pageYScale = d3
+        // Buy scale (lower half - low prices, inverted y-axis)
+        const buyYScale = d3
             .scaleLinear()
-            .domain([bottomBoundaryBuy, topBoundarySell])
-            .range([heightRef.current, 0]);
+            .domain([buyDomainMin, buyDomainMax])
+            .range([lowerRangeBottom, lowerRangeTop]);
+
+        // Store range data for split scale mouse calculations
+        rangeDataRef.current = {
+            upperRangeBottom,
+            lowerRangeTop,
+            buyDomainMin,
+            buyDomainMax,
+            sellDomainMin,
+            sellDomainMax,
+        };
+
+        // Create composite page scale for non-mobile mode that delegates to buy/sell scales
+        // For mobile mode, use simple linear scale
+        let pageYScale: any;
+        if (locationRef.current === 'liqMobile') {
+            pageYScale = d3
+                .scaleLinear()
+                .domain([minPrice, maxPrice])
+                .range([heightRef.current, 0]);
+        } else {
+            // Composite scale function that delegates to appropriate sub-scale
+            pageYScale = function (price: number) {
+                if (price >= (midPriceRef.current || 0)) {
+                    return sellYScale(price);
+                } else {
+                    return buyYScale(price);
+                }
+            };
+
+            // Add invert method for reverse lookups
+            pageYScale.invert = function (y: number) {
+                if (y <= upperRangeBottom) {
+                    return sellYScale.invert(y);
+                } else if (y >= lowerRangeTop) {
+                    return buyYScale.invert(y);
+                } else {
+                    return midPriceRef.current || 0;
+                }
+            };
+
+            // Add domain and range methods for d3fc compatibility
+            pageYScale.domain = () => [minPrice, maxPrice];
+            pageYScale.range = () => [lowerRangeBottom, upperRangeTop];
+        }
 
         xScaleRef.current = xScale;
         buyYScaleRef.current = scaleDataRef.current
@@ -552,8 +712,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -578,8 +738,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -595,8 +755,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -617,8 +777,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -666,10 +826,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 clipCanvas(hoverLineDataRef.current[0].offsetY, canvas, true);
             }
 
-            sellArea(currentSellDataRef.current);
-            buyArea(currentBuyDataRef.current);
-            sellLine(currentSellDataRef.current);
-            buyLine(currentBuyDataRef.current);
+            // Extend data to scale boundaries for smooth shapes
+            const { buyDomainMin, buyDomainMax, sellDomainMin, sellDomainMax } =
+                rangeDataRef.current;
+
+            const extendedSellData = extendDataToBoundaries(
+                currentSellDataRef.current,
+                sellDomainMin,
+                sellDomainMax,
+                'sell',
+            );
+            const extendedBuyData = extendDataToBoundaries(
+                currentBuyDataRef.current,
+                buyDomainMin,
+                buyDomainMax,
+                'buy',
+            );
+
+            sellArea(extendedSellData);
+            buyArea(extendedBuyData);
+            sellLine(extendedSellData);
+            buyLine(extendedBuyData);
         });
     }, [width, height, location, chartReady, chartMode]);
 
@@ -977,7 +1154,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         if (location === 'liqMobile') {
             yPoint = scaleDataRef.current.yScale(focusedPrice) / usedDpr;
         } else {
-            yPoint = pageYScaleRef.current(focusedPrice / usedDpr);
+            // Use split scale approach to get Y position from price
+            if (focusedPrice >= (midPriceRef.current || 0)) {
+                // Upper range (sell) - use sell scale
+                yPoint = sellYScaleRef.current!(focusedPrice) / usedDpr;
+            } else {
+                // Lower range (buy) - use buy scale
+                yPoint = buyYScaleRef.current!(focusedPrice) / usedDpr;
+            }
         }
         handleTooltip(0, yPoint, true);
     }, [focusedPrice, location]);
@@ -1010,9 +1194,31 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const centerY = getCenterY();
             const isBuy = centerY < offsetY * usedDpr;
 
-            const priceOnMousePoint = pageYScaleRef.current.invert(
-                offsetY * usedDpr,
-            );
+            // Calculate price from mouse Y position
+            let priceOnMousePoint: number;
+            if (locationRef.current === 'liqMobile') {
+                // Use simple linear scale for mobile mode
+                priceOnMousePoint = pageYScaleRef.current.invert(
+                    offsetY * usedDpr,
+                );
+            } else {
+                // For non-mobile mode, use buy/sell scales directly
+                // Use dpr (not usedDpr) because scale ranges are in DPR coordinates
+                const yPos = offsetY * dpr;
+                const { upperRangeBottom, lowerRangeTop } =
+                    rangeDataRef.current;
+
+                if (yPos <= upperRangeBottom) {
+                    // Upper range (sell) - use sell scale
+                    priceOnMousePoint = sellYScaleRef.current!.invert(yPos);
+                } else if (yPos >= lowerRangeTop) {
+                    // Lower range (buy) - use buy scale
+                    priceOnMousePoint = buyYScaleRef.current!.invert(yPos);
+                } else {
+                    // In the gap - return midPrice
+                    priceOnMousePoint = midPriceRef.current || 0;
+                }
+            }
 
             // chart is being updated from store, so we don't need to update the store
             if (!updateFromStore) {
@@ -1169,6 +1375,68 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             }
 
             highlightHoveredArea.current = true;
+
+            // Debug: Draw price on separate debug canvas
+            if (showDebugCanvas && d3CanvasLiqDebug.current) {
+                const debugCanvas = d3CanvasLiqDebug.current;
+                const debugCtx = debugCanvas.getContext('2d');
+                if (debugCtx) {
+                    const dpr = window.devicePixelRatio || 1;
+                    // Clear canvas
+                    debugCtx.clearRect(
+                        0,
+                        0,
+                        debugCanvas.width,
+                        debugCanvas.height,
+                    );
+
+                    // Draw debug info
+                    debugCtx.save();
+                    debugCtx.scale(dpr, dpr);
+                    debugCtx.font = '12px Arial';
+                    debugCtx.fillStyle = 'yellow';
+                    debugCtx.strokeStyle = 'black';
+                    debugCtx.lineWidth = 2;
+
+                    const { upperRangeBottom } = rangeDataRef.current;
+                    const yPosDpr = offsetY * dpr;
+                    const isUpper = yPosDpr <= upperRangeBottom;
+
+                    // Calculate what the scales think
+                    let scalePrice = 0;
+                    let scaleDomain = '';
+                    let scaleRange = '';
+                    if (isUpper && sellYScaleRef.current) {
+                        scalePrice = sellYScaleRef.current.invert(yPosDpr);
+                        const domain = sellYScaleRef.current.domain();
+                        const range = sellYScaleRef.current.range();
+                        scaleDomain = `[${domain[0].toFixed(1)}, ${domain[1].toFixed(1)}]`;
+                        scaleRange = `[${(range[0] / dpr).toFixed(0)}, ${(range[1] / dpr).toFixed(0)}]px`;
+                    } else if (!isUpper && buyYScaleRef.current) {
+                        scalePrice = buyYScaleRef.current.invert(yPosDpr);
+                        const domain = buyYScaleRef.current.domain();
+                        const range = buyYScaleRef.current.range();
+                        scaleDomain = `[${domain[0].toFixed(1)}, ${domain[1].toFixed(1)}]`;
+                        scaleRange = `[${(range[0] / dpr).toFixed(0)}, ${(range[1] / dpr).toFixed(0)}]px`;
+                    }
+
+                    const debugLines = [
+                        `Price: ${priceOnMousePoint.toFixed(2)}`,
+                        `ScaleCalc: ${scalePrice.toFixed(2)}`,
+                        `Y: ${offsetY.toFixed(0)}px (${yPosDpr.toFixed(0)} dpr)`,
+                        `Area: ${isUpper ? 'SELL' : 'BUY'}`,
+                        `Domain: ${scaleDomain}`,
+                        `Range: ${scaleRange}`,
+                    ];
+
+                    debugLines.forEach((line, i) => {
+                        debugCtx.strokeText(line, 10, 20 + i * 18);
+                        debugCtx.fillText(line, 10, 20 + i * 18);
+                    });
+
+                    debugCtx.restore();
+                }
+            }
         },
         [getCenterY],
     );
@@ -1391,8 +1659,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -1411,8 +1679,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -1472,12 +1740,33 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         hoveredCanvas,
                     );
 
-                    sellLineSeriesRef.current(currentSellDataRef.current);
-                    buyLineSeriesRef.current(currentBuyDataRef.current);
+                    // Extend data to scale boundaries for smooth shapes
+                    const {
+                        buyDomainMin,
+                        buyDomainMax,
+                        sellDomainMin,
+                        sellDomainMax,
+                    } = rangeDataRef.current;
+
+                    const extendedSellData = extendDataToBoundaries(
+                        currentSellDataRef.current,
+                        sellDomainMin,
+                        sellDomainMax,
+                        'sell',
+                    );
+                    const extendedBuyData = extendDataToBoundaries(
+                        currentBuyDataRef.current,
+                        buyDomainMin,
+                        buyDomainMax,
+                        'buy',
+                    );
+
+                    sellLineSeriesRef.current(extendedSellData);
+                    buyLineSeriesRef.current(extendedBuyData);
 
                     hoverLine(hoverLineDataRef.current);
-                    highlightedBuyArea(currentBuyDataRef.current);
-                    highlightedSellArea(currentSellDataRef.current);
+                    highlightedBuyArea(extendedBuyData);
+                    highlightedSellArea(extendedSellData);
                 }
             })
             .on('measure', () => {
@@ -1600,6 +1889,21 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     width: `${widthRef.current}px`,
                     height: `${heightRef.current}px`,
                 }}
+            />
+
+            <canvas
+                ref={d3CanvasLiqDebug}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: `${widthRef.current}px`,
+                    height: `${heightRef.current}px`,
+                    pointerEvents: 'none',
+                    zIndex: 1000,
+                }}
+                width={widthRef.current * (window.devicePixelRatio || 1)}
+                height={heightRef.current * (window.devicePixelRatio || 1)}
             />
         </div>
     );
