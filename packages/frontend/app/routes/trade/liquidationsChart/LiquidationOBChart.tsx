@@ -87,6 +87,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         upperRangeBottom: 0,
         lowerRangeTop: 0,
         midPrice: 0,
+        buyDomainMin: 0,
+        buyDomainMax: 0,
+        sellDomainMin: 0,
+        sellDomainMax: 0,
     });
 
     const [chartReady, setChartReady] = useState(false);
@@ -174,26 +178,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const sellColorRef = useRef(getBsColor().sell);
 
     const hideTooltipRef = useRef(false);
-
-    // Helper to ensure minimum width for area chart ticks (using ref for stable reference)
-    const getMinRatioRef = useRef((ratio: number | undefined): number => {
-        if (!ratio || ratio === 0) return 0;
-        const minRatio = minAreaWidth / widthRef.current;
-        return Math.max(ratio, minRatio);
-    });
-
-    // Update the ref function when width changes
-    useEffect(() => {
-        getMinRatioRef.current = (ratio: number | undefined): number => {
-            if (!ratio || ratio === 0) return 0;
-            const minRatio = minAreaWidth / widthRef.current;
-            return Math.max(ratio, minRatio);
-        };
-    }, [width]);
-
-    const getMinRatio = (ratio: number | undefined): number => {
-        return getMinRatioRef.current(ratio);
-    };
 
     // calculates center y for liq chart (on overlay chart that center point is changed based on tv chart y axis positioning)
     const getCenterY = useCallback(() => {
@@ -437,6 +421,82 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [],
     );
 
+    // Helper function to extend data to scale boundaries
+    const extendDataToBoundaries = useCallback(
+        (
+            data: LiqLevel[],
+            domainMin: number,
+            domainMax: number,
+            type: 'buy' | 'sell',
+        ): LiqLevel[] => {
+            if (!data || data.length === 0) return data;
+
+            const extended = [...data];
+            const firstPoint = extended[0];
+            const lastPoint = extended[extended.length - 1];
+
+            // Determine if data is in ascending (low to high) or descending (high to low) order
+            const isAscending = firstPoint.px < lastPoint.px;
+
+            // Get actual min/max prices in the data
+            const minPx = Math.min(firstPoint.px, lastPoint.px);
+            const maxPx = Math.max(firstPoint.px, lastPoint.px);
+
+            // Add point at domain min if data doesn't reach it
+            if (minPx > domainMin) {
+                const maxCumulativePoint =
+                    (firstPoint.cumulativeRatio || 0) >=
+                    (lastPoint.cumulativeRatio || 0)
+                        ? firstPoint
+                        : lastPoint;
+
+                const minPoint = {
+                    px: domainMin,
+                    ratio: 0,
+                    sz: 0,
+                    type: type,
+                    cumulativeRatio: maxCumulativePoint.cumulativeRatio || 0,
+                    cumulativeSz: maxCumulativePoint.cumulativeSz || 0,
+                };
+
+                if (isAscending) {
+                    extended.unshift(minPoint); // Add at beginning for ascending
+                } else {
+                    extended.push(minPoint); // Add at end for descending
+                }
+            }
+
+            // Add point at domain max if data doesn't reach it
+            if (maxPx < domainMax) {
+                // For cumulative values, always use the point with highest cumulative value
+                // (regardless of price order, cumulative values always increase)
+                const maxCumulativePoint =
+                    (firstPoint.cumulativeRatio || 0) >=
+                    (lastPoint.cumulativeRatio || 0)
+                        ? firstPoint
+                        : lastPoint;
+
+                const maxPoint = {
+                    px: domainMax,
+                    ratio: 0,
+                    sz: 0,
+                    type: type,
+                    cumulativeRatio: maxCumulativePoint.cumulativeRatio || 0,
+                    cumulativeSz: maxCumulativePoint.cumulativeSz || 0,
+                };
+
+                if (isAscending) {
+                    extended.push(maxPoint); // Add at end for ascending
+                } else {
+                    extended.unshift(maxPoint); // Add at beginning for descending
+                }
+            }
+
+            return extended;
+        },
+        [],
+    );
+
     const updateScales = useCallback(() => {
         const currentBuyData = currentBuyDataRef.current;
         const currentSellData = currentSellDataRef.current;
@@ -454,8 +514,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         // Calculate max ratio in data based on chart mode
         const getRatioValue = (d: LiqLevel) =>
             chartModeRef.current === 'distribution'
-                ? getMinRatio(d.ratio)
-                : getMinRatio(d.cumulativeRatio);
+                ? d.ratio || 0
+                : d.cumulativeRatio || 0;
 
         const maxBuyRatio =
             currentBuyData.length > 0
@@ -585,6 +645,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             upperRangeBottom,
             lowerRangeTop,
             midPrice,
+            buyDomainMin,
+            buyDomainMax,
+            sellDomainMin,
+            sellDomainMax,
         };
 
         // Create composite page scale for non-mobile mode that delegates to buy/sell scales
@@ -673,8 +737,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -699,8 +763,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -716,8 +780,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -738,8 +802,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -787,10 +851,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 clipCanvas(hoverLineDataRef.current[0].offsetY, canvas, true);
             }
 
-            sellArea(currentSellDataRef.current);
-            buyArea(currentBuyDataRef.current);
-            sellLine(currentSellDataRef.current);
-            buyLine(currentBuyDataRef.current);
+            // Extend data to scale boundaries for smooth shapes
+            const { buyDomainMin, buyDomainMax, sellDomainMin, sellDomainMax } =
+                rangeDataRef.current;
+
+            const extendedSellData = extendDataToBoundaries(
+                currentSellDataRef.current,
+                sellDomainMin,
+                sellDomainMax,
+                'sell',
+            );
+            const extendedBuyData = extendDataToBoundaries(
+                currentBuyDataRef.current,
+                buyDomainMin,
+                buyDomainMax,
+                'buy',
+            );
+
+            sellArea(extendedSellData);
+            buyArea(extendedBuyData);
+            sellLine(extendedSellData);
+            buyLine(extendedBuyData);
         });
     }, [width, height, location, chartReady, chartMode]);
 
@@ -1605,8 +1686,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -1625,8 +1706,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: LiqLevel) =>
                 chartModeRef.current === 'distribution'
-                    ? getMinRatio(d.ratio)
-                    : getMinRatio(d.cumulativeRatio),
+                    ? d.ratio
+                    : d.cumulativeRatio,
             )
             .crossValue((d: LiqLevel) => d.px)
             .xScale(xScaleRef.current)
@@ -1686,12 +1767,33 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         hoveredCanvas,
                     );
 
-                    sellLineSeriesRef.current(currentSellDataRef.current);
-                    buyLineSeriesRef.current(currentBuyDataRef.current);
+                    // Extend data to scale boundaries for smooth shapes
+                    const {
+                        buyDomainMin,
+                        buyDomainMax,
+                        sellDomainMin,
+                        sellDomainMax,
+                    } = rangeDataRef.current;
+
+                    const extendedSellData = extendDataToBoundaries(
+                        currentSellDataRef.current,
+                        sellDomainMin,
+                        sellDomainMax,
+                        'sell',
+                    );
+                    const extendedBuyData = extendDataToBoundaries(
+                        currentBuyDataRef.current,
+                        buyDomainMin,
+                        buyDomainMax,
+                        'buy',
+                    );
+
+                    sellLineSeriesRef.current(extendedSellData);
+                    buyLineSeriesRef.current(extendedBuyData);
 
                     hoverLine(hoverLineDataRef.current);
-                    highlightedBuyArea(currentBuyDataRef.current);
-                    highlightedSellArea(currentSellDataRef.current);
+                    highlightedBuyArea(extendedBuyData);
+                    highlightedSellArea(extendedSellData);
                 }
             })
             .on('measure', () => {
