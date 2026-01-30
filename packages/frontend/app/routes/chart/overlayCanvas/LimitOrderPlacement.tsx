@@ -376,25 +376,26 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
 
             if (!mousePrice) return;
+
+            useTradeDataStore.getState().setOrderInputPriceValue({
+                value: mousePrice,
+                changeType: 'quickTradeMode',
+            });
+            useTradeDataStore.getState().setTradeDirection(side);
+            useTradeDataStore.getState().setMarketOrderType('limit');
+            useTradeDataStore.getState().setIsMidModeActive(false);
+
+            // Convert currency string to OrderBookMode
+            const currency = activeOrder?.currency || 'USD';
+            const upperSymbol = symbolInfo?.coin?.toUpperCase() ?? 'BTC';
+            const denom = currency === upperSymbol ? 'symbol' : 'usd';
+
+            useTradeDataStore.getState().setOrderInputSizeValue({
+                value: activeOrder?.size || 0,
+                denom: denom,
+            });
+
             if (!activeOrder?.bypassConfirmation) {
-                useTradeDataStore.getState().setOrderInputPriceValue({
-                    value: mousePrice,
-                    changeType: 'quickTradeMode',
-                });
-                useTradeDataStore.getState().setTradeDirection(side);
-                useTradeDataStore.getState().setMarketOrderType('limit');
-                useTradeDataStore.getState().setIsMidModeActive(false);
-
-                // Convert currency string to OrderBookMode
-                const currency = activeOrder?.currency || 'USD';
-                const upperSymbol = symbolInfo?.coin?.toUpperCase() ?? 'BTC';
-                const denom = currency === upperSymbol ? 'symbol' : 'usd';
-
-                useTradeDataStore.getState().setOrderInputSizeValue({
-                    value: activeOrder?.size || 0,
-                    denom: denom,
-                });
-
                 return;
             }
             // Set prepared order immediately on click
