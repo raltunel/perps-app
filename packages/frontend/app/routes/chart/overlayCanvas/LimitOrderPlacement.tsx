@@ -94,6 +94,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const lastCursorToolRef = React.useRef<'cursor' | 'dot' | 'arrow_cursor'>(
         'cursor',
     );
+    const mouseDownTimeRef = React.useRef<number | null>(null);
+    const mouseDownDomainRef = React.useRef<{
+        min: number;
+        max: number;
+    } | null>(null);
 
     function roundDownToTenth(value: number) {
         return Math.floor(value * 10) / 10;
@@ -234,17 +239,49 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         };
     }, [chart, scaleData, overlayCanvasMousePositionRef, quickMode]);
 
-    // Listen for clicks on TradingView chart
     useEffect(() => {
-        if (!chart || !scaleData || !overlayCanvasRef.current) return;
+        if (!chart || !scaleData) return;
 
-        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
-        if (!iframeDoc) return;
+        const handleMouseDown = () => {
+            mouseDownTimeRef.current = Date.now();
+            const currentDomain = scaleData?.yScale.domain();
+            if (currentDomain && currentDomain.length >= 2) {
+                mouseDownDomainRef.current = {
+                    min: currentDomain[0],
+                    max: currentDomain[1],
+                };
+            }
+        };
 
-        const handleChartClick = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
+        const handleMouseUp = (e: MouseEvent) => {
+            if (mouseDownTimeRef.current && mouseDownDomainRef.current) {
+                const mouseUpTime = Date.now();
+                const duration = mouseUpTime - mouseDownTimeRef.current;
+                const currentDomain = scaleData?.yScale.domain();
 
-            if (target.tagName !== 'CANVAS') return;
+                if (
+                    duration > 150 &&
+                    currentDomain &&
+                    currentDomain.length >= 2
+                ) {
+                    const domainChanged =
+                        Math.abs(
+                            currentDomain[0] - mouseDownDomainRef.current.min,
+                        ) > 0.0001 ||
+                        Math.abs(
+                            currentDomain[1] - mouseDownDomainRef.current.max,
+                        ) > 0.0001;
+
+                    if (domainChanged) {
+                        mouseDownTimeRef.current = null;
+                        mouseDownDomainRef.current = null;
+                        return;
+                    }
+                }
+            }
+
+            mouseDownTimeRef.current = null;
+            mouseDownDomainRef.current = null;
 
             const canvas = overlayCanvasRef.current;
             if (!canvas) return;
@@ -262,12 +299,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     clickY <= buttonBounds.y + buttonBounds.height
                 ) {
                     if (mousePrice) {
-                        const canvas = overlayCanvasRef.current;
-                        if (!canvas) return;
-
-                        const rect = canvas.getBoundingClientRect();
                         const dropdownWidth = 280;
-                        const dpr = window.devicePixelRatio || 1;
 
                         const posX =
                             buttonBounds.x +
@@ -293,16 +325,13 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             if (!quickMode) return;
             if (isExecutingRef.current) return;
 
-            const y = e.clientY - canvas.getBoundingClientRect().top;
-
-            const price = scaleData.yScale.invert(y);
-
             const side: 'buy' | 'sell' =
                 markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
 
+            if (!mousePrice) return;
             if (!activeOrder?.bypassConfirmation) {
                 useTradeDataStore.getState().setOrderInputPriceValue({
-                    value: price,
+                    value: mousePrice,
                     changeType: 'quickTradeMode',
                 });
                 useTradeDataStore.getState().setTradeDirection(side);
@@ -370,10 +399,20 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 requestAnimationFrame(animateProgress);
         };
 
-        iframeDoc.addEventListener('click', handleChartClick);
+        try {
+            chart.subscribe('mouse_down', handleMouseDown);
+            chart.subscribe('mouse_up', handleMouseUp);
+        } catch (error) {
+            console.error('Failed to subscribe to mouse events:', error);
+        }
 
         return () => {
-            iframeDoc.removeEventListener('click', handleChartClick);
+            try {
+                chart.unsubscribe('mouse_down', handleMouseDown);
+                chart.unsubscribe('mouse_up', handleMouseUp);
+            } catch {
+                // Chart may have been destroyed
+            }
         };
     }, [
         chart,
@@ -878,7 +917,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 };
 
                 if (isSuccess) {
-                    setTimeout(cleanup, 1000);
+                    setTimeout(cleanup, 500);
                 } else {
                     cleanup();
                 }
