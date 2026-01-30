@@ -99,6 +99,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         min: number;
         max: number;
     } | null>(null);
+    const hadSelectionOnMouseDownRef = React.useRef(false);
 
     function roundDownToTenth(value: number) {
         return Math.floor(value * 10) / 10;
@@ -244,6 +245,32 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
         const handleMouseDown = () => {
             mouseDownTimeRef.current = Date.now();
+
+            try {
+                const selection = chart.activeChart().selection();
+
+                if (!selection.isEmpty()) {
+                    const sources = selection.allSources();
+
+                    let hasShape = false;
+                    for (const entityId of sources) {
+                        try {
+                            chart.activeChart().getShapeById(entityId);
+                            hasShape = true;
+                            break;
+                        } catch {
+                            // If it throws, it's a mark/indicator, not a shape
+                        }
+                    }
+
+                    hadSelectionOnMouseDownRef.current = hasShape;
+                } else {
+                    hadSelectionOnMouseDownRef.current = false;
+                }
+            } catch {
+                hadSelectionOnMouseDownRef.current = false;
+            }
+
             const currentDomain = scaleData?.yScale.domain();
             if (currentDomain && currentDomain.length >= 2) {
                 mouseDownDomainRef.current = {
@@ -254,6 +281,26 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         };
 
         const handleMouseUp = (e: MouseEvent) => {
+            if (hadSelectionOnMouseDownRef.current) {
+                mouseDownTimeRef.current = null;
+                mouseDownDomainRef.current = null;
+                hadSelectionOnMouseDownRef.current = false;
+                return;
+            }
+
+            try {
+                const selection = chart.activeChart().selection();
+                if (!selection.isEmpty()) {
+                    mouseDownTimeRef.current = null;
+                    mouseDownDomainRef.current = null;
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking selection:', error);
+            }
+
+            hadSelectionOnMouseDownRef.current = false;
+
             if (mouseDownTimeRef.current && mouseDownDomainRef.current) {
                 const mouseUpTime = Date.now();
                 const duration = mouseUpTime - mouseDownTimeRef.current;
