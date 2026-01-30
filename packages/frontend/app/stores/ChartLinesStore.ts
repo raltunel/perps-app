@@ -19,6 +19,9 @@ interface ChartLinesStore {
 
     showPlusButton: boolean;
     setShowPlusButton: (show: boolean) => void;
+
+    isCancelClicking: boolean;
+    setIsCancelClicking: (value: boolean) => void;
 }
 
 export const useChartLinesStore = create<ChartLinesStore>((set) => ({
@@ -36,4 +39,7 @@ export const useChartLinesStore = create<ChartLinesStore>((set) => ({
 
     showPlusButton: true,
     setShowPlusButton: (show: boolean) => set({ showPlusButton: show }),
+
+    isCancelClicking: false,
+    setIsCancelClicking: (value: boolean) => set({ isCancelClicking: value }),
 }));

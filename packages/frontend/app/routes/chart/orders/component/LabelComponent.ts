@@ -92,6 +92,7 @@ const LabelComponent = ({
         shouldConfirmOrder,
         setShouldConfirmOrder,
         setShowPlusButton,
+        setIsCancelClicking,
     } = useChartLinesStore();
 
     const priceDomain = useChartScaleStore((state) => state.priceDomain);
@@ -855,12 +856,15 @@ const LabelComponent = ({
     }, [chart, isDrag, drawnLabelsRef.current, isMobile]);
 
     const handleCancel = async (order: LineData) => {
+        setIsCancelClicking(true);
+
         if (!order.oid) {
             notifications.add({
                 title: t('transactions.cancelFailed.title'),
                 message: t('transactions.cancelFailed.message'),
                 icon: 'error',
             });
+            setIsCancelClicking(false);
             return;
         }
 
@@ -977,6 +981,8 @@ const LabelComponent = ({
                     },
                 });
             }
+        } finally {
+            setIsCancelClicking(false);
         }
     };
 

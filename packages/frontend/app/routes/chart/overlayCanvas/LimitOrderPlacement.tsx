@@ -73,7 +73,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         openQuickModeConfirm,
     } = useOrderPlacementStore();
     const { zoomChanged } = useChartScaleStore();
-    const { showPlusButton, setShowPlusButton } = useChartLinesStore();
+    const {
+        showPlusButton,
+        setShowPlusButton,
+        isCancelClicking,
+        setIsCancelClicking,
+    } = useChartLinesStore();
     const { executeLimitOrder } = useLimitOrderService();
     const notifications = useNotificationStore();
     const { formatNum } = useNumFormatter();
@@ -281,6 +286,13 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         };
 
         const handleMouseUp = (e: MouseEvent) => {
+            if (isCancelClicking) {
+                mouseDownTimeRef.current = null;
+                mouseDownDomainRef.current = null;
+                setIsCancelClicking(false);
+                return;
+            }
+
             if (hadSelectionOnMouseDownRef.current) {
                 mouseDownTimeRef.current = null;
                 mouseDownDomainRef.current = null;
@@ -471,6 +483,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         markPx,
         colors,
         quickMode,
+        isCancelClicking,
     ]);
 
     useEffect(() => {
