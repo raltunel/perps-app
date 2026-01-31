@@ -41,6 +41,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         obMinSell,
         obMaxBuy,
         addToResolutionPair,
+        midPrice,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
     const symbolInfoRef = useRef(symbolInfo);
@@ -72,17 +73,19 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const { buyLiqs, sellLiqs } = useLiquidationStore();
 
     const buyLiqsFilteredOB = useMemo(() => {
-        let filteredBuyLiqs = buyLiqs.filter((liq) => liq.px >= obMinBuy);
+        if (!midPrice) return [];
+        let filteredBuyLiqs = buyLiqs.filter(
+            (liq) => liq.px >= obMinBuy && liq.px <= midPrice,
+        );
 
         if (
             filteredBuyLiqs.length > 0 &&
             obMinSellRef.current > 0 &&
             obMaxBuyRef.current > 0
         ) {
-            const markPx = symbolInfoRef.current?.markPx || 0;
             filteredBuyLiqs = [
                 {
-                    px: markPx,
+                    px: midPrice,
                     sz: 0,
                     type: 'buy',
                     ratio: 0,
@@ -93,20 +96,22 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             ];
         }
         return filteredBuyLiqs;
-    }, [buyLiqs, obMinBuy]);
+    }, [buyLiqs, obMinBuy, midPrice]);
 
     const sellLiqsFilteredOB = useMemo(() => {
-        let filteredSellLiqs = sellLiqs.filter((liq) => liq.px <= obMaxSell);
+        if (!midPrice) return [];
+        let filteredSellLiqs = sellLiqs.filter(
+            (liq) => liq.px <= obMaxSell && liq.px >= midPrice,
+        );
 
         if (
             filteredSellLiqs.length > 0 &&
             obMinSellRef.current > 0 &&
             obMaxBuyRef.current > 0
         ) {
-            const markPx = symbolInfoRef.current?.markPx || 0;
             filteredSellLiqs = [
                 {
-                    px: markPx,
+                    px: midPrice,
                     sz: 0,
                     type: 'sell',
                     ratio: 0,
@@ -117,7 +122,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             ];
         }
         return filteredSellLiqs;
-    }, [sellLiqs, obMaxSell]);
+    }, [sellLiqs, obMaxSell, midPrice]);
 
     // Find max sz across all liq levels (both buy and sell sides)
     const maxLiqSz = useMemo(() => {

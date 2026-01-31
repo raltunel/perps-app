@@ -1506,6 +1506,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         // if (buyData.length === 0 || sellData.length === 0) return;
 
         // For initial load, set current data directly
+
         if (!isInitialized.current) {
             currentBuyDataRef.current = buyData;
             currentSellDataRef.current = sellData;
