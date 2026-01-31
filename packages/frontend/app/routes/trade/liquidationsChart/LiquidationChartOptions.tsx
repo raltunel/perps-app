@@ -88,6 +88,7 @@ const LiquidationChartOptions: React.FC<
                     '#tv_chart iframe',
                 ) as HTMLIFrameElement;
 
+                if (!tvIframe) return;
                 const tvIframeDoc = tvIframe.contentDocument;
                 if (tvIframeDoc) {
                     tvIframeDoc.addEventListener('click', iframeDocListener);
@@ -99,6 +100,7 @@ const LiquidationChartOptions: React.FC<
                 '#tv_chart iframe',
             ) as HTMLIFrameElement;
 
+            if (!tvIframe) return;
             const tvIframeDoc = tvIframe.contentDocument;
             if (tvIframeDoc) {
                 tvIframeDoc.removeEventListener('click', iframeDocListener);
